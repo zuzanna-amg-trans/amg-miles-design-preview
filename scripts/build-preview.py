@@ -8,7 +8,7 @@ import shutil
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC_FILES = (
-    "index.html", ".nojekyll",
+    "index.html",
     "design-preview/index.html", "design-preview/app.js", "design-preview/styles.css",
     "design-preview/assets/OFL-Onest.txt", "design-preview/assets/amg-logo-white.webp",
     "design-preview/assets/favicon.svg", "design-preview/assets/onest-cyrillic.woff2",
