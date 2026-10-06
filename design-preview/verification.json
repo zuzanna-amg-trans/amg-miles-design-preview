@@ -1,30 +1,54 @@
 {
-  "date": "2026-10-06",
-  "artifact": "independent-visual-prototype",
-  "repository_dev_connected": false,
-  "backend_connected": false,
-  "data": "fictional-demo-only",
-  "syntax_check": {"javascript": "passed"},
-  "browser": "Codex in-app browser",
-  "verified_views": ["overview", "invoices", "history", "rewards", "orders", "rules"],
-  "verified_interactions": [
-    "reward-category-filter: electronics returns 3 products",
-    "reward-detail-dialog",
-    "goal-selection reflected in overview",
-    "unpaid-invoices filter returns 3 records",
-    "invoice-search: 1042 returns 1 record",
-    "invoice-search empty result",
-    "invoice-detail-dialog",
-    "dialog Escape closes the dialog",
-    "rules FAQ expands",
-    "mobile navigation opens and routes to reward catalog"
+  "verified_at_date": "2026-10-07",
+  "scope": "Independent visual prototype; all sample data fictional",
+  "main_navigation": [
+    "Zlecenia",
+    "Faktury",
+    "Nagrody"
   ],
-  "layout": {
-    "desktop": {"viewport_width": 1280, "document_width": 1280, "table_viewport_width": 609, "table_content_width": 609, "invoice_font_px": 13},
-    "mobile_overview": {"viewport_width": 390, "document_width": 390, "table_viewport_width": 348, "table_content_width": 539, "table_scroll": "contained"},
-    "mobile_rewards": {"viewport_width": 390, "document_width": 390, "reward_count": 6}
+  "browser_checks": {
+    "active_order_cards": 2,
+    "archived_order_cards": 3,
+    "order_search_lyon_all_results": 1,
+    "order_search_lyon_archived_results": 0,
+    "tracking_detail_opens": true,
+    "history_modal_opens": true,
+    "history_escape_closes_and_restores_focus": true,
+    "archived_order_documents_open_demo_modal": true,
+    "invoice_rows": 6,
+    "invoice_filtered_search_1042_rows": 1,
+    "reward_cards": 6,
+    "electronics_filter_cards": 3,
+    "goal_selection_updates_visible_card_and_focus": true,
+    "point_history_rows": 3,
+    "reward_claims_empty_state": true,
+    "faq_items": 4,
+    "font_onest_loaded": true,
+    "brand_logo_loaded": true,
+    "console_errors": [],
+    "console_warnings": [],
+    "back_navigation_closes_modal": true
   },
-  "console_errors_or_warnings": [],
-  "screenshots": ["screenshots/panel-desktop.jpg", "screenshots/nagrody-desktop.jpg", "screenshots/panel-mobile.jpg", "screenshots/nagrody-mobile.jpg"],
-  "limits": ["not production QA", "not backend integration", "no repository dev modifications", "no deployment"]
+  "responsive": {
+    "desktop": {
+      "viewport_width": 1617,
+      "document_width": 1617
+    },
+    "mobile": {
+      "viewport_width": 390,
+      "document_width": 390,
+      "delivery_summary_precedes_map": true,
+      "invoice_table_viewport_width": 348,
+      "invoice_table_content_width": 635
+    }
+  },
+  "production_tracking_verified": false,
+  "backend_integration": false,
+  "private_customer_records_in_public_preview": false,
+  "screenshot_format": "JPEG; file signature verified",
+  "screenshot_source": "Local fictional prototype; no authenticated customer-panel screenshots",
+  "all_screenshot_contents_visually_verified": true,
+  "new_screenshots_published": false,
+  "existing_documentary_images_preserved": true,
+  "visual_verification": "New local screenshots inspected and kept outside the published repository; four existing documentary images retained"
 }
