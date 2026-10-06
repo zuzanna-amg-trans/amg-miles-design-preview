@@ -1,6 +1,6 @@
-# AMG Miles — niezależny podgląd identyfikacji
+# AMG Miles — podgląd panelu klienta
 
-Ten katalog zawiera klikalny prototyp wizualny. **Nie jest kopią repozytorium dev AMG Miles**: repozytorium Miles nie było dostępne w podłączonej integracji GitHub podczas rozpoczęcia pracy. Do zastosowania zmian w prawdziwym froncie wymagany jest link do repozytorium i wskazanie właściwej gałęzi.
+Klikalny projekt wizualny panelu. Najważniejszy przepływ: **zlecenia → śledzenie pojedynczego transportu → statusy i dokumenty**. Punktów i nagród można szukać w zakładce Nagrody, a historii punktów i zasad — w jej podrzędnej nawigacji.
 
 ## Uruchomienie
 
@@ -8,33 +8,41 @@ Ten katalog zawiera klikalny prototyp wizualny. **Nie jest kopią repozytorium d
 python3 design-preview/server.py
 ```
 
-Otwórz `http://127.0.0.1:4318`. Serwer nasłuchuje wyłącznie lokalnie.
+Adres lokalny: `http://127.0.0.1:4318`. Serwer nasłuchuje wyłącznie na `127.0.0.1`.
 
-## Dostępne widoki
+Publiczny podgląd: https://zuzanna-amg-trans.github.io/amg-miles-design-preview/
 
-- Przegląd salda, wygasających punktów i faktur.
-- Faktury z filtrowaniem, wyszukiwaniem i oknem szczegółów.
-- Historia punktów.
-- Katalog nagród z filtrami kategorii, oknem szczegółów i demonstracyjnym wyborem celu.
-- Moje nagrody ze stanem pustym.
-- Zasady programu z rozwijanymi pytaniami.
-- Okna powiadomień i kontaktu; nawigacja mobilna.
+Pełne testy przeglądarkowe wykonuje GitHub Actions przez pull request. Po integracji z `main` workflow testuje pakiet, publikuje go i sprawdza publiczny podgląd. Nie instaluj lokalnie zależności testowych ani nie uruchamiaj lokalnych serii zrzutów; zasady procesu określa [AGENTS.md](../AGENTS.md).
 
-**Wszystkie numery faktur, kwoty, salda, nagrody i powiadomienia są fikcyjne** i jawnie oznaczone w interfejsie. Prototyp nie loguje użytkownika, nie rozlicza faktur, nie wysyła wiadomości ani nie składa zamówień. Cel nagrody działa tylko w pamięci bieżącego podglądu i znika po przeładowaniu.
+## Widoki i interakcje
 
-## Źródła identyfikacji
+- Lista zleceń z filtrami realizacji/archiwum i wyszukiwaniem numeru, numeru klienta lub miasta.
+- Szczegóły zlecenia: mapa poglądowa, przykładowa pozycja pojazdu, czas dostawy, okno dostawy, etapy i historia statusów.
+- Zlecenie dostarczone z miejscem na podgląd CMR i faktury.
+- Faktury z filtrowaniem, wyszukiwaniem i szczegółami.
+- Katalog nagród, demonstracyjny wybór celu, historia punktów, moje nagrody i zasady programu.
+- Kontakt, okna szczegółów i obsługa klawiaturą; trzy główne zakładki są widoczne również na telefonie.
 
-Logo AMG i font Onest pochodzą z zasobów aktualnie wyrenderowanej strony https://amg-trans.eu/, pozyskanych 6 października 2026. Akcent strony głównej: `#ff8145`.
+Wszystkie rekordy w `demoSource` są fikcyjne. Publiczny kod, ilustracje i zrzuty ekranu nie zawierają danych z zalogowanego konta Miles. Prototyp nie uwierzytelnia użytkowników, nie pobiera GPS, nie przelicza rzeczywistych rozliczeń, nie wysyła wiadomości ani nie zamawia nagród. Zapis celu pozostaje w pamięci bieżącej karty i znika po przeładowaniu.
 
-Informacje o punktach w widoku zasad odtwarzają publiczną stronę https://miles.amg-trans.eu/: 5 pkt za 1 EUR netto, bonus 100% przy płatności do 10 dni, bonus 30% do połowy terminu oraz 12 miesięcy ważności. Ich ostateczne zastosowanie i pierwszeństwo reguł musi określać backend. Prototyp nie wprowadza nowej logiki rozliczeń. Ilustracje nagród są autorskimi wektorowymi placeholderami, nie ofertą rzeczywistych produktów.
+## Identyfikacja
 
-## Przy integracji z dev
+Onest, grafit, ciepły pomarańcz `#ff8145`, jasne powierzchnie oraz zaokrąglone przyciski z osobnym kółkiem na ikonę. Logo i font pozyskano z oficjalnej strony AMG Trans 6 października 2026.
 
-1. Zidentyfikować framework, komponenty i obecne kontrakty API w repozytorium.
-2. Przenieść tokeny CSS i wzorce komponentów do istniejącej architektury.
-3. Zastąpić `demoSource` danymi właściwego projektu; nie używać danych demonstracyjnych jako fallbacku w panelu produkcyjnym.
-4. Pobierać z backendu saldo, statusy, bonusy, daty wygaśnięcia, dostępność i ceny nagród.
-5. Zachować dotychczasowy przepływ uwierzytelnienia, uprawnienia i procedurę zamawiania nagród.
-6. Dopasować stany ładowania, pustych danych, błędów i braku uprawnień do rzeczywistych odpowiedzi API.
+Schemat statusów inspirowano rzeczywistym widokiem zleceń i jego historią po zalogowaniu 7 października 2026. Zalogowane konto pokazywało zlecenia archiwalne; rzeczywisty ekran GPS i pola ETA dla aktywnego zlecenia nie zostały jeszcze zweryfikowane. Ilustracja mapy, ETA oraz pola pojazdu i ładunku są propozycją interfejsu, a nie potwierdzonym kontraktem API.
 
-Pliki są celowo bez zależności buildowych, aby kierunek wizualny można było przejrzeć przed poznaniem architektury dev. Podgląd jest przeznaczony do publikacji w osobnym repozytorium `zuzanna-amg-trans/amg-miles-design-preview` przez GitHub Pages. Główna strona AMG i właściwy backend Miles pozostają osobnymi projektami.
+Publiczna strona programu podaje 5 punktów za 1 EUR netto, bonus 100% przy płatności do 10 dni, bonus 30% do połowy terminu oraz 12 miesięcy ważności. Prototyp prezentuje te informacje bez implementowania nowej logiki rozliczeń.
+
+## Przeniesienie do właściwego frontu
+
+Ten katalog nie jest kopią repozytorium dev AMG Miles. Do integracji potrzebny jest link i dostęp do właściwego repozytorium oraz potwierdzenie jego gałęzi.
+
+1. Sprawdzić framework, istniejące komponenty, uwierzytelnienie i rzeczywiste odpowiedzi API.
+2. Przenieść tokeny i komponenty do istniejącej architektury, zachowując aktualne uprawnienia.
+3. Pobierać listę zleceń i pełną historię statusów z backendu. Cztery etapy w projekcie są wizualnym skrótem; oryginalne statusy i daty muszą być zachowane w historii.
+4. Potwierdzić dostawcę mapy, źródło GPS, częstotliwość aktualizacji oraz dostępność i znaczenie ETA. Pokazać wiek pozycji; dla brakującej pozycji lub ETA wyświetlić jawny stan braku danych.
+5. Udostępniać CMR i faktury według faktycznej dostępności dokumentów i uprawnień, niezależnie od samego statusu transportu.
+6. Pobierać kwoty, waluty, statusy płatności, punkty i bonusy z właściwego systemu rozliczeń. Zachować rozróżnienie kwot netto/brutto i istniejące warunki naliczania.
+7. Obsłużyć ładowanie, brak aktywnych zleceń, błędy, brak danych GPS i brak uprawnień bez podstawiania danych demo.
+
+Kod celowo nie wymaga narzędzi buildowych, aby można było ocenić kierunek przed integracją z backendem.

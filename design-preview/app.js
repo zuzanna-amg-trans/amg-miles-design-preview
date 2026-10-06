@@ -31,6 +31,10 @@ const ICONS = {
   mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/>',
   shield: '<path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z"/><path d="m8 12 3 3 5-6"/>',
   book: '<path d="M12 5v15M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1Z"/>',
+  truck: '<path d="M3 6h11v11H3zM14 10h4l3 4v3h-7M3 17h2M10 17h5M20 17h1"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>',
+  pin: '<path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/>',
+  left: '<path d="M19 12H5m5-5-5 5 5 5"/>',
+  document: '<path d="M14 3H5v18h14V8l-5-5ZM14 3v5h5M8 12h8M8 16h6"/>',
 };
 
 const icon = (name, extra = '') => `<svg class="icon ${extra}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ICONS.grid}</svg>`;
@@ -40,6 +44,13 @@ const money = value => new Intl.NumberFormat('pl-PL', {style:'currency',currency
 
 const demoSource = {
   balance: {available:24850,earnedThisMonth:3450,expiring:2000,expiresAt:'31.10.2026',bonusOpportunity:800},
+  orders: [
+    {id:'DEMO-261001',reference:'AMG-DEMO-01',from:'Poznań',fromCountry:'PL',to:'Lyon',toCountry:'FR',status:'W drodze na rozładunek',kind:'driving',active:true,step:2,load:'06.10.2026, 14:00',delivery:'07.10.2026',deliveryTime:'18:30',window:'18:00–19:00',position:'Stuttgart, Niemcy',updated:'07.10.2026, 10:24',vehicle:'Zestaw 13,6 m',cargo:'8 palet · 3 200 kg',fromXY:[752,138],toXY:[263,480],positionXY:[484,340],path:'M752 138 C686 140 650 192 607 225 S550 280 484 340 S344 421 263 480',traveled:'M752 138 C686 140 650 192 607 225 S550 280 484 340',events:[['Zlecenie przyjęte','05.10.2026, 11:20'],['W drodze na załadunek','06.10.2026, 11:35'],['Na załadunku','06.10.2026, 13:45'],['W drodze na rozładunek','06.10.2026, 14:30']],journeyDates:['05.10 · 11:20','06.10 · 14:00','06.10 · 14:30',null]},
+    {id:'DEMO-261002',reference:'AMG-DEMO-02',from:'Rotterdam',fromCountry:'NL',to:'Wrocław',toCountry:'PL',status:'Na załadunku',kind:'loading',active:true,step:1,load:'07.10.2026, 10:00',delivery:'08.10.2026',deliveryTime:'11:00',window:'10:00–12:00',position:'Rotterdam, Holandia',updated:'07.10.2026, 10:18',vehicle:'Zestaw 13,6 m',cargo:'12 palet · 4 800 kg',fromXY:[373,107],toXY:[739,268],positionXY:[373,107],path:'M373 107 C449 128 498 150 555 176 S672 242 739 268',traveled:null,events:[['Zlecenie przyjęte','06.10.2026, 09:10'],['W drodze na załadunek','07.10.2026, 08:20'],['Na załadunku','07.10.2026, 09:48']],journeyDates:['06.10 · 09:10','07.10 · 09:48',null,null]},
+    {id:'DEMO-260903',reference:'AMG-DEMO-03',from:'Leipzig',fromCountry:'DE',to:'Gdańsk',toCountry:'PL',status:'Rozładowane',kind:'completed',active:false,step:3,load:'04.10.2026, 08:00',delivery:'05.10.2026',deliveryTime:'09:15',window:'09:00–10:00',vehicle:'Zestaw 13,6 m',cargo:'10 palet · 4 000 kg',events:[['Zlecenie przyjęte','03.10.2026, 11:00'],['Na załadunku','04.10.2026, 08:00'],['W drodze na rozładunek','04.10.2026, 09:10'],['Na rozładunku','05.10.2026, 08:55'],['Rozładowane','05.10.2026, 09:15']],journeyDates:['03.10 · 11:00','04.10 · 08:00','04.10 · 09:10','05.10 · 09:15']},
+    {id:'DEMO-260904',reference:'AMG-DEMO-04',from:'Antwerpia',fromCountry:'BE',to:'Katowice',toCountry:'PL',status:'Rozładowane',kind:'completed',active:false,step:3,load:'01.10.2026, 12:00',delivery:'02.10.2026',deliveryTime:'14:10',window:'14:00–15:00',vehicle:'Zestaw 13,6 m',cargo:'6 palet · 2 100 kg',events:[['Zlecenie przyjęte','30.09.2026, 10:00'],['Na załadunku','01.10.2026, 12:00'],['W drodze na rozładunek','01.10.2026, 13:20'],['Rozładowane','02.10.2026, 14:10']],journeyDates:['30.09 · 10:00','01.10 · 12:00','01.10 · 13:20','02.10 · 14:10']},
+    {id:'DEMO-260905',reference:'AMG-DEMO-05',from:'Berlin',fromCountry:'DE',to:'Warszawa',toCountry:'PL',status:'Rozładowane',kind:'completed',active:false,step:3,load:'28.09.2026, 09:00',delivery:'29.09.2026',deliveryTime:'08:45',window:'08:00–10:00',vehicle:'Zestaw 13,6 m',cargo:'14 palet · 5 400 kg',events:[['Zlecenie przyjęte','27.09.2026, 12:00'],['Na załadunku','28.09.2026, 09:00'],['W drodze na rozładunek','28.09.2026, 10:15'],['Rozładowane','29.09.2026, 08:45']],journeyDates:['27.09 · 12:00','28.09 · 09:00','28.09 · 10:15','29.09 · 08:45']},
+  ],
   invoices: [
     {id:'DEMO/2026/1042',issued:'02.10.2026',amount:160,due:'16.10.2026',status:'unpaid',points:800,bonus:800,fastUntil:'12.10.2026'},
     {id:'DEMO/2026/1038',issued:'01.10.2026',amount:110,due:'15.10.2026',status:'unpaid',points:550,bonus:550,fastUntil:'11.10.2026'},
@@ -58,8 +69,8 @@ const demoSource = {
   ],
 };
 
-const VIEWS = { overview:'Przegląd', invoices:'Moje faktury', history:'Historia punktów', rewards:'Katalog nagród', orders:'Moje nagrody', rules:'Zasady programu' };
-let state = {view:'overview',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones'};
+const VIEWS = {orders:'Zlecenia',tracking:'Podgląd zlecenia',invoices:'Faktury',rewards:'Nagrody',history:'Historia punktów',claims:'Moje nagrody',rules:'Zasady programu'};
+let state = {view:'orders',orderStatus:'active',orderSearch:'',selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones'};
 let toastTimer;
 let modalTrigger;
 
@@ -81,23 +92,17 @@ function button(label, action, style='primary', extras='') {
 }
 
 function shell() {
-  const navItem = (view,name,ic,count='') => `<button class="nav-item ${state.view===view?'active':''}" data-view="${view}" ${state.view===view?'aria-current="page"':''}>${icon(ic)}<span>${name}</span>${count?`<span class="nav-count">${count}</span>`:''}</button>`;
-  document.getElementById('app').innerHTML = `<div class="shell">
-    <button class="nav-scrim" aria-label="Zamknij nawigację" data-action="menu-close"></button>
-    <aside class="sidebar" id="primary-navigation" aria-label="Nawigacja panelu">
-      <button class="icon-button mobile-nav-close" aria-label="Zamknij menu" data-action="menu-close">${icon('close')}</button>
-      <button class="brand" data-view="overview" aria-label="AMG Miles — przegląd"><img src="assets/amg-logo-white.webp" alt="AMG European Transport"><span class="brand-word">miles<em>.</em></span><span class="brand-caption">Współpraca. Z korzyścią.</span></button>
-      <div class="nav-label">Twój panel</div><nav class="nav-list" aria-label="Twoje rozliczenia">
-        ${navItem('overview','Przegląd','grid')}${navItem('invoices','Moje faktury','invoice',3)}${navItem('history','Historia punktów','history')}
-      </nav><div class="nav-label">Twoje korzyści</div><nav class="nav-list" aria-label="Nagrody i program">
-        ${navItem('rewards','Katalog nagród','gift')}${navItem('orders','Moje nagrody','bag')}${navItem('rules','Zasady programu','spark')}
-      </nav>
-      <div class="sidebar-bottom"><div class="help-card">${icon('support')}<strong>Jesteśmy po drodze.</strong><p>Masz pytanie? Porozmawiajmy.</p><button class="help-link" data-action="contact">Skontaktuj się z nami ${icon('arrow')}</button></div>
-      <div class="account"><span class="avatar">TF</span><div><strong>Twoja firma</strong><small>Konto demonstracyjne</small></div>${icon('shield')}</div></div>
-    </aside>
-    <header class="topbar"><button class="icon-button mobile-menu" aria-label="Otwórz nawigację" aria-expanded="false" aria-controls="primary-navigation" data-action="menu">${icon('menu')}</button><button class="mobile-brand" data-view="overview">AMG <em>Miles.</em></button><div class="breadcrumbs">Panel klienta ${icon('chevron')} <strong>${VIEWS[state.view]}</strong></div><div class="top-actions"><span class="demo-pill">Podgląd projektu · dane demo</span><button class="icon-button top-help" aria-label="Pomoc i zasady programu" data-view="rules">${icon('question')}</button><button class="icon-button" aria-label="Powiadomienia" data-action="notifications">${icon('bell')}<span class="notification-dot"></span></button></div></header>
-    <main class="content" id="main-content" tabindex="-1"><div class="view">${renderView()}</div><footer class="page-footer"><span>© 2026 AMG Trans. Współpraca, która się opłaca.</span><button data-action="about-preview">Informacje o podglądzie ${icon('arrow')}</button></footer></main>
+  const active=['orders','tracking'].includes(state.view)?'orders':state.view==='invoices'?'invoices':'rewards';
+  const navItem=(view,name,ic)=>`<button class="nav-item ${active===view?'active':''}" data-view="${view}" ${active===view?'aria-current="page"':''}>${icon(ic)}<span>${name}</span></button>`;
+  document.getElementById('app').innerHTML=`<div class="shell">
+    <header class="topbar"><div class="header-inner">
+      <button class="brand" data-view="orders" aria-label="AMG Miles — zlecenia"><img src="assets/amg-logo-white.webp" alt="AMG European Transport"><span class="brand-word">miles<em>.</em></span></button>
+      <nav class="primary-nav" aria-label="Nawigacja panelu">${navItem('orders','Zlecenia','truck')}${navItem('invoices','Faktury','invoice')}${navItem('rewards','Nagrody','gift')}</nav>
+      <div class="header-actions"><button class="points-pill" data-action="open-balance" aria-label="Twoje punkty demonstracyjne: ${number(demoSource.balance.available)}">${icon('spark')}<strong>${number(demoSource.balance.available)}</strong><span>pkt</span></button><button class="contact-button" data-action="contact">${icon('support')}<span>Kontakt</span></button><span class="avatar" aria-label="Konto demonstracyjne">TF</span></div>
+    </div></header>
+    <main class="content ${state.view==='tracking'?'tracking-content':''}" id="main-content" tabindex="-1"><div class="preview-note">Podgląd projektu <span>·</span> wszystkie dane są przykładowe</div><div class="view">${renderView()}</div><footer class="page-footer"><span>© 2026 AMG Trans</span><div><button data-view="rules">Zasady AMG Miles</button><button data-action="about-preview">O podglądzie ${icon('arrow')}</button></div></footer></main>
   </div>`;
+  document.title=`${VIEWS[state.view]} · AMG Miles — podgląd`;
 }
 
 function pageHead(eyebrow,title,description,cta='') {
@@ -105,40 +110,101 @@ function pageHead(eyebrow,title,description,cta='') {
 }
 
 function invoiceTable(items,compact=false) {
-  return `<div class="table-wrap"><table aria-label="${compact?'Ostatnie faktury — dane demonstracyjne':'Twoje faktury — dane demonstracyjne'}"><thead><tr><th>Faktura</th><th class="numeric">Kwota netto</th><th>Status</th><th class="numeric">${compact?'Punkty':'Punkty bazowe'}</th>${compact?'':'<th>Termin płatności</th>'}</tr></thead><tbody>${items.map(i=>`<tr><td><button class="row-detail" data-action="invoice-detail" data-id="${i.id}" aria-label="Szczegóły faktury ${i.id}">${i.id}${icon('arrow')}</button><small>${i.issued}</small></td><td class="numeric">${money(i.amount)}</td><td><span class="status ${i.status==='unpaid'?'amber':''}">${i.status==='paid'?'Opłacona':'Do opłacenia'}</span></td><td class="numeric">${i.status==='paid'?`+${number(i.points+i.bonus)}`:number(i.points)}${i.status==='unpaid'?'<small>po płatności</small>':i.bonus?'<small>w tym bonus 100%</small>':'<small>przyznane</small>'}</td>${compact?'':`<td>${i.due}</td>`}</tr>`).join('')}</tbody></table></div>`;
+  return `<div class="table-wrap"><table aria-label="${compact?'Ostatnie faktury — dane demonstracyjne':'Twoje faktury — dane demonstracyjne'}"><thead><tr><th>Faktura</th><th class="numeric">Kwota netto</th><th>Status</th><th class="numeric">Punkty</th>${compact?'':'<th>Termin płatności</th>'}</tr></thead><tbody>${items.map(i=>`<tr><td><button class="row-detail" data-action="invoice-detail" data-id="${i.id}" aria-label="Szczegóły faktury ${i.id}">${i.id}${icon('arrow')}</button><small>${i.issued}</small></td><td class="numeric">${money(i.amount)}</td><td><span class="status ${i.status==='unpaid'?'amber':''}">${i.status==='paid'?'Opłacona':'Do opłacenia'}</span></td><td class="numeric">${i.status==='paid'?`+${number(i.points+i.bonus)}`:number(i.points)}${i.status==='unpaid'?'<small>po płatności</small>':i.bonus?'<small>w tym bonus 100%</small>':'<small>przyznane</small>'}</td>${compact?'':`<td>${i.due}</td>`}</tr>`).join('')}</tbody></table></div>`;
 }
 
-function goalCard() {
-  const reward = demoSource.rewards.find(r=>r.id===state.goal);
-  const progress=Math.min(100,demoSource.balance.available/reward.points*100);
-  return `<section class="card goal-card"><div class="card-heading"><h2>Twój kolejny cel</h2><span class="tag">Nagroda demo</span></div><div class="goal-visual">${productArt(reward.art)}<span class="art-caption">ILUSTRACJA PRODUKTU</span></div><div class="goal-body"><div class="goal-title"><div><h3>${reward.name}</h3><small>${number(reward.points)} pkt</small></div>${icon('target')}</div><div class="goal-progress" role="progressbar" aria-label="Postęp do wybranej nagrody" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progress)}"><span style="width:${progress}%"></span></div><div class="goal-meta"><span>${number(demoSource.balance.available)} / ${number(reward.points)} pkt</span><strong>${Math.round(progress)}%</strong></div><button class="text-action" data-action="reward-detail" data-id="${reward.id}">${progress<100?`Brakuje ${number(reward.points-demoSource.balance.available)} pkt`:'Cel w Twoim zasięgu'} ${icon('arrow')}</button></div></section>`;
+function matchingOrders() {
+  const query=state.orderSearch.trim().toLocaleLowerCase('pl');
+  return demoSource.orders.filter(o=>(state.orderStatus==='all'||(state.orderStatus==='active'?o.active:!o.active))&&`${o.id} ${o.reference} ${o.from} ${o.to}`.toLocaleLowerCase('pl').includes(query));
 }
 
-function overviewView() {
-  const b=demoSource.balance;
-  return `${pageHead('Twój panel · 6 października 2026','Współpraca, która<br><em>się opłaca.</em>','Twoje faktury, punkty i nagrody. Wszystko w jednym miejscu.',button('Odkryj nagrody','open-rewards'))}
-  <section class="summary-grid" aria-label="Podsumowanie punktów"><div class="balance-card card"><div class="orbit"><span class="orbit-point"></span></div><div class="balance-top"><span>Twoje dostępne punkty</span><span class="tiny-icon">${icon('spark')}</span></div><div class="points">${number(b.available)}<span>pkt</span></div><div class="balance-footer"><span class="trend">${icon('arrow')} +${number(b.earnedThisMonth)} pkt</span><span>w tym miesiącu</span></div></div><div class="card stat-card"><div class="stat-top"><span>Wykorzystaj wkrótce</span>${icon('clock')}</div><div class="stat-value">${number(b.expiring)} <small>pkt</small></div><p>Te punkty wygasną<br>${b.expiresAt}.</p><div class="stat-note">${icon('calendar')} Masz czas na dobrą nagrodę</div></div><div class="card stat-card bonus-card"><div class="stat-top"><span>Szybciej znaczy więcej</span>${icon('bolt')}</div><div class="stat-value">+100<small>%</small></div><p>Zapłać do 10 dni i podwój swoje punkty.</p><button class="stat-note" data-action="invoice-detail" data-id="DEMO/2026/1042">Do zyskania ${number(b.bonusOpportunity)} pkt ${icon('right')}</button></div></section>
-  <div class="work-grid"><section class="card"><div class="card-heading"><div><h2>Ostatnie faktury</h2><p>Każda płatność przybliża Cię do nagrody.</p></div><button class="text-action" data-view="invoices">Wszystkie ${icon('arrow')}</button></div>${invoiceTable(demoSource.invoices.slice(0,4),true)}<div class="table-footer"><span>3 faktury czekają na płatność</span><button class="text-action" data-action="unpaid-invoices">Sprawdź faktury ${icon('right')}</button></div></section>${goalCard()}</div>
-  <div class="rules-strip"><div class="rule-small"><div class="rule-icon">${icon('invoice')}</div><div><strong>1 euro = 5 punktów</strong><span>Za każdą opłaconą fakturę</span></div></div><div class="rule-small"><div class="rule-icon">${icon('bolt')}</div><div><strong>Do 100% więcej</strong><span>Za szybszą płatność</span></div></div><div class="rule-small"><div class="rule-icon">${icon('calendar')}</div><div><strong>12 miesięcy ważności</strong><span>Od przyznania punktów</span></div></div><button class="text-action" data-view="rules">Zasady ${icon('arrow')}</button></div>`;
+function orderStatus(o) {
+  return `<span class="status ${o.kind==='loading'?'amber':o.active?'':'neutral'}">${esc(o.status)}</span>`;
+}
+
+function orderCard(o) {
+  return `<article class="card order-card">
+    <div class="order-top"><div class="order-reference"><strong>${o.id}</strong><span>Twój numer: ${o.reference}</span></div>${orderStatus(o)}</div>
+    <div class="order-body"><div class="order-route"><div><h2>${o.from}<span class="country-code">${o.fromCountry}</span></h2></div><span class="route-connector">${icon('right')}</span><div><h2>${o.to}<span class="country-code">${o.toCountry}</span></h2></div></div>
+      <button class="button ${o.active?'button-dark':'button-secondary'}" data-action="order-detail" data-id="${o.id}"><span>${o.active?'Śledź transport':'Zobacz zlecenie'}</span><span class="button-circle">${icon(o.active?'arrow':'right')}</span></button>
+    </div>
+    <div class="order-bottom"><div class="order-time">${icon('calendar')}<div><span>Załadunek</span><strong>${o.load}</strong></div></div><div class="order-time">${icon(o.active?'clock':'check')}<div><span>${o.active?(o.kind==='loading'?'Planowana dostawa':'Przewidywana dostawa'):'Rozładowano'}</span><strong>${o.delivery}, ${o.deliveryTime}</strong></div></div><span class="order-doc-note">${icon(o.active?'document':'check')}${o.active?'Dokumenty po dostawie':'CMR i faktura dostępne'}</span></div>
+  </article>`;
+}
+
+function orderResults() {
+  const orders=matchingOrders();
+  return `${orders.length?orders.map(orderCard).join(''):emptyState('search','Nie ma takich zleceń','Zmień filtr lub wyszukaj inny numer albo miasto.')}<div class="results-count" role="status">${orders.length} z ${demoSource.orders.length} zleceń demonstracyjnych</div>`;
+}
+
+function ordersView() {
+  return `${pageHead('Panel klienta','Twoje <em>zlecenia.</em>','Sprawdź, na jakim etapie jest Twój transport.')}
+    <div class="filter-bar"><div class="filters" aria-label="Filtruj zlecenia">${[['active','W realizacji',2],['completed','Zakończone',3],['all','Wszystkie',5]].map(([key,name,count])=>`<button class="filter ${state.orderStatus===key?'active':''}" aria-pressed="${state.orderStatus===key}" data-action="order-filter" data-id="${key}">${name}<span>${count}</span></button>`).join('')}</div><label class="search-field">${icon('search')}<input id="order-search" type="search" placeholder="Numer zlecenia lub miasto" aria-label="Szukaj zlecenia po numerze lub mieście" value="${esc(state.orderSearch)}"></label></div>
+    <div class="order-list" id="order-results">${orderResults()}</div>
+    <div class="miles-strip"><span class="miles-symbol">${icon('gift')}</span><div><strong>Twoja współpraca daje więcej.</strong><span>Masz ${number(demoSource.balance.available)} punktów AMG Miles w tym podglądzie.</span></div><button class="text-action" data-view="rewards">Zobacz nagrody ${icon('arrow')}</button></div>`;
+}
+
+// Schematic illustration only. Production tracking must use the real map and GPS API.
+function routeMap(o) {
+  return `<svg class="route-map" viewBox="0 0 900 550" role="img" aria-label="Poglądowa mapa demonstracyjnej trasy ${o.from} — ${o.to}. Pozycja przykładowa: ${o.position}.">
+    <defs><pattern id="map-grain" width="42" height="42" patternUnits="userSpaceOnUse"><circle cx="9" cy="14" r="1" fill="#889383" opacity=".11"/></pattern><filter id="marker-shadow" x="-100%" y="-100%" width="300%" height="300%"><feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#15221e" flood-opacity=".15"/></filter></defs>
+    <rect width="900" height="550" fill="#edf0e9"/><path d="M0 0h363l-23 46-58 35-30 52-61 11-17 38-60 30L0 224Z" fill="#dce7e5"/>
+    <path d="M176 550 205 476 241 445 244 399 291 371 336 316 390 302 425 261 461 227 489 182 480 131 504 78 530 0M627 0 646 94 625 150 661 211 644 277 677 328 659 381 701 433 722 550M0 361 96 348 183 341 240 310 294 324 339 313 397 324 449 346 465 397 482 437 534 451 579 485 637 499 691 479 736 488 790 485 900 509" fill="none" stroke="#cdd4c8" stroke-width="1.5"/>
+    <path d="M700 366 749 370 783 388 804 389 814 377 844 386 874 399 900 397M407 0 404 52 379 88 355 125 342 155 330 192 294 216 262 220" fill="none" stroke="#d1d9d3" stroke-width="2"/>
+    <g fill="#dfe6d6" opacity=".65"><path d="m580 40 20 62-43 21-33-17 4-45Z"/><path d="m716 346 81 33-24 61-68-17-24-46Z"/><path d="m127 406 92-39 28 63-84 33-54-26Z"/><path d="m804 25 80 64-37 47-71-51Z"/></g>
+    <g fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".9"><path d="M62 304C175 276 231 267 304 249S446 213 500 180 619 132 788 84M112 499C223 439 313 386 394 318S484 255 545 229 701 229 864 181M343 38C384 138 452 223 514 284S603 360 620 429 647 507 664 550M783 0C768 78 739 160 727 207S703 277 752 342 815 444 850 550M0 425C117 407 207 385 313 386S447 366 546 365 732 377 900 365"/></g>
+    <g fill="none" stroke="#d9e4e4" stroke-width="2"><path d="M563 0C544 117 576 167 567 232S534 306 580 371 622 439 607 550M283 267C315 317 334 346 314 408S302 469 307 550"/></g>
+    <g fill="#8d9789" font-size="14" font-family="Onest, sans-serif" letter-spacing="4"><text x="184" y="359">FRANCJA</text><text x="497" y="216">NIEMCY</text><text x="730" y="207">POLSKA</text><text x="357" y="67" font-size="10" letter-spacing="2">HOLANDIA</text><text x="325" y="202" font-size="10" letter-spacing="2">BELGIA</text><text x="530" y="455" font-size="10" letter-spacing="2">SZWAJCARIA</text><text x="721" y="371" font-size="10" letter-spacing="2">CZECHY</text></g>
+    <g fill="#9ca796" font-family="Onest, sans-serif" font-size="12"><circle cx="401" cy="273" r="3"/><text x="411" y="277">Frankfurt</text><circle cx="587" cy="96" r="3"/><text x="598" y="100">Berlin</text><circle cx="230" cy="295" r="3"/><text x="241" y="299">Paris</text><circle cx="683" cy="419" r="3"/><text x="692" y="423">München</text></g>
+    <path d="${o.path}" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round"/><path d="${o.path}" fill="none" stroke="#aab4a6" stroke-width="5" stroke-linecap="round" stroke-dasharray="6 7"/>
+    ${o.traveled?`<path d="${o.traveled}" fill="none" stroke="#e2743d" stroke-width="5" stroke-linecap="round"/>`:''}
+    <g fill="#fff" stroke="#273c32" stroke-width="3"><circle cx="${o.fromXY[0]}" cy="${o.fromXY[1]}" r="7"/><circle cx="${o.toXY[0]}" cy="${o.toXY[1]}" r="7"/></g>
+    <g font-family="Onest, sans-serif" font-size="16" font-weight="500" fill="#354038"><text x="${o.fromXY[0]+15}" y="${o.fromXY[1]-11}">${o.from}</text><text x="${o.toXY[0]+15}" y="${o.toXY[1]+27}">${o.to}</text></g>
+    <g transform="translate(${o.positionXY[0]},${o.positionXY[1]})" filter="url(#marker-shadow)"><circle r="37" fill="#ff8145" opacity=".14"/><circle r="24" fill="#202923" stroke="#fff" stroke-width="4"/><g transform="translate(-12,-12)" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round">${ICONS.truck}</g><rect x="-61" y="37" width="122" height="31" rx="15.5" fill="#fff"/><text x="0" y="57" text-anchor="middle" font-family="Onest, sans-serif" font-size="12" font-weight="500" fill="#28352d">${o.position.split(',')[0]}</text></g>
+  </svg>`;
+}
+
+function journey(o) {
+  return `<ol class="journey" aria-label="Etapy realizacji zlecenia">${['Przyjęte','Załadunek','W drodze','Dostawa'].map((label,i)=>{const done=i<o.step||(!o.active&&i===o.step); const current=i===o.step&&o.active;return `<li class="${done?'done':current?'current':'upcoming'}" ${current?'aria-current="step"':''}><span class="step-dot">${done?icon('check'):current?icon(o.kind==='loading'?'pin':'truck'):(i+1)}</span><div><strong>${label}</strong><span>${o.journeyDates[i]||'Przed nami'}</span></div></li>`;}).join('')}</ol>`;
+}
+
+function trackingView() {
+  const o=demoSource.orders.find(item=>item.id===state.selectedOrder);
+  return `<button class="back-link" data-view="orders">${icon('left')} Wszystkie zlecenia</button>
+    ${pageHead(o.id,`${o.from}<span class="title-arrow">${icon('right')}<span class="sr-only"> — </span></span>${o.to}`,`Twój numer: ${o.reference}`,button('Kontakt z AMG','contact','secondary'))}
+    <div class="tracking-grid"><section class="card map-card"><div class="map-heading"><h2>${icon(o.active?'pin':'check')}${o.active?'Pozycja pojazdu':'Dostawa zakończona'}</h2><span class="demo-tag">${o.active?'Mapa poglądowa · demo':'Dokumenty demo'}</span></div>
+      ${o.active?`<div class="map-area">${routeMap(o)}</div><div class="map-footer">${icon('pin')}<strong>${o.position}</strong><span>Przykładowa pozycja · ${o.updated}</span></div>`:`<div class="completed-panel"><span class="completion-icon">${icon('check')}</span><h3>Transport dotarł na miejsce.</h3><p>${o.to} · ${o.delivery}, ${o.deliveryTime}</p><div class="completed-documents"><button class="document-button" data-action="document-demo" data-id="${o.id}" data-document="CMR">${icon('document')} CMR ${icon('arrow')}</button><button class="document-button" data-action="document-demo" data-id="${o.id}" data-document="Faktura">${icon('invoice')} Faktura ${icon('arrow')}</button></div></div>`}
+    </section><section class="card delivery-card"><div class="delivery-card-top">${orderStatus(o)}</div><div class="delivery-estimate"><span>${o.active?(o.kind==='loading'?'Planowana dostawa':'Przewidywana dostawa'):'Rozładowano'}</span><strong>${o.deliveryTime}</strong><span class="delivery-date">${o.delivery}</span><small>${o.active?'Okno dostawy':'Planowane okno'} ${o.window}</small></div><dl class="delivery-facts"><div><dt>Załadunek</dt><dd>${o.load}</dd></div><div><dt>Pojazd</dt><dd>${o.vehicle}</dd></div><div><dt>Ładunek</dt><dd>${o.cargo}</dd></div></dl></section></div>
+    <section class="card progress-card"><div class="card-heading"><h2>Realizacja zlecenia</h2><button class="text-action" data-action="order-history" data-id="${o.id}">${icon('history')} Historia statusów ${icon('arrow')}</button></div>${journey(o)}</section>
+    ${o.active?`<div class="document-note">${icon('document')}<span>CMR i fakturę znajdziesz tutaj po zakończeniu transportu.</span></div>`:''}`;
+}
+
+function orderHistory(id) {
+  const o=demoSource.orders.find(item=>item.id===id); if(!o)return;
+  openDialog('Historia · dane przykładowe',o.id,`<ol class="status-history">${o.events.map(([label,time])=>`<li><span class="history-point"></span><div><strong>${label}</strong><span>${time}</span></div></li>`).join('')}</ol>`,button('Wróć do zlecenia','close-dialog','secondary'));
+}
+
+function rewardNav() {
+  return `<nav class="reward-nav" aria-label="Program AMG Miles">${[['rewards','Katalog nagród'],['history','Historia punktów'],['claims','Moje nagrody'],['rules','Zasady programu']].map(([key,name])=>`<button data-view="${key}" class="${state.view===key?'active':''}" ${state.view===key?'aria-current="page"':''}>${name}</button>`).join('')}</nav>`;
 }
 
 function invoicesView() {
   const filtered = demoSource.invoices.filter(i=>(state.invoiceStatus==='all'||i.status===state.invoiceStatus)&&i.id.toLowerCase().includes(state.search.toLowerCase()));
-  return `${pageHead('Twoje rozliczenia','Moje <em>faktury.</em>','Przejrzyste płatności. Więcej punktów za terminową współpracę.')}
+  return `${pageHead('Twoje rozliczenia','Twoje <em>faktury.</em>','Dokumenty i terminy płatności w jednym miejscu.')}
   <div class="filter-bar"><div class="filters" aria-label="Filtruj faktury">${[['all','Wszystkie',6],['unpaid','Do opłacenia',3],['paid','Opłacone',3]].map(([key,name,count])=>`<button class="filter ${state.invoiceStatus===key?'active':''}" aria-pressed="${state.invoiceStatus===key}" data-action="invoice-filter" data-id="${key}">${name} · ${count}</button>`).join('')}</div><label class="search-field">${icon('search')}<input id="invoice-search" type="search" placeholder="Szukaj numeru faktury" aria-label="Szukaj numeru faktury" value="${esc(state.search)}"></label></div>
   <section class="card" id="invoice-results">${filtered.length?invoiceTable(filtered):emptyState('search','Brak pasujących faktur','Spróbuj innego numeru lub zmień wybrany filtr.')}<div class="table-footer"><span>${filtered.length} z ${demoSource.invoices.length} faktur · dane demonstracyjne</span><span>Kwoty netto w EUR</span></div></section>`;
 }
 
 function rewardsView() {
   const rewards=demoSource.rewards.filter(r=>state.rewardCategory==='Wszystkie'||r.category===state.rewardCategory);
-  return `${pageHead('Twoje korzyści','Dobra współpraca.<br><em>Dobre nagrody.</em>','Wybierz kolejny cel i zobacz, jak blisko już jesteś.',button(`${number(demoSource.balance.available)} pkt`,'open-balance','secondary'))}
+  return `${rewardNav()}${pageHead('Program AMG Miles','Twoje <em>nagrody.</em>','Wybierz coś dla siebie za punkty ze współpracy z AMG.')}
   <div class="filter-bar"><div class="filters" aria-label="Kategorie nagród">${['Wszystkie','Elektronika','Lifestyle','Vouchery'].map(c=>`<button class="filter ${state.rewardCategory===c?'active':''}" data-action="reward-filter" data-id="${c}" aria-pressed="${state.rewardCategory===c}">${c}</button>`).join('')}</div><span style="font-size:10px;color:var(--muted)">Przykładowy katalog do oceny wyglądu</span></div>
-  <div class="reward-grid">${rewards.map(r=>`<article class="card reward-card"><div class="reward-art ${r.color}"><span class="reward-category">${r.category}</span>${productArt(r.art)}</div><div class="reward-body"><h2>${r.name}</h2><p>${r.detail}</p><div class="reward-bottom"><strong>${number(r.points)} <small>pkt</small></strong><button class="icon-button" aria-label="Zobacz nagrodę: ${r.name}" data-action="reward-detail" data-id="${r.id}">${icon('arrow')}</button></div></div></article>`).join('')}</div>`;
+  <div class="reward-grid">${rewards.map(r=>`<article class="card reward-card"><div class="reward-art ${r.color}"><span class="reward-category">${r.category}</span>${r.id===state.goal?'<span class="goal-label">Twój cel</span>':''}${productArt(r.art)}</div><div class="reward-body"><h2>${r.name}</h2><p>${r.detail}</p><div class="reward-bottom"><strong>${number(r.points)} <small>pkt</small></strong><button class="icon-button" aria-label="Zobacz nagrodę: ${r.name}" data-action="reward-detail" data-id="${r.id}">${icon('arrow')}</button></div></div></article>`).join('')}</div>`;
 }
 
 function historyView() {
   const paid=demoSource.invoices.filter(i=>i.status==='paid');
-  return `${pageHead('Twoja aktywność','Każdy punkt<br><em>ma swoją historię.</em>','Zobacz przyznane punkty i bonusy za szybsze płatności.')}
+  return `${rewardNav()}${pageHead('Program AMG Miles','Historia <em>punktów.</em>','Przyznane punkty i bonusy za szybsze płatności.')}
   <section class="card"><div class="card-heading"><div><h2>Październik 2026</h2><p>3 płatności · dane demonstracyjne</p></div><span class="trend">+${number(demoSource.balance.earnedThisMonth)} pkt</span></div><div class="history-list">${paid.map(i=>`<div class="history-row"><div class="history-symbol">${icon(i.bonus?'bolt':'invoice')}</div><div><h3>${i.bonus?'Płatność z bonusem 100%':'Punkty za opłaconą fakturę'}</h3><p>${i.id} · ${i.paidAt}</p></div><div class="history-amount">+${number(i.points+i.bonus)} pkt<small>${i.bonus?`${number(i.points)} bazowe + ${number(i.bonus)} bonusowe`:'punkty bazowe'}</small></div></div>`).join('')}</div></section>`;
 }
 
@@ -146,24 +212,24 @@ function emptyState(ic,title,text,action='') {
   return `<div class="empty-state"><div class="empty-icon">${icon(ic)}</div><h2>${title}</h2><p>${text}</p>${action}</div>`;
 }
 
-function ordersView() {
-  return `${pageHead('Twoje nagrody','Coś dobrego<br><em>jest przed Tobą.</em>','Tutaj znajdziesz status i historię zamówionych nagród.')}<section class="card">${emptyState('bag','Pierwsza nagroda jeszcze przed Tobą','Wybierz coś dla siebie i ustaw kolejny cel. W tym podglądzie nie składamy zamówień.',button('Przejdź do katalogu','open-rewards'))}</section>`;
+function claimsView() {
+  return `${rewardNav()}${pageHead('Twoje nagrody','Moje <em>nagrody.</em>','Status i historia Twoich zamówionych nagród.')}<section class="card">${emptyState('bag','Pierwsza nagroda jeszcze przed Tobą','Wybierz coś dla siebie i ustaw kolejny cel. W tym podglądzie nie składamy zamówień.',button('Przejdź do katalogu','open-rewards'))}</section>`;
 }
 
 function rulesView() {
-  return `${pageHead('Program AMG Miles','Proste zasady.<br><em>Konkretny zysk.</em>','Płać za faktury, zbieraj punkty i wybieraj nagrody.')}
+  return `${rewardNav()}${pageHead('Program AMG Miles','Zasady <em>programu.</em>','Jak zdobywać punkty i korzystać z nagród.')}
   <div class="rule-layout"><div><section class="card rule-detail"><h2>${icon('invoice')} Punkty za współpracę</h2><p>Za każde 1 euro netto z opłaconej faktury otrzymujesz 5 punktów AMG Miles.</p><div class="formula"><b>1 <span>EUR</span></b><span>=</span><b>5 <span>PKT</span></b></div></section><section class="card rule-detail"><h2>${icon('bolt')} Szybsza płatność, większy bonus</h2><p>Zasady wyświetlane na aktualnej stronie programu:</p><div class="bonus-row"><span>Płatność do 10 dni od wystawienia</span><strong>+100%</strong></div><div class="bonus-row"><span>Płatność do połowy terminu</span><strong>+30%</strong></div><div class="bonus-row"><span>Punkty bazowe za płatność</span><strong>5 pkt / EUR</strong></div></section><section class="card rule-detail"><h2>${icon('calendar')} Czas na Twoje korzyści</h2><p>Punkty są ważne przez 12 miesięcy od daty przyznania. Datę wygaśnięcia zobaczysz w swoim panelu.</p></section></div><section class="card faq"><h2>Wszystko jasne?</h2><details open><summary>Kiedy pojawią się moje punkty?</summary><p>Po zarejestrowaniu płatności za fakturę w systemie. Punkty są przyznawane automatycznie.</p></details><details><summary>Jak wymienić punkty na nagrody?</summary><p>Zaloguj się, otwórz katalog nagród i wybierz nagrodę. Ten podgląd pozwala obejrzeć interfejs i ustawić przykładowy cel.</p></details><details><summary>Ile trwa realizacja nagrody?</summary><p>Aktualna strona programu podaje zwykle do 14 dni. Docelowy status realizacji będzie pochodził z backendu.</p></details><details><summary>Co oznaczają dane demo?</summary><p>Kwoty, faktury, saldo i katalog w tym projekcie służą wyłącznie do oceny wyglądu. Nie są rzeczywistymi danymi Twojej firmy.</p></details><div style="margin-top:20px">${button('Porozmawiajmy','contact','secondary')}</div></section></div>`;
 }
 
 function renderView() {
-  return ({overview:overviewView,invoices:invoicesView,rewards:rewardsView,history:historyView,orders:ordersView,rules:rulesView}[state.view]||overviewView)();
+  return ({orders:ordersView,tracking:trackingView,invoices:invoicesView,rewards:rewardsView,history:historyView,claims:claimsView,rules:rulesView}[state.view]||ordersView)();
 }
 
 function navigate(view,focus=true) {
   if (!VIEWS[view]) return;
   state.view=view;
   state.search='';
-  const hash=`#${view}`;
+  const hash=view==='tracking'?`#tracking/${state.selectedOrder}`:`#${view}`;
   if (window.location.hash!==hash) window.history.pushState(null,'',hash);
   shell();
   window.scrollTo({top:0,behavior:'instant'});
@@ -180,16 +246,6 @@ function openDialog(eyebrow,title,body,actions='') {
 function closeDialog() {
   document.getElementById('detail-dialog').close();
   if(modalTrigger && modalTrigger.isConnected) modalTrigger.focus();
-}
-
-function setMenuOpen(open) {
-  document.querySelector('.shell').classList.toggle('nav-open',open);
-  document.querySelector('.mobile-menu').setAttribute('aria-expanded',String(open));
-  document.querySelector('.topbar').inert=open;
-  document.getElementById('main-content').inert=open;
-  const nav=document.querySelector('.sidebar');
-  if(open){nav.setAttribute('role','dialog');nav.setAttribute('aria-modal','true');document.querySelector('.mobile-nav-close').focus();}
-  else{nav.removeAttribute('role');nav.removeAttribute('aria-modal');document.querySelector('.mobile-menu').focus();}
 }
 
 function showToast(message) {
@@ -214,46 +270,51 @@ document.addEventListener('click',event=>{
   if(target.dataset.view) {closeDialog(); navigate(target.dataset.view); return;}
   const {action,id}=target.dataset;
   if(action==='open-rewards')navigate('rewards');
-  if(action==='menu'||action==='menu-close'){
-    const open=action==='menu'&&!document.querySelector('.shell').classList.contains('nav-open');
-    setMenuOpen(open);
-  }
+  if(action==='order-detail'){state.selectedOrder=id;navigate('tracking');}
+  if(action==='order-filter'){state.orderStatus=id;shell();document.querySelector(`[data-action="order-filter"][data-id="${id}"]`).focus();}
+  if(action==='order-history')orderHistory(id);
+  if(action==='document-demo')openDialog('Dokument demonstracyjny',target.dataset.document,`<p class="dialog-copy">W tym podglądzie dokumenty służą do pokazania miejsca, w którym klient otworzy CMR lub fakturę przypisaną do zlecenia.</p><div class="dialog-stats"><div class="dialog-stat"><span>Zlecenie</span><strong>${esc(id)}</strong></div><div class="dialog-stat"><span>Dokument</span><strong>${esc(target.dataset.document)} · demo</strong></div></div>`,button('Wróć','close-dialog','secondary'));
   if(action==='reward-filter'){state.rewardCategory=id; shell(); document.querySelector(`[data-action="reward-filter"][data-id="${id}"]`).focus();}
   if(action==='invoice-filter'){state.invoiceStatus=id; shell(); document.querySelector(`[data-action="invoice-filter"][data-id="${id}"]`).focus();}
   if(action==='unpaid-invoices'){state.invoiceStatus='unpaid'; navigate('invoices');}
   if(action==='reward-detail')rewardDetail(id);
   if(action==='invoice-detail')invoiceDetail(id);
-  if(action==='set-goal'){state.goal=id;closeDialog();showToast('Cel ustawiony w podglądzie. Zobacz go w Przeglądzie.');}
+  if(action==='set-goal'){state.goal=id;closeDialog();shell();document.querySelector(`[data-action="reward-detail"][data-id="${id}"]`)?.focus();showToast('Cel nagrody ustawiony w tym podglądzie.');}
   if(action==='close-dialog')closeDialog();
-  if(action==='open-balance')openDialog('Twoje punkty · dane demo','Dobra współpraca.<br>Dobre saldo.',`<div class="dialog-stats"><div class="dialog-stat"><span>Dostępne punkty</span><strong>${number(demoSource.balance.available)} pkt</strong></div><div class="dialog-stat"><span>Przyznane w październiku</span><strong>+${number(demoSource.balance.earnedThisMonth)} pkt</strong></div><div class="dialog-stat"><span>Wygasają 31.10.2026</span><strong>${number(demoSource.balance.expiring)} pkt</strong></div></div><p class="dialog-copy">To przykładowe saldo służące do oceny wyglądu panelu.</p>`,button('Historia punktów','open-history','secondary'));
+  if(action==='open-balance')openDialog('Twoje punkty · dane demo','Twoje punkty AMG Miles.',`<div class="dialog-stats"><div class="dialog-stat"><span>Dostępne punkty</span><strong>${number(demoSource.balance.available)} pkt</strong></div><div class="dialog-stat"><span>Przyznane w październiku</span><strong>+${number(demoSource.balance.earnedThisMonth)} pkt</strong></div><div class="dialog-stat"><span>Wygasają 31.10.2026</span><strong>${number(demoSource.balance.expiring)} pkt</strong></div></div><p class="dialog-copy">To przykładowe saldo służące do oceny wyglądu panelu.</p>`,button('Historia punktów','open-history','secondary'));
   if(action==='open-history'){closeDialog();navigate('history');}
-  if(action==='notifications')openDialog('Powiadomienia · przykładowe','Bądź na bieżąco.',`<div class="history-row"><div class="history-symbol">${icon('bolt')}</div><div><h3>Nowe punkty za szybką płatność</h3><p>+2 250 pkt · przykładowe powiadomienie</p></div></div><div class="history-row"><div class="history-symbol">${icon('clock')}</div><div><h3>Wykorzystaj punkty do końca miesiąca</h3><p>2 000 pkt wygasa 31.10.2026 · dane demo</p></div></div>`,button('Przejdź do historii','open-history','secondary'));
   if(action==='contact')openDialog('AMG Trans · kontakt','Jesteśmy po drodze.',`<p class="dialog-copy">Porozmawiajmy o Twojej współpracy z AMG.</p><div class="dialog-stats"><div class="dialog-stat"><span>E-mail</span><strong>hello@amg-trans.eu</strong></div><div class="dialog-stat"><span>Telefon</span><strong>+48 508 24 5555</strong></div></div><p class="dialog-copy">Dane kontaktowe z aktualnej strony AMG Trans. Ten podgląd nie wysyła wiadomości.</p>`,button('Zamknij','close-dialog','secondary'));
-  if(action==='about-preview')openDialog('AMG Miles · projekt wizualny','Nowy kierunek.<br>Ten sam charakter.',`<p class="dialog-copy">Jasny panel oparty na identyfikacji AMG: Onest, grafit, ciepły pomarańcz i przyciski ze strzałką w osobnym kółku.</p><p class="dialog-copy">To niezależny podgląd wyglądu. Faktury, saldo, nagrody i powiadomienia są demonstracyjne. Podłączenie właściwego backendu i przeniesienie do repozytorium dev są osobnym etapem.</p>`,button('Wróć do panelu','close-dialog','secondary'));
+  if(action==='about-preview')openDialog('AMG Miles · projekt wizualny','Nowy kierunek.<br>Ten sam charakter.',`<p class="dialog-copy">Jasny panel oparty na identyfikacji AMG: Onest, grafit, ciepły pomarańcz i przyciski ze strzałką w osobnym kółku.</p><p class="dialog-copy">To niezależny podgląd wyglądu. Zlecenia, trasy, pozycje pojazdów, czasy dostawy, faktury, saldo i nagrody są demonstracyjne. Podłączenie właściwego backendu i przeniesienie do repozytorium dev są osobnym etapem.</p>`,button('Wróć do panelu','close-dialog','secondary'));
 });
 
 document.addEventListener('input',event=>{
+  if(event.target.id==='order-search'){state.orderSearch=event.target.value;document.getElementById('order-results').innerHTML=orderResults();return;}
   if(event.target.id!=='invoice-search')return;
   state.search=event.target.value;
   const filtered=demoSource.invoices.filter(i=>(state.invoiceStatus==='all'||i.status===state.invoiceStatus)&&i.id.toLowerCase().includes(state.search.toLowerCase()));
   document.getElementById('invoice-results').innerHTML=`${filtered.length?invoiceTable(filtered):emptyState('search','Brak pasujących faktur','Spróbuj innego numeru lub zmień wybrany filtr.')}<div class="table-footer"><span>${filtered.length} z 6 faktur · dane demonstracyjne</span><span>Kwoty netto w EUR</span></div>`;
 });
-document.addEventListener('keydown',event=>{
-  if(event.key==='Escape'&&document.querySelector('.shell.nav-open')){
-    setMenuOpen(false);
-  }
-  if(event.key==='Tab'&&document.querySelector('.shell.nav-open')){
-    const buttons=Array.from(document.querySelectorAll('.sidebar button')).filter(b=>b.getClientRects().length);
-    const first=buttons[0],last=buttons[buttons.length-1];
-    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
-    if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
-  }
+document.getElementById('detail-dialog').addEventListener('cancel',()=>{if(modalTrigger?.isConnected)modalTrigger.focus();});
+document.querySelector('.skip-link').addEventListener('click',event=>{
+  event.preventDefault();
+  const main=document.getElementById('main-content');
+  main.focus({preventScroll:true});
+  main.scrollIntoView({block:'start'});
 });
 document.getElementById('detail-dialog').addEventListener('click',event=>{
   if(event.target!==event.currentTarget)return;
   const r=event.currentTarget.getBoundingClientRect();
   if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeDialog();
 });
-window.addEventListener('popstate',()=>{const v=window.location.hash.slice(1);if(VIEWS[v]){state.view=v;state.search='';shell();}});
-const initialView=window.location.hash.slice(1);if(VIEWS[initialView])state.view=initialView;
-shell();
+function applyRoute() {
+  if(document.getElementById('detail-dialog').open)closeDialog();
+  const [view,id]=window.location.hash.slice(1).split('/');
+  state.view=view==='overview'?'orders':VIEWS[view]?view:'orders';
+  if(state.view==='tracking'){
+    if(demoSource.orders.some(o=>o.id===id))state.selectedOrder=id;
+    else state.view='orders';
+  }
+  shell();
+}
+window.addEventListener('popstate',applyRoute);
+applyRoute();

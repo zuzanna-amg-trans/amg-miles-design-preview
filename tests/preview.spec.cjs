@@ -20,29 +20,28 @@ const test = base.extend({
   }, { auto: true }],
 });
 
-async function navigate(page, view, isMobile) {
-  if (isMobile) {
-    await page.getByRole('button', { name: 'Otwórz nawigację', exact: true }).click();
-  }
-  await page.locator(`.nav-item[data-view="${view}"]`).click();
+async function navigate(page, view) {
+  await page.locator(`.primary-nav [data-view="${view}"]`).click();
   await expect(page).toHaveURL(new RegExp(`#${view}$`));
 }
 
 const views = [
-  ['overview', /Współpraca, która\s*się opłaca\./],
-  ['invoices', /Moje faktury\./],
-  ['history', /Każdy punkt\s*ma swoją historię\./],
-  ['rewards', /Dobra współpraca\.\s*Dobre nagrody\./],
-  ['orders', /Coś dobrego\s*jest przed Tobą\./],
-  ['rules', /Proste zasady\.\s*Konkretny zysk\./],
+  ['orders', 'Twoje zlecenia.', 'orders'],
+  ['tracking/DEMO-261001', /Poznań\s*—\s*Lyon/, 'orders'],
+  ['invoices', 'Twoje faktury.', 'invoices'],
+  ['rewards', 'Twoje nagrody.', 'rewards'],
+  ['history', 'Historia punktów.', 'rewards'],
+  ['claims', 'Moje nagrody.', 'rewards'],
+  ['rules', 'Zasady programu.', 'rewards'],
 ];
 
-for (const [view, heading] of views) {
+for (const [view, heading, primaryView] of views) {
   test(`${view}: content, assets and contained layout`, async ({ page }) => {
     await page.goto(`./#${view}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(heading);
-    await expect(page.locator('.demo-pill')).toHaveText('Podgląd projektu · dane demo');
-    await expect(page.locator(`.nav-item[data-view="${view}"]`)).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('.preview-note')).toHaveText('Podgląd projektu · wszystkie dane są przykładowe');
+    await expect(page.locator('.primary-nav button')).toHaveCount(3);
+    await expect(page.locator(`.primary-nav [data-view="${primaryView}"]`)).toHaveAttribute('aria-current', 'page');
     await page.evaluate(() => document.fonts.ready);
     await expect.poll(() => page.locator('.brand img').evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
     const layout = await page.evaluate(() => ({
@@ -54,6 +53,88 @@ for (const [view, heading] of views) {
     expect(layout.fontLoaded, 'The bundled font loads').toBe(true);
   });
 }
+
+test('orders are the entry view; filters and search keep their combined scope', async ({ page }) => {
+  await page.goto('./');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twoje zlecenia.');
+  const cards = page.locator('.order-card');
+  await expect(cards).toHaveCount(2);
+  const completed = page.locator('[data-action="order-filter"][data-id="completed"]');
+  await completed.click();
+  await expect(completed).toHaveAttribute('aria-pressed', 'true');
+  await expect(cards).toHaveCount(3);
+  const search = page.getByRole('searchbox', { name: 'Szukaj zlecenia po numerze lub mieście', exact: true });
+  await search.fill('Lyon');
+  await expect(cards).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Nie ma takich zleceń', exact: true })).toBeVisible();
+  await page.locator('[data-action="order-filter"][data-id="all"]').click();
+  await expect(search).toHaveValue('Lyon');
+  await expect(cards).toHaveCount(1);
+  await expect(cards).toContainText('DEMO-261001');
+  await search.fill('AMG-DEMO-02');
+  await expect(cards).toHaveCount(1);
+  await expect(cards).toContainText('Rotterdam');
+  await search.fill('');
+  await expect(cards).toHaveCount(5);
+});
+
+test('tracking opens from an order; history restores focus and browser back closes it', async ({ page, isMobile }) => {
+  await page.goto('./');
+  await page.locator('.order-card').filter({ hasText: 'DEMO-261001' }).getByRole('button', { name: 'Śledź transport', exact: true }).click();
+  await expect(page).toHaveURL(/#tracking\/DEMO-261001$/);
+  await expect(page.locator('.delivery-card')).toContainText('Przewidywana dostawa');
+  await expect(page.locator('.delivery-estimate strong')).toHaveText('18:30');
+  await expect(page.locator('.map-footer')).toContainText('Przykładowa pozycja');
+  await expect(page.locator('.journey li')).toHaveCount(4);
+  await expect(page.locator('.journey [aria-current="step"] strong')).toHaveText('W drodze');
+  if (isMobile) {
+    const delivery = await page.locator('.delivery-card').boundingBox();
+    const map = await page.locator('.map-card').boundingBox();
+    expect(delivery.y, 'Delivery information precedes the map on a phone').toBeLessThan(map.y);
+  }
+  const history = page.getByRole('button', { name: 'Historia statusów', exact: true });
+  await history.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.locator('.status-history li')).toHaveCount(4);
+  await expect(dialog).toContainText('W drodze na rozładunek');
+  await page.keyboard.press('Escape');
+  await expect(dialog).not.toBeVisible();
+  await expect(history).toBeFocused();
+  await history.click();
+  await page.goBack();
+  await expect(dialog).not.toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twoje zlecenia.');
+});
+
+test('a shared tracking link retains the selected transport on reload', async ({ page }) => {
+  await page.goto('./#tracking/DEMO-261002');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Rotterdam\s*—\s*Wrocław/);
+  await expect(page.locator('.delivery-card')).toContainText('Planowana dostawa');
+  await expect(page.locator('.delivery-estimate strong')).toHaveText('11:00');
+  await expect(page.locator('.journey [aria-current="step"] strong')).toHaveText('Załadunek');
+  await page.reload();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Rotterdam\s*—\s*Wrocław/);
+  await page.getByRole('button', { name: 'Wszystkie zlecenia', exact: true }).click();
+  await expect(page).toHaveURL(/#orders$/);
+  await expect(page.locator('.order-card')).toHaveCount(2);
+});
+
+test('completed transport exposes sample documents and completed steps', async ({ page }) => {
+  await page.goto('./#orders');
+  await page.locator('[data-action="order-filter"][data-id="completed"]').click();
+  await page.locator('.order-card').filter({ hasText: 'DEMO-260903' }).getByRole('button', { name: 'Zobacz zlecenie', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Dostawa zakończona', exact: true })).toBeVisible();
+  await expect(page.locator('.route-map')).toHaveCount(0);
+  await expect(page.locator('.journey .done')).toHaveCount(4);
+  const cmr = page.getByRole('button', { name: 'CMR', exact: true });
+  await cmr.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('heading', { name: 'CMR', exact: true })).toBeVisible();
+  await expect(dialog).toContainText('CMR · demo');
+  await expect(dialog).toContainText('DEMO-260903');
+  await page.keyboard.press('Escape');
+  await expect(cmr).toBeFocused();
+});
 
 test('invoice filters, search, empty state and detail dialog', async ({ page }) => {
   await page.goto('./#invoices');
@@ -81,7 +162,7 @@ test('invoice filters, search, empty state and detail dialog', async ({ page }) 
   await expect(rows.locator('.status')).toHaveText(['Opłacona', 'Opłacona', 'Opłacona']);
 });
 
-test('reward categories, detail and temporary goal selection', async ({ page, isMobile }) => {
+test('reward categories, detail and temporary goal selection', async ({ page }) => {
   await page.goto('./#rewards');
   const cards = page.locator('.reward-card');
   await expect(cards).toHaveCount(6);
@@ -96,29 +177,47 @@ test('reward categories, detail and temporary goal selection', async ({ page, is
   await expect(dialog.getByRole('heading', { name: 'Głośnik przenośny', exact: true })).toBeVisible();
   await dialog.getByRole('button', { name: 'Ustaw jako cel', exact: true }).click();
   await expect(dialog).not.toBeVisible();
-  await navigate(page, 'overview', isMobile);
-  await expect(page.locator('.goal-card h3')).toHaveText('Głośnik przenośny');
+  const speaker = cards.filter({ has: page.getByRole('heading', { name: 'Głośnik przenośny', exact: true }) });
+  await expect(speaker.locator('.goal-label')).toHaveText('Twój cel');
+  await expect(speaker.getByRole('button')).toBeFocused();
   await page.reload();
-  await expect(page.locator('.goal-card h3')).toHaveText('Słuchawki bezprzewodowe');
+  await expect(speaker.locator('.goal-label')).toHaveCount(0);
+  await expect(cards.filter({ hasText: 'Słuchawki bezprzewodowe' }).locator('.goal-label')).toHaveText('Twój cel');
 });
 
-test('navigation works and the mobile menu releases focus', async ({ page, isMobile }) => {
+test('the three primary tabs remain available and rewards have their own subnavigation', async ({ page }) => {
   await page.goto('./');
-  if (isMobile) {
-    const menu = page.locator('.mobile-menu');
-    await menu.click();
-    await expect(menu).toHaveAttribute('aria-expanded', 'true');
-    await expect(page.locator('#main-content')).toHaveJSProperty('inert', true);
-    await page.keyboard.press('Escape');
-    await expect(menu).toHaveAttribute('aria-expanded', 'false');
-    await expect(menu).toBeFocused();
-    await expect(page.locator('#main-content')).toHaveJSProperty('inert', false);
+  for (const view of ['invoices', 'rewards', 'orders']) {
+    const tab = page.locator(`.primary-nav [data-view="${view}"]`);
+    await expect(tab).toBeVisible();
+    await navigate(page, view);
+    await expect(tab).toHaveAttribute('aria-current', 'page');
   }
-  await navigate(page, 'orders', isMobile);
+  await navigate(page, 'rewards');
+  await page.getByRole('navigation', { name: 'Program AMG Miles', exact: true }).getByRole('button', { name: 'Moje nagrody', exact: true }).click();
+  await expect(page).toHaveURL(/#claims$/);
   await expect(page.getByRole('heading', { name: 'Pierwsza nagroda jeszcze przed Tobą', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Przejdź do katalogu', exact: true }).click();
   await expect(page.locator('.reward-card')).toHaveCount(6);
-  await expect(page.locator('#main-content')).toHaveJSProperty('inert', false);
+  await expect(page.locator('.primary-nav [data-view="rewards"]')).toHaveAttribute('aria-current', 'page');
+});
+
+test('the keyboard skip link focuses content without changing the route', async ({ page }) => {
+  await page.goto('./#invoices');
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Przejdź do treści', exact: true })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#main-content')).toBeFocused();
+  await expect(page).toHaveURL(/#invoices$/);
+  await expect(page.locator('#invoice-results tbody tr')).toHaveCount(6);
+});
+
+test('old dashboard and unknown tracking links fall back to the order list', async ({ page }) => {
+  for (const hash of ['overview', 'tracking/unknown-order']) {
+    await page.goto(`./#${hash}`);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twoje zlecenia.');
+    await expect(page.locator('.order-card')).toHaveCount(2);
+  }
 });
 
 test('program FAQ expands and closes', async ({ page }) => {

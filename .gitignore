@@ -12,3 +12,5 @@ playwright-report/
 test-results/
 coverage/
 *.log
+/design-preview/screenshots/zlecenia-*.jpg
+/design-preview/screenshots/sledzenie-*.jpg
