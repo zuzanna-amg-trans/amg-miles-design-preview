@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-06",
+  "artifact": "independent-visual-prototype",
+  "repository_dev_connected": false,
+  "backend_connected": false,
+  "data": "fictional-demo-only",
+  "syntax_check": {"javascript": "passed"},
+  "browser": "Codex in-app browser",
+  "verified_views": ["overview", "invoices", "history", "rewards", "orders", "rules"],
+  "verified_interactions": [
+    "reward-category-filter: electronics returns 3 products",
+    "reward-detail-dialog",
+    "goal-selection reflected in overview",
+    "unpaid-invoices filter returns 3 records",
+    "invoice-search: 1042 returns 1 record",
+    "invoice-search empty result",
+    "invoice-detail-dialog",
+    "dialog Escape closes the dialog",
+    "rules FAQ expands",
+    "mobile navigation opens and routes to reward catalog"
+  ],
+  "layout": {
+    "desktop": {"viewport_width": 1280, "document_width": 1280, "table_viewport_width": 609, "table_content_width": 609, "invoice_font_px": 13},
+    "mobile_overview": {"viewport_width": 390, "document_width": 390, "table_viewport_width": 348, "table_content_width": 539, "table_scroll": "contained"},
+    "mobile_rewards": {"viewport_width": 390, "document_width": 390, "reward_count": 6}
+  },
+  "console_errors_or_warnings": [],
+  "screenshots": ["screenshots/panel-desktop.jpg", "screenshots/nagrody-desktop.jpg", "screenshots/panel-mobile.jpg", "screenshots/nagrody-mobile.jpg"],
+  "limits": ["not production QA", "not backend integration", "no repository dev modifications", "no deployment"]
+}
