@@ -41,7 +41,10 @@ if __name__ == "__main__":
     if manifest.get("files") != expected or manifest.get("data") != "fictional-demo-only":
         raise SystemExit("The published manifest does not match the tested static package.")
     for name, digest in expected.items():
-        public = fetch(urllib.parse.urljoin(base, name) + "?" + query)
+        try:
+            public = fetch(urllib.parse.urljoin(base, name) + "?" + query)
+        except urllib.error.URLError as error:
+            raise SystemExit(f"Cannot read public asset {name}: {error}") from error
         if hashlib.sha256(public).hexdigest() != digest:
             raise SystemExit(f"Public file does not match the tested commit: {name}")
     print(f"Verified public commit {commit}, run {run_id}, and {len(expected)} static file hashes.")
