@@ -1,0 +1,117 @@
+name: Test and publish preview
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: amg-miles-preview-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    name: Test static preview
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install test dependencies on GitHub
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Check JavaScript syntax
+        run: npm run check
+      - name: Package the static preview
+        run: npm run build:preview
+      - name: Install the Chromium headless shell on GitHub
+        run: npx playwright install --with-deps --only-shell chromium
+      - name: Test desktop and mobile views
+        id: browser_tests
+        run: npm test
+      - name: Store successful test report for 7 days
+        if: ${{ !cancelled() && steps.browser_tests.outcome == 'success' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: preview-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: playwright-report/
+          retention-days: 7
+          if-no-files-found: error
+      - name: Store failed test diagnostics for 14 days
+        if: ${{ !cancelled() && steps.browser_tests.outcome == 'failure' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: preview-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+          if-no-files-found: error
+      - name: Upload the tested Pages package for 1 day
+        if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        with:
+          path: _site/
+          retention-days: 1
+          include-hidden-files: true
+
+  deploy:
+    name: Publish and verify preview
+    needs: test
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy the tested package
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Read back the public commit and asset hashes
+        run: npm run verify:deployment
+        env:
+          PREVIEW_URL: ${{ steps.deployment.outputs.page_url }}
+      - name: Install test dependencies on GitHub
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install the Chromium headless shell on GitHub
+        run: npx playwright install --with-deps --only-shell chromium
+      - name: Test the published desktop and mobile views
+        id: public_tests
+        run: npm test
+        env:
+          PREVIEW_URL: ${{ steps.deployment.outputs.page_url }}
+      - name: Store successful public verification for 7 days
+        if: ${{ !cancelled() && steps.public_tests.outcome == 'success' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: public-preview-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: playwright-report/
+          retention-days: 7
+          if-no-files-found: error
+      - name: Store failed public verification for 14 days
+        if: ${{ !cancelled() && steps.public_tests.outcome == 'failure' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: public-preview-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+          if-no-files-found: error
