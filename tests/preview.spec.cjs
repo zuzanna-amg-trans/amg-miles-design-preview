@@ -105,7 +105,7 @@ test('reward categories, detail and temporary goal selection', async ({ page, is
 test('navigation works and the mobile menu releases focus', async ({ page, isMobile }) => {
   await page.goto('./');
   if (isMobile) {
-    const menu = page.getByRole('button', { name: 'Otwórz nawigację', exact: true });
+    const menu = page.locator('.mobile-menu');
     await menu.click();
     await expect(menu).toHaveAttribute('aria-expanded', 'true');
     await expect(page.locator('#main-content')).toHaveJSProperty('inert', true);
