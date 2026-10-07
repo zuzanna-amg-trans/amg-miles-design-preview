@@ -16,7 +16,7 @@ Pełne testy przeglądarkowe wykonuje GitHub Actions przez pull request. Po inte
 
 ## Widoki i interakcje
 
-- Menu statusów po lewej i szersza lista po prawej (proporcja około 1:3 na komputerze). Rozwijane grupy „W realizacji”, „Zakończone”, „Wszystkie” pokazują trasę i numer klienta. Na telefonie menu ma zwijany nagłówek.
+- Menu statusów po lewej i szersza lista po prawej (proporcja około 1:3 na komputerze). Rozwijane grupy „W realizacji”, „Zakończone”, „Wszystkie” pokazują miasta trasy oraz kraje i kody pocztowe załadunku i rozładunku. Opis towaru, liczba palet i waga ułatwiają rozpoznanie zlecenia w skróconym menu. Na telefonie menu ma zwijany nagłówek.
 - Karta zlecenia z numerem klienta, miastami, kodami pocztowymi i krajem, towarem, wagą i liczbą palet. Wyszukiwanie obejmuje numery klienta i AMG, miasta, kody oraz nazwę towaru; współpracuje z wybraną grupą statusów.
 - Dwa osobne terminy: dojazd na załadunek i na rozładunek, z godziną i datą. Nadchodzący termin ma opis „Przewidywany dojazd”; potwierdzony dojazd jest oznaczony jako potwierdzony. Bieżący status rozróżnia jazdę na załadunek i na rozładunek.
 - Śledzenie rozwijane bezpośrednio pod kartą zlecenia: mapa poglądowa z przybliżaniem i resetem, przykładowa pozycja, godzina dojazdu właściwa dla etapu, okno załadunku lub dostawy, pięć etapów i historia statusów. Numer AMG jest w nagłówku podglądu. Jedno rozwinięte zlecenie naraz; link `#tracking/ID` otwiera je w kontekście listy.

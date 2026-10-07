@@ -93,7 +93,7 @@ test('orders are the entry view; filters and search keep their combined scope', 
   await expect(cards).toHaveCount(5);
 });
 
-test('status directory expands route and client numbers beside the wider desktop list', async ({ page, isMobile }) => {
+test('status directory identifies orders by cities, country postal codes and cargo beside the wider desktop list', async ({ page, isMobile }) => {
   await page.goto('./#orders');
   const directory = page.locator('.order-directory');
   const nav = page.getByRole('navigation', { name: 'Zlecenia według statusu', exact: true });
@@ -113,7 +113,13 @@ test('status directory expands route and client numbers beside the wider desktop
   const activeItems = page.locator('#group-active .order-tree-item');
   await expect(activeItems).toHaveCount(2);
   await expect(activeItems.first()).toContainText('Poznań → Lyon');
-  await expect(activeItems.first()).toContainText('Nr klienta: AMG-DEMO-01');
+  await expect(activeItems.first().locator('.order-tree-postals')).toHaveText('PL 60-001 → FR 69007');
+  await expect(activeItems.first().locator('.order-tree-goods')).toHaveText('Części maszyn');
+  await expect(activeItems.first().locator('.order-tree-cargo')).toHaveText(/8 palet · 3\s200 kg/);
+  await expect(activeItems.first()).not.toContainText('AMG-DEMO-01');
+  await expect(activeItems.nth(1).locator('.order-tree-postals')).toHaveText('NL 3011 AA → PL 50-001');
+  await expect(activeItems.nth(1).locator('.order-tree-goods')).toHaveText('Opakowania kartonowe');
+  await expect(activeItems.nth(1).locator('.order-tree-cargo')).toHaveText(/12 palet · 4\s800 kg/);
   await active.click();
   await openDirectory(page);
   await expect(active).toHaveAttribute('aria-expanded', 'false');
@@ -122,9 +128,13 @@ test('status directory expands route and client numbers beside the wider desktop
   await openDirectory(page);
   await expect(page.locator('#group-completed .order-tree-item')).toHaveCount(3);
   await expect(page.locator('#group-completed .order-tree-item').first()).toContainText('Leipzig → Gdańsk');
+  await expect(page.locator('#group-completed .order-tree-postals').first()).toHaveText('DE 04109 → PL 80-001');
+  await expect(page.locator('#group-completed .order-tree-goods').first()).toHaveText('Elementy metalowe');
+  await expect(page.locator('#group-completed .order-tree-cargo').first()).toHaveText(/10 palet · 4\s000 kg/);
   await filterOrders(page, 'all');
   await openDirectory(page);
   await expect(page.locator('#group-all .order-tree-item')).toHaveCount(5);
+  await expect(page.locator('#group-all .order-tree-postals')).toHaveText(['PL 60-001 → FR 69007', 'NL 3011 AA → PL 50-001', 'DE 04109 → PL 80-001', 'BE 2000 → PL 40-001', 'DE 10115 → PL 00-001']);
   await expect(page.locator('#group-completed .order-tree-item').first()).not.toBeVisible();
 });
 

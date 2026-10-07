@@ -4,7 +4,7 @@ Jasny, klikalny projekt panelu AMG Miles z naciskiem na śledzenie zleceń.
 
 **[Otwórz aktualny podgląd](https://zuzanna-amg-trans.github.io/amg-miles-design-preview/)**
 
-Główne zakładki to **Zlecenia, Faktury i Nagrody**. Ekran startowy pokazuje realizowane transporty. Na komputerze około 1/4 szerokości zajmuje rozwijane menu „W realizacji”, „Zakończone”, „Wszystkie”, a pozostałą część — lista zleceń. Po rozwinięciu grupy menu pokazuje trasy i numery zleceń klienta.
+Główne zakładki to **Zlecenia, Faktury i Nagrody**. Ekran startowy pokazuje realizowane transporty. Na komputerze około 1/4 szerokości zajmuje rozwijane menu „W realizacji”, „Zakończone”, „Wszystkie”, a pozostałą część — lista zleceń. Po rozwinięciu grupy menu pokazuje miasta załadunku i rozładunku, kraj oraz kod pocztowy po obu stronach trasy, a poniżej towar, liczbę palet i wagę.
 
 Nowy kierunek wizualny łączy grafitowy pasek górny, jasne karty i pomarańczowe przyciski AMG. Karta zlecenia pokazuje numer klienta, miasta, kody pocztowe poprzedzone krajem, towar, wagę i liczbę palet. Załadunek i rozładunek mają osobne godziny dojazdu. Status określa, czy pojazd jedzie na załadunek, czy na rozładunek.
 
@@ -22,7 +22,7 @@ Zlecenia, trasy, pozycje pojazdów, czasy dostawy, dokumenty, kwoty i punkty są
 
 ## Testy i publikacja na GitHubie
 
-Workflow [Test and publish preview](https://github.com/zuzanna-amg-trans/amg-miles-design-preview/actions/workflows/preview.yml) wykonuje pełne testy na maszynach GitHuba. Pull request uruchamia sprawdzenie składni i 54 testy przeglądarkowych w widoku komputerowym oraz mobilnym. Testowany jest gotowy pakiet strony: lista i śledzenie zleceń, faktury, nagrody, historia punktów, moje nagrody i zasady programu. Sprawdzane są proporcje menu i listy, rozwijane grupy z numerami klienta, kody pocztowe i ładunek, osobne czasy dojazdu, śledzenie w obrębie karty i przełączanie bez utraty kontekstu, filtry, wyszukiwanie, historia statusów, dokumenty podczas transportu, brak GPS, przybliżanie i reset mapy, rozwijane szczegóły transportu, kontakt, wybór celu, FAQ, nawigacja, obsługa klawiaturą, ładowanie zasobów i brak przewijania całej strony w poziomie. Aktualny wynik konkretnego wykonania znajduje się w GitHub Actions.
+Workflow [Test and publish preview](https://github.com/zuzanna-amg-trans/amg-miles-design-preview/actions/workflows/preview.yml) wykonuje pełne testy na maszynach GitHuba. Pull request uruchamia sprawdzenie składni i 54 testy przeglądarkowe w widoku komputerowym oraz mobilnym. Testowany jest gotowy pakiet strony: lista i śledzenie zleceń, faktury, nagrody, historia punktów, moje nagrody i zasady programu. Sprawdzane są proporcje menu i listy, rozwijane grupy z miastami, krajami, kodami pocztowymi i opisem ładunku, kody pocztowe i ładunek, osobne czasy dojazdu, śledzenie w obrębie karty i przełączanie bez utraty kontekstu, filtry, wyszukiwanie, historia statusów, dokumenty podczas transportu, brak GPS, przybliżanie i reset mapy, rozwijane szczegóły transportu, kontakt, wybór celu, FAQ, nawigacja, obsługa klawiaturą, ładowanie zasobów i brak przewijania całej strony w poziomie. Aktualny wynik konkretnego wykonania znajduje się w GitHub Actions.
 
 Po zmianie `main` ten sam workflow publikuje przetestowany pakiet przez GitHub Pages, odczytuje publiczny identyfikator commita i sumy kontrolne zasobów oraz ponownie wykonuje testy na publicznej stronie. Nieudane testy przed publikacją blokują nowe wdrożenie. Źródłem Pages jest **GitHub Actions**.
 

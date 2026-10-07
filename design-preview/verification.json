@@ -1,5 +1,5 @@
 {
-  "revision_date": "2026-10-07",
+  "revision_date": "2026-10-08",
   "scope": "Independent visual prototype; all sample records fictional",
   "visual_direction": "Light operational panel with graphite top navigation, a 1:3 status directory and order list, and inline tracking",
   "main_navigation": [
@@ -62,8 +62,11 @@
       "Wszystkie"
     ],
     "directory_items": [
-      "route",
-      "client_order_number"
+      "route_cities",
+      "country_prefixed_postal_codes",
+      "goods",
+      "packages",
+      "weight_kg"
     ],
     "collapsed_card_fields": [
       "client_order_number",
