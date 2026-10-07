@@ -322,6 +322,15 @@ dialog::backdrop { background:#13141677; backdrop-filter:blur(5px); }
 
 /* Shared components use the same neutral surfaces and AMG accents. */
 .reward-nav { background:white; border-color:var(--line); }
+.page-head:has(.reward-balance) { flex-wrap:wrap; }
+.reward-balance { display:flex; align-items:center; gap:14px; border:1px solid var(--line); background:white; border-radius:16px; padding:15px 17px; text-align:left; flex-shrink:0; }
+.reward-balance:hover { border-color:#f7c4a7; background:#fffbf7; }
+.balance-symbol { width:34px; height:34px; display:grid; place-items:center; background:#fff0e5; color:#c46b3d; border-radius:10px; }
+.balance-symbol .icon { width:17px; height:17px; }
+.reward-balance small { display:block; color:var(--muted); font-size:10px; }
+.reward-balance strong { font-size:22px; font-weight:500; letter-spacing:-.03em; display:block; }
+.reward-balance strong small { display:inline; font-size:10px; font-weight:400; }
+.reward-balance>.icon { width:16px; color:#8c9095; margin-left:12px; }
 .reward-art { background:#f0ede6; }
 .reward-art.blue { background:#eef1f3; }
 .reward-art.peach { background:#f8ece3; }
@@ -495,6 +504,8 @@ dialog::backdrop { background:#13141677; backdrop-filter:blur(5px); }
   .completed-panel { min-height:265px; }
   .completed-panel h3 { font-size:21px; }
   .reward-nav { padding:5px; gap:3px; flex-wrap:wrap; }
+  .reward-balance { width:100%; padding:14px 17px; }
+  .reward-balance>.icon { margin-left:auto; }
   .reward-nav button { min-height:40px; font-size:10px; gap:6px; padding:8px 10px; }
   .reward-nav .icon { width:14px; height:14px; }
   .catalog-summary { flex-direction:column; align-items:flex-start; gap:16px; }

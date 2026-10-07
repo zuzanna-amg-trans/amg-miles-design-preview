@@ -223,7 +223,8 @@ function invoicesView() {
 
 function rewardsView() {
   const rewards=demoSource.rewards.filter(r=>state.rewardCategory==='Wszystkie'||r.category===state.rewardCategory);
-  return `${rewardNav()}${pageHead('Program AMG Miles','Twoje <em>nagrody.</em>','Wybierz coś dla siebie za punkty ze współpracy z AMG.')}
+  const balance=`<button class="reward-balance" data-action="open-balance" aria-label="Twoje punkty AMG Miles"><span class="balance-symbol">${icon('spark')}</span><span><small>Dostępne punkty · demo</small><strong>${number(demoSource.balance.available)} <small>pkt</small></strong></span>${icon('arrow')}</button>`;
+  return `${rewardNav()}${pageHead('Program AMG Miles','Twoje <em>nagrody.</em>','Wybierz coś dla siebie za punkty ze współpracy z AMG.',balance)}
   <div class="filter-bar"><div class="filters" aria-label="Kategorie nagród">${['Wszystkie','Elektronika','Lifestyle','Vouchery'].map(c=>`<button class="filter ${state.rewardCategory===c?'active':''}" data-action="reward-filter" data-id="${c}" aria-pressed="${state.rewardCategory===c}">${c}</button>`).join('')}</div><span style="font-size:10px;color:var(--muted)">Przykładowy katalog do oceny wyglądu</span></div>
   <div class="reward-grid">${rewards.map(r=>`<article class="card reward-card"><div class="reward-art ${r.color}"><span class="reward-category">${r.category}</span>${r.id===state.goal?'<span class="goal-label">Twój cel</span>':''}${productArt(r.art)}</div><div class="reward-body"><h2>${r.name}</h2><p>${r.detail}</p><div class="reward-bottom"><strong>${number(r.points)} <small>pkt</small></strong><button class="icon-button" aria-label="Zobacz nagrodę: ${r.name}" data-action="reward-detail" data-id="${r.id}">${icon('arrow')}</button></div></div></article>`).join('')}</div>`;
 }

@@ -269,6 +269,13 @@ test('the three primary tabs remain available and rewards have their own subnavi
     await expect(tab).toHaveAttribute('aria-current', 'page');
   }
   await navigate(page, 'rewards');
+  await page.getByRole('button', { name: 'Twoje punkty AMG Miles', exact: true }).click();
+  const balance = page.getByRole('dialog');
+  await expect(balance.getByRole('heading', { name: 'Twoje punkty AMG Miles.', exact: true })).toBeVisible();
+  await balance.getByRole('button', { name: 'Historia punktów', exact: true }).click();
+  await expect(page).toHaveURL(/#history$/);
+  await expect(page.locator('.history-row')).toHaveCount(3);
+  await navigate(page, 'rewards');
   await page.getByRole('navigation', { name: 'Program AMG Miles', exact: true }).getByRole('button', { name: 'Moje nagrody', exact: true }).click();
   await expect(page).toHaveURL(/#claims$/);
   await expect(page.getByRole('heading', { name: 'Pierwsza nagroda jeszcze przed Tobą', exact: true })).toBeVisible();
