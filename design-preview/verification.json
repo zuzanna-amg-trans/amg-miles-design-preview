@@ -1,7 +1,7 @@
 {
   "revision_date": "2026-10-07",
   "scope": "Independent visual prototype; all sample records fictional",
-  "visual_direction": "Light operational panel with graphite navigation and AMG orange actions",
+  "visual_direction": "Light operational panel with graphite top navigation, a 1:3 status directory and order list, and inline tracking",
   "main_navigation": [
     "Zlecenia",
     "Faktury",
@@ -31,12 +31,16 @@
     "missing_gps_order": "DEMO-261002",
     "missing_gps_has_vehicle_marker": false,
     "progress_is_estimated": true,
-    "transport_details_initially_collapsed": true
+    "transport_details_initially_collapsed": true,
+    "loading_status_order": "DEMO-261002",
+    "unloading_status_order": "DEMO-261001",
+    "journey_stages": 5,
+    "arrival_times_separate_by_operation": true
   },
   "browser_verification": {
     "executor": "GitHub Actions only",
     "workflow": ".github/workflows/preview.yml",
-    "tests_per_run": 46,
+    "tests_per_run": 54,
     "viewports": [
       "desktop: 1280 x 900",
       "mobile: 390 x 844"
@@ -49,5 +53,30 @@
   "private_customer_records_in_public_preview": false,
   "new_screenshots_published": false,
   "existing_documentary_images_preserved": true,
-  "existing_documentary_images_describe_current_revision": false
+  "existing_documentary_images_describe_current_revision": false,
+  "order_list": {
+    "desktop_directory_fraction": 0.25,
+    "status_groups": [
+      "W realizacji",
+      "Zakończone",
+      "Wszystkie"
+    ],
+    "directory_items": [
+      "route",
+      "client_order_number"
+    ],
+    "collapsed_card_fields": [
+      "client_order_number",
+      "cities",
+      "country_prefixed_postal_codes",
+      "goods",
+      "weight_kg",
+      "packages",
+      "load_arrival",
+      "unload_arrival"
+    ],
+    "tracking_presentation": "One order expanded below its card, within the filtered list",
+    "internal_order_number": "Expanded heading and transport details",
+    "mobile_directory_initially_collapsed": true
+  }
 }

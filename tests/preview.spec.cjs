@@ -25,9 +25,25 @@ async function navigate(page, view) {
   await expect(page).toHaveURL(new RegExp(`#${view}$`));
 }
 
+async function openDirectory(page) {
+  const toggle = page.locator('.directory-mobile-toggle');
+  if (await toggle.isVisible() && await toggle.getAttribute('aria-expanded') === 'false') {
+    await toggle.click();
+  }
+}
+
+async function filterOrders(page, group) {
+  await openDirectory(page);
+  await page.locator(`[data-action="order-filter"][data-id="${group}"]`).click();
+}
+
+function orderCard(page, id) {
+  return page.locator(`.order-card[data-order-id="${id}"]`);
+}
+
 const views = [
   ['orders', 'Twoje zlecenia.', 'orders'],
-  ['tracking/DEMO-261001', /Poznań\s*—\s*Lyon/, 'orders'],
+  ['tracking/DEMO-261001', 'Twoje zlecenia.', 'orders'],
   ['invoices', 'Twoje faktury.', 'invoices'],
   ['rewards', 'Twoje nagrody.', 'rewards'],
   ['history', 'Historia punktów.', 'rewards'],
@@ -59,18 +75,17 @@ test('orders are the entry view; filters and search keep their combined scope', 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twoje zlecenia.');
   const cards = page.locator('.order-card');
   await expect(cards).toHaveCount(2);
-  const completed = page.locator('[data-action="order-filter"][data-id="completed"]');
-  await completed.click();
-  await expect(completed).toHaveAttribute('aria-pressed', 'true');
+  await filterOrders(page, 'completed');
+  await expect(page.locator('[data-action="order-filter"][data-id="completed"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(cards).toHaveCount(3);
   const search = page.getByRole('searchbox', { name: 'Szukaj zlecenia po numerze lub mieście', exact: true });
   await search.fill('Lyon');
   await expect(cards).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Nie ma takich zleceń', exact: true })).toBeVisible();
-  await page.locator('[data-action="order-filter"][data-id="all"]').click();
+  await filterOrders(page, 'all');
   await expect(search).toHaveValue('Lyon');
   await expect(cards).toHaveCount(1);
-  await expect(cards).toContainText('DEMO-261001');
+  await expect(cards).toHaveAttribute('data-order-id', 'DEMO-261001');
   await search.fill('AMG-DEMO-02');
   await expect(cards).toHaveCount(1);
   await expect(cards).toContainText('Rotterdam');
@@ -78,21 +93,88 @@ test('orders are the entry view; filters and search keep their combined scope', 
   await expect(cards).toHaveCount(5);
 });
 
-test('tracking opens from an order; history restores focus and browser back closes it', async ({ page, isMobile }) => {
-  await page.goto('./');
-  await page.locator('.order-card').filter({ hasText: 'DEMO-261001' }).getByRole('button', { name: 'Śledź transport', exact: true }).click();
-  await expect(page).toHaveURL(/#tracking\/DEMO-261001$/);
-  await expect(page.locator('.delivery-card')).toContainText('Przewidywana dostawa');
-  await expect(page.locator('.delivery-estimate strong')).toHaveText('18:30');
-  await expect(page.locator('.map-footer')).toContainText('Przykładowa pozycja');
-  await expect(page.locator('.journey li')).toHaveCount(4);
-  await expect(page.locator('.journey [aria-current="step"] strong')).toHaveText('W drodze');
+test('status directory expands route and client numbers beside the wider desktop list', async ({ page, isMobile }) => {
+  await page.goto('./#orders');
+  const directory = page.locator('.order-directory');
+  const nav = page.getByRole('navigation', { name: 'Zlecenia według statusu', exact: true });
   if (isMobile) {
-    const delivery = await page.locator('.delivery-card').boundingBox();
-    const map = await page.locator('.map-card').boundingBox();
-    expect(delivery.y, 'Delivery information precedes the map on a phone').toBeLessThan(map.y);
+    await expect(nav).not.toBeVisible();
+    await openDirectory(page);
+    await expect(nav).toBeVisible();
+  } else {
+    const menu = await directory.boundingBox();
+    const list = await page.locator('.orders-right').boundingBox();
+    expect(menu.x + menu.width).toBeLessThan(list.x);
+    expect(menu.width / (menu.width + list.width)).toBeCloseTo(.25, 1);
+    expect(list.width).toBeGreaterThan(menu.width * 2.5);
   }
-  const history = page.getByRole('button', { name: 'Historia statusów', exact: true });
+  const active = page.locator('[data-action="order-filter"][data-id="active"]');
+  await expect(active).toHaveAttribute('aria-expanded', 'true');
+  const activeItems = page.locator('#group-active .order-tree-item');
+  await expect(activeItems).toHaveCount(2);
+  await expect(activeItems.first()).toContainText('Poznań → Lyon');
+  await expect(activeItems.first()).toContainText('Nr klienta: AMG-DEMO-01');
+  await active.click();
+  await openDirectory(page);
+  await expect(active).toHaveAttribute('aria-expanded', 'false');
+  await expect(activeItems.first()).not.toBeVisible();
+  await filterOrders(page, 'completed');
+  await openDirectory(page);
+  await expect(page.locator('#group-completed .order-tree-item')).toHaveCount(3);
+  await expect(page.locator('#group-completed .order-tree-item').first()).toContainText('Leipzig → Gdańsk');
+  await filterOrders(page, 'all');
+  await openDirectory(page);
+  await expect(page.locator('#group-all .order-tree-item')).toHaveCount(5);
+  await expect(page.locator('#group-completed .order-tree-item').first()).not.toBeVisible();
+});
+
+test('order cards expose country postal codes, goods, weight and pallet count before expanding', async ({ page }) => {
+  await page.goto('./#orders');
+  const first = orderCard(page, 'DEMO-261001');
+  await expect(first.locator('.order-reference')).toContainText('Numer zlecenia klienta');
+  await expect(first.locator('.order-reference strong')).toHaveText('AMG-DEMO-01');
+  await expect(first.locator('.route-address')).toHaveText(['PL 60-001', 'FR 69007']);
+  await expect(first.locator('.order-cargo')).toContainText('Części maszyn');
+  await expect(first.locator('.order-cargo')).toContainText(/3\s200 kg/);
+  await expect(first.locator('.order-cargo')).toContainText('8 palet');
+  await expect(first).not.toContainText('DEMO-261001');
+  await expect(first.locator('.status')).toHaveText('W drodze na rozładunek');
+  await expect(first.locator('[data-arrival="load"]')).toContainText('Dojazd na załadunek');
+  await expect(first.locator('[data-arrival="unload"]')).toContainText('Przewidywany dojazd na rozładunek');
+  await expect(first.locator('[data-arrival="unload"] strong')).toHaveText('18:3007.10.2026');
+  const second = orderCard(page, 'DEMO-261002');
+  await expect(second.locator('.route-address')).toHaveText(['NL 3011 AA', 'PL 50-001']);
+  await expect(second.locator('.status')).toHaveText('W drodze na załadunek');
+  await expect(second.locator('[data-arrival="load"]')).toContainText('Przewidywany dojazd na załadunek');
+  await expect(second.locator('[data-arrival="load"] strong')).toHaveText('10:0007.10.2026');
+  await expect(second.locator('[data-arrival="unload"] strong')).toHaveText('11:0008.10.2026');
+});
+
+test('tracking expands below its order; history restores focus and browser back closes it', async ({ page, isMobile, context }) => {
+  await page.goto('./');
+  const first = orderCard(page, 'DEMO-261001');
+  await first.getByRole('button', { name: 'Śledź transport', exact: true }).click();
+  await expect(page).toHaveURL(/#tracking\/DEMO-261001$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twoje zlecenia.');
+  await expect(page.locator('.order-card')).toHaveCount(2);
+  await expect(context.pages()).toHaveLength(1);
+  const panel = first.getByRole('region', { name: 'Śledzenie zlecenia klienta AMG-DEMO-01', exact: true });
+  await expect(panel).toBeVisible();
+  const footer = await first.locator('.order-bottom').boundingBox();
+  const inline = await panel.boundingBox();
+  expect(inline.y).toBeGreaterThanOrEqual(footer.y + footer.height - 1);
+  await expect(panel.locator('.delivery-card')).toContainText('Przewidywany dojazd na rozładunek');
+  await expect(panel.locator('.delivery-estimate strong')).toHaveText('18:30');
+  await expect(panel.locator('.inline-heading')).toContainText('Numer AMG: DEMO-261001');
+  await expect(panel.locator('.map-footer')).toContainText('Przykładowa pozycja');
+  await expect(panel.locator('.journey li')).toHaveCount(5);
+  await expect(panel.locator('.journey [aria-current="step"] strong')).toHaveText('W drodze na rozładunek');
+  if (isMobile) {
+    const delivery = await panel.locator('.delivery-card').boundingBox();
+    const map = await panel.locator('.map-card').boundingBox();
+    expect(delivery.y, 'Arrival information precedes the map on a phone').toBeLessThan(map.y);
+  }
+  const history = panel.getByRole('button', { name: 'Historia statusów', exact: true });
   await history.click();
   const dialog = page.getByRole('dialog');
   await expect(dialog.locator('.status-history li')).toHaveCount(4);
@@ -103,29 +185,60 @@ test('tracking opens from an order; history restores focus and browser back clos
   await history.click();
   await page.goBack();
   await expect(dialog).not.toBeVisible();
+  await expect(page.locator('.inline-tracking')).toHaveCount(0);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twoje zlecenia.');
 });
 
-test('a shared tracking link retains the selected transport on reload', async ({ page }) => {
+test('a shared tracking link retains the inline order and active arrival phase on reload', async ({ page }) => {
   await page.goto('./#tracking/DEMO-261002');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Rotterdam\s*—\s*Wrocław/);
-  await expect(page.locator('.delivery-card')).toContainText('Planowana dostawa');
-  await expect(page.locator('.delivery-estimate strong')).toHaveText('11:00');
-  await expect(page.locator('.journey [aria-current="step"] strong')).toHaveText('Załadunek');
+  const second = orderCard(page, 'DEMO-261002');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twoje zlecenia.');
+  await expect(second.locator('.inline-tracking')).toBeVisible();
+  await expect(second.locator('.delivery-card')).toContainText('Przewidywany dojazd na załadunek');
+  await expect(second.locator('.delivery-estimate strong')).toHaveText('10:00');
+  await expect(second.locator('.delivery-card')).toContainText('Okno załadunku 09:30–10:30');
+  await expect(second.locator('.journey [aria-current="step"] strong')).toHaveText('W drodze na załadunek');
   await page.reload();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Rotterdam\s*—\s*Wrocław/);
-  await page.getByRole('button', { name: 'Wszystkie zlecenia', exact: true }).click();
+  await expect(second.locator('.inline-tracking')).toBeVisible();
+  await second.getByRole('button', { name: 'Zwiń podgląd', exact: true }).click();
   await expect(page).toHaveURL(/#orders$/);
+  await expect(page.locator('.inline-tracking')).toHaveCount(0);
   await expect(page.locator('.order-card')).toHaveCount(2);
+  await expect(second.getByRole('button', { name: 'Śledź transport', exact: true })).toBeFocused();
 });
 
-test('completed transport exposes sample documents and completed steps', async ({ page }) => {
+test('directory selection switches the inline map while preserving order and search context', async ({ page }) => {
   await page.goto('./#orders');
-  await page.locator('[data-action="order-filter"][data-id="completed"]').click();
-  await page.locator('.order-card').filter({ hasText: 'DEMO-260903' }).getByRole('button', { name: 'Zobacz zlecenie', exact: true }).click();
+  await openDirectory(page);
+  await page.locator('#group-active [data-action="order-select"][data-id="DEMO-261001"]').click();
+  await expect(orderCard(page, 'DEMO-261001').locator('.inline-tracking')).toBeVisible();
+  await openDirectory(page);
+  await page.locator('#group-active [data-action="order-select"][data-id="DEMO-261002"]').click();
+  await expect(page).toHaveURL(/#tracking\/DEMO-261002$/);
+  await expect(page.locator('.inline-tracking')).toHaveCount(1);
+  await expect(orderCard(page, 'DEMO-261001').locator('.inline-tracking')).toHaveCount(0);
+  await expect(orderCard(page, 'DEMO-261002').locator('.inline-tracking')).toBeVisible();
+  const search = page.getByRole('searchbox', { name: 'Szukaj zlecenia po numerze lub mieście', exact: true });
+  await search.fill('50-001');
+  await expect(search).toBeFocused();
+  await expect(page.locator('.order-card')).toHaveCount(1);
+  await expect(page.locator('.inline-tracking')).toHaveCount(1);
+  await search.fill('60-001');
+  await expect(search).toBeFocused();
+  await expect(page).toHaveURL(/#orders$/);
+  await expect(page.locator('.order-card')).toHaveCount(1);
+  await expect(page.locator('.inline-tracking')).toHaveCount(0);
+  await expect(orderCard(page, 'DEMO-261001')).toBeVisible();
+});
+
+test('completed transport exposes sample documents and five completed steps in the list', async ({ page }) => {
+  await page.goto('./#orders');
+  await filterOrders(page, 'completed');
+  await orderCard(page, 'DEMO-260903').getByRole('button', { name: 'Zobacz zlecenie', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Dostawa zakończona', exact: true })).toBeVisible();
   await expect(page.locator('.route-map')).toHaveCount(0);
-  await expect(page.locator('.journey .done')).toHaveCount(4);
+  await expect(page.locator('.journey .done')).toHaveCount(5);
+  await expect(page.locator('.delivery-card')).toContainText('Dojazd na rozładunek');
   const cmr = page.getByRole('button', { name: 'CMR', exact: true });
   await cmr.click();
   const dialog = page.getByRole('dialog');
@@ -139,7 +252,7 @@ test('completed transport exposes sample documents and completed steps', async (
 test('documents are available during transport and estimated progress is explicit', async ({ page }) => {
   await page.goto('./#tracking/DEMO-261001');
   await expect(page.locator('.delivery-card')).toContainText('Godzina szacunkowa');
-  await expect(page.locator('.journey [aria-current="step"]')).toContainText('W drodze');
+  await expect(page.locator('.journey [aria-current="step"]')).toContainText('W drodze na rozładunek');
   const progress = page.getByRole('progressbar', { name: 'Szacunkowy postęp transportu', exact: true });
   await expect(progress).toHaveAttribute('aria-valuenow', '75');
   for (const name of ['CMR', 'Zdjęcie załadunku']) {
@@ -153,17 +266,19 @@ test('documents are available during transport and estimated progress is explici
   }
 });
 
-test('missing GPS and documents show honest empty states while preserving the planned delivery', async ({ page }) => {
+test('missing GPS and documents preserve separate planned load and unload arrival times', async ({ page }) => {
   await page.goto('./#tracking/DEMO-261002');
   await expect(page.locator('.map-footer')).toContainText('Pozycja GPS niedostępna');
   await expect(page.locator('.route-map')).toHaveAttribute('aria-label', /Brak pozycji GPS/);
-  await expect(page.locator('.delivery-estimate strong')).toHaveText('11:00');
+  await expect(page.locator('.delivery-estimate strong')).toHaveText('10:00');
+  await expect(page.locator('.delivery-card')).toContainText('Brak bieżącej pozycji GPS');
+  await expect(orderCard(page, 'DEMO-261002').locator('[data-arrival="unload"]')).toContainText('11:00');
   await expect(page.locator('.documents-card')).toContainText('Dokumenty w przygotowaniu');
   await expect(page.locator('.documents-card button')).toHaveCount(0);
   await expect(page.getByRole('progressbar')).toHaveCount(0);
 });
 
-test('schematic map zoom is bounded and reset restores the whole route', async ({ page }) => {
+test('schematic map zoom is bounded and reset and order switching restore the whole route', async ({ page }) => {
   await page.goto('./#tracking/DEMO-261001');
   const map = page.locator('.route-map');
   const zoomIn = page.getByRole('button', { name: 'Przybliż mapę', exact: true });
@@ -179,8 +294,9 @@ test('schematic map zoom is bounded and reset restores the whole route', async (
   await expect(map).toHaveAttribute('viewBox', '0 0 900 550');
   await expect(zoomOut).toBeDisabled();
   await expect(zoomIn).toBeEnabled();
-  await page.getByRole('button', { name: 'Wszystkie zlecenia', exact: true }).click();
-  await page.locator('.order-card').filter({ hasText: 'DEMO-261002' }).getByRole('button', { name: 'Śledź transport', exact: true }).click();
+  await zoomIn.click();
+  await orderCard(page, 'DEMO-261002').getByRole('button', { name: 'Śledź transport', exact: true }).click();
+  await expect(page.locator('.inline-tracking')).toHaveCount(1);
   await expect(map).toHaveAttribute('viewBox', '0 0 900 550');
 });
 
@@ -195,9 +311,23 @@ test('transport details stay collapsed and can be opened with the keyboard', asy
   await expect(details).toHaveJSProperty('open', true);
   await expect(details.getByText('8 palet · 3 200 kg', { exact: true })).toBeVisible();
   await expect(details.getByText('Karlsruhe, DE', { exact: true })).toBeVisible();
+  await expect(details.getByText('DEMO-261001', { exact: true })).toBeVisible();
+  await expect(details.getByText('Części maszyn', { exact: true })).toBeVisible();
   await page.keyboard.press('Enter');
   await expect(details).toHaveJSProperty('open', false);
   await expect(summary).toBeFocused();
+});
+
+test('order search also finds goods and internal numbers while the client number stays primary', async ({ page }) => {
+  await page.goto('./#orders');
+  const search = page.getByRole('searchbox', { name: 'Szukaj zlecenia po numerze lub mieście', exact: true });
+  await search.fill('opakowania');
+  await expect(page.locator('.order-card')).toHaveCount(1);
+  await expect(page.locator('.order-reference strong')).toHaveText('AMG-DEMO-02');
+  await search.fill('DEMO-261001');
+  await expect(page.locator('.order-card')).toHaveCount(1);
+  await expect(page.locator('.order-reference strong')).toHaveText('AMG-DEMO-01');
+  await expect(page.locator('.order-card')).not.toContainText('DEMO-261001');
 });
 
 test('contact remains accessible from the header on desktop and phone', async ({ page }) => {
