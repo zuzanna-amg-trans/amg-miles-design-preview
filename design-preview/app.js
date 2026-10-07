@@ -19,6 +19,9 @@ const ICONS = {
   bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/>',
   question: '<circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 0 1 6 0c0 2-3 2-3 4M12 17h.01"/>',
   menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  minus: '<path d="M5 12h14"/>',
+  expand: '<path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/>',
+  camera: '<path d="M4 7h4l2-3h4l2 3h4v14H4Z"/><circle cx="12" cy="13" r="4"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   bolt: '<path d="m13 2-9 12h7l-1 8 10-13h-7l1-7Z"/>',
@@ -45,11 +48,11 @@ const money = value => new Intl.NumberFormat('pl-PL', {style:'currency',currency
 const demoSource = {
   balance: {available:24850,earnedThisMonth:3450,expiring:2000,expiresAt:'31.10.2026',bonusOpportunity:800},
   orders: [
-    {id:'DEMO-261001',reference:'AMG-DEMO-01',from:'Poznań',fromCountry:'PL',to:'Lyon',toCountry:'FR',status:'W drodze na rozładunek',kind:'driving',active:true,step:2,load:'06.10.2026, 14:00',delivery:'07.10.2026',deliveryTime:'18:30',window:'18:00–19:00',position:'Stuttgart, Niemcy',updated:'07.10.2026, 10:24',vehicle:'Zestaw 13,6 m',cargo:'8 palet · 3 200 kg',fromXY:[752,138],toXY:[263,480],positionXY:[484,340],path:'M752 138 C686 140 650 192 607 225 S550 280 484 340 S344 421 263 480',traveled:'M752 138 C686 140 650 192 607 225 S550 280 484 340',events:[['Zlecenie przyjęte','05.10.2026, 11:20'],['W drodze na załadunek','06.10.2026, 11:35'],['Na załadunku','06.10.2026, 13:45'],['W drodze na rozładunek','06.10.2026, 14:30']],journeyDates:['05.10 · 11:20','06.10 · 14:00','06.10 · 14:30',null]},
-    {id:'DEMO-261002',reference:'AMG-DEMO-02',from:'Rotterdam',fromCountry:'NL',to:'Wrocław',toCountry:'PL',status:'Na załadunku',kind:'loading',active:true,step:1,load:'07.10.2026, 10:00',delivery:'08.10.2026',deliveryTime:'11:00',window:'10:00–12:00',position:'Rotterdam, Holandia',updated:'07.10.2026, 10:18',vehicle:'Zestaw 13,6 m',cargo:'12 palet · 4 800 kg',fromXY:[373,107],toXY:[739,268],positionXY:[373,107],path:'M373 107 C449 128 498 150 555 176 S672 242 739 268',traveled:null,events:[['Zlecenie przyjęte','06.10.2026, 09:10'],['W drodze na załadunek','07.10.2026, 08:20'],['Na załadunku','07.10.2026, 09:48']],journeyDates:['06.10 · 09:10','07.10 · 09:48',null,null]},
-    {id:'DEMO-260903',reference:'AMG-DEMO-03',from:'Leipzig',fromCountry:'DE',to:'Gdańsk',toCountry:'PL',status:'Rozładowane',kind:'completed',active:false,step:3,load:'04.10.2026, 08:00',delivery:'05.10.2026',deliveryTime:'09:15',window:'09:00–10:00',vehicle:'Zestaw 13,6 m',cargo:'10 palet · 4 000 kg',events:[['Zlecenie przyjęte','03.10.2026, 11:00'],['Na załadunku','04.10.2026, 08:00'],['W drodze na rozładunek','04.10.2026, 09:10'],['Na rozładunku','05.10.2026, 08:55'],['Rozładowane','05.10.2026, 09:15']],journeyDates:['03.10 · 11:00','04.10 · 08:00','04.10 · 09:10','05.10 · 09:15']},
-    {id:'DEMO-260904',reference:'AMG-DEMO-04',from:'Antwerpia',fromCountry:'BE',to:'Katowice',toCountry:'PL',status:'Rozładowane',kind:'completed',active:false,step:3,load:'01.10.2026, 12:00',delivery:'02.10.2026',deliveryTime:'14:10',window:'14:00–15:00',vehicle:'Zestaw 13,6 m',cargo:'6 palet · 2 100 kg',events:[['Zlecenie przyjęte','30.09.2026, 10:00'],['Na załadunku','01.10.2026, 12:00'],['W drodze na rozładunek','01.10.2026, 13:20'],['Rozładowane','02.10.2026, 14:10']],journeyDates:['30.09 · 10:00','01.10 · 12:00','01.10 · 13:20','02.10 · 14:10']},
-    {id:'DEMO-260905',reference:'AMG-DEMO-05',from:'Berlin',fromCountry:'DE',to:'Warszawa',toCountry:'PL',status:'Rozładowane',kind:'completed',active:false,step:3,load:'28.09.2026, 09:00',delivery:'29.09.2026',deliveryTime:'08:45',window:'08:00–10:00',vehicle:'Zestaw 13,6 m',cargo:'14 palet · 5 400 kg',events:[['Zlecenie przyjęte','27.09.2026, 12:00'],['Na załadunku','28.09.2026, 09:00'],['W drodze na rozładunek','28.09.2026, 10:15'],['Rozładowane','29.09.2026, 08:45']],journeyDates:['27.09 · 12:00','28.09 · 09:00','28.09 · 10:15','29.09 · 08:45']},
+    {id:'DEMO-261001',reference:'AMG-DEMO-01',from:'Poznań',fromCountry:'PL',to:'Lyon',toCountry:'FR',status:'W drodze na rozładunek',kind:'driving',active:true,step:2,load:'06.10.2026, 14:00',delivery:'07.10.2026',deliveryTime:'18:30',window:'18:00–19:00',progress:75,documents:[{name:'CMR',kind:'document',detail:'Po załadunku · 06.10, 14:12'},{name:'Zdjęcie załadunku',kind:'camera',detail:'06.10, 14:08'}],stops:[['Załadunek','Poznań, PL','06.10.2026, 14:00'],['Punkt pośredni','Karlsruhe, DE','07.10.2026, 11:30 · plan'],['Rozładunek','Lyon, FR','07.10.2026, 18:00–19:00 · plan']],position:'Stuttgart, Niemcy',updated:'07.10.2026, 10:24',vehicle:'Zestaw 13,6 m',cargo:'8 palet · 3 200 kg',fromXY:[752,138],toXY:[263,480],positionXY:[484,340],path:'M752 138 C686 140 650 192 607 225 S550 280 484 340 S344 421 263 480',traveled:'M752 138 C686 140 650 192 607 225 S550 280 484 340',events:[['Zlecenie przyjęte','05.10.2026, 11:20'],['W drodze na załadunek','06.10.2026, 11:35'],['Na załadunku','06.10.2026, 13:45'],['W drodze na rozładunek','06.10.2026, 14:30']],journeyDates:['05.10 · 11:20','06.10 · 14:00','06.10 · 14:30',null]},
+    {id:'DEMO-261002',reference:'AMG-DEMO-02',from:'Rotterdam',fromCountry:'NL',to:'Wrocław',toCountry:'PL',status:'Na załadunku',kind:'loading',active:true,step:1,load:'07.10.2026, 10:00',delivery:'08.10.2026',deliveryTime:'11:00',window:'10:00–12:00',progress:null,documents:[],stops:[['Załadunek','Rotterdam, NL','07.10.2026, 10:00'],['Rozładunek','Wrocław, PL','08.10.2026, 10:00–12:00 · plan']],position:null,updated:null,vehicle:'Zestaw 13,6 m',cargo:'12 palet · 4 800 kg',fromXY:[373,107],toXY:[739,268],positionXY:null,path:'M373 107 C449 128 498 150 555 176 S672 242 739 268',traveled:null,events:[['Zlecenie przyjęte','06.10.2026, 09:10'],['W drodze na załadunek','07.10.2026, 08:20'],['Na załadunku','07.10.2026, 09:48']],journeyDates:['06.10 · 09:10','07.10 · 09:48',null,null]},
+    {id:'DEMO-260903',reference:'AMG-DEMO-03',from:'Leipzig',fromCountry:'DE',to:'Gdańsk',toCountry:'PL',status:'Rozładowane',kind:'completed',active:false,step:3,progress:100,documents:[{name:'CMR',kind:'document',detail:'Po rozładunku · demo'},{name:'Faktura',kind:'invoice',detail:'Przykładowy dokument'}],load:'04.10.2026, 08:00',delivery:'05.10.2026',deliveryTime:'09:15',window:'09:00–10:00',vehicle:'Zestaw 13,6 m',cargo:'10 palet · 4 000 kg',events:[['Zlecenie przyjęte','03.10.2026, 11:00'],['Na załadunku','04.10.2026, 08:00'],['W drodze na rozładunek','04.10.2026, 09:10'],['Na rozładunku','05.10.2026, 08:55'],['Rozładowane','05.10.2026, 09:15']],journeyDates:['03.10 · 11:00','04.10 · 08:00','04.10 · 09:10','05.10 · 09:15']},
+    {id:'DEMO-260904',reference:'AMG-DEMO-04',from:'Antwerpia',fromCountry:'BE',to:'Katowice',toCountry:'PL',status:'Rozładowane',kind:'completed',active:false,step:3,progress:100,documents:[{name:'CMR',kind:'document',detail:'Po rozładunku · demo'},{name:'Faktura',kind:'invoice',detail:'Przykładowy dokument'}],load:'01.10.2026, 12:00',delivery:'02.10.2026',deliveryTime:'14:10',window:'14:00–15:00',vehicle:'Zestaw 13,6 m',cargo:'6 palet · 2 100 kg',events:[['Zlecenie przyjęte','30.09.2026, 10:00'],['Na załadunku','01.10.2026, 12:00'],['W drodze na rozładunek','01.10.2026, 13:20'],['Rozładowane','02.10.2026, 14:10']],journeyDates:['30.09 · 10:00','01.10 · 12:00','01.10 · 13:20','02.10 · 14:10']},
+    {id:'DEMO-260905',reference:'AMG-DEMO-05',from:'Berlin',fromCountry:'DE',to:'Warszawa',toCountry:'PL',status:'Rozładowane',kind:'completed',active:false,step:3,progress:100,documents:[{name:'CMR',kind:'document',detail:'Po rozładunku · demo'},{name:'Faktura',kind:'invoice',detail:'Przykładowy dokument'}],load:'28.09.2026, 09:00',delivery:'29.09.2026',deliveryTime:'08:45',window:'08:00–10:00',vehicle:'Zestaw 13,6 m',cargo:'14 palet · 5 400 kg',events:[['Zlecenie przyjęte','27.09.2026, 12:00'],['Na załadunku','28.09.2026, 09:00'],['W drodze na rozładunek','28.09.2026, 10:15'],['Rozładowane','29.09.2026, 08:45']],journeyDates:['27.09 · 12:00','28.09 · 09:00','28.09 · 10:15','29.09 · 08:45']},
   ],
   invoices: [
     {id:'DEMO/2026/1042',issued:'02.10.2026',amount:160,due:'16.10.2026',status:'unpaid',points:800,bonus:800,fastUntil:'12.10.2026'},
@@ -70,7 +73,7 @@ const demoSource = {
 };
 
 const VIEWS = {orders:'Zlecenia',tracking:'Podgląd zlecenia',invoices:'Faktury',rewards:'Nagrody',history:'Historia punktów',claims:'Moje nagrody',rules:'Zasady programu'};
-let state = {view:'orders',orderStatus:'active',orderSearch:'',selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones'};
+let state = {view:'orders',orderStatus:'active',orderSearch:'',selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones',mapZoom:1};
 let toastTimer;
 let modalTrigger;
 
@@ -91,16 +94,19 @@ function button(label, action, style='primary', extras='') {
   return `<button class="button button-${style}" data-action="${action}" ${extras}><span>${label}</span><span class="button-circle">${icon('arrow')}</span></button>`;
 }
 
+
 function shell() {
   const active=['orders','tracking'].includes(state.view)?'orders':state.view==='invoices'?'invoices':'rewards';
-  const navItem=(view,name,ic)=>`<button class="nav-item ${active===view?'active':''}" data-view="${view}" ${active===view?'aria-current="page"':''}>${icon(ic)}<span>${name}</span></button>`;
+  const navItem=(view,name,ic)=>`<button class="nav-item ${active===view?'active':''}" data-view="${view}" ${active===view?'aria-current="page"':''}>${icon(ic)}<span>${name}</span>${icon('right','nav-arrow')}</button>`;
   document.getElementById('app').innerHTML=`<div class="shell">
-    <header class="topbar"><div class="header-inner">
+    <aside class="sidebar">
       <button class="brand" data-view="orders" aria-label="AMG Miles — zlecenia"><img src="assets/amg-logo-white.webp" alt="AMG European Transport"><span class="brand-word">miles<em>.</em></span></button>
+      <div class="sidebar-label">Twój panel klienta</div>
       <nav class="primary-nav" aria-label="Nawigacja panelu">${navItem('orders','Zlecenia','truck')}${navItem('invoices','Faktury','invoice')}${navItem('rewards','Nagrody','gift')}</nav>
-      <div class="header-actions"><button class="points-pill" data-action="open-balance" aria-label="Twoje punkty demonstracyjne: ${number(demoSource.balance.available)}">${icon('spark')}<strong>${number(demoSource.balance.available)}</strong><span>pkt</span></button><button class="contact-button" data-action="contact">${icon('support')}<span>Kontakt</span></button><span class="avatar" aria-label="Konto demonstracyjne">TF</span></div>
-    </div></header>
-    <main class="content ${state.view==='tracking'?'tracking-content':''}" id="main-content" tabindex="-1"><div class="preview-note">Podgląd projektu <span>·</span> wszystkie dane są przykładowe</div><div class="view">${renderView()}</div><footer class="page-footer"><span>© 2026 AMG Trans</span><div><button data-view="rules">Zasady AMG Miles</button><button data-action="about-preview">O podglądzie ${icon('arrow')}</button></div></footer></main>
+      <div class="sidebar-bottom"><button class="points-pill" data-action="open-balance" aria-label="Twoje punkty demonstracyjne: ${number(demoSource.balance.available)}"><span class="points-icon">${icon('spark')}</span><span><small>Twoje AMG Miles</small><strong>${number(demoSource.balance.available)} <span>pkt</span></strong></span>${icon('chevron')}</button><span class="sidebar-signature">Zawsze po drodze<span class="little-dot"></span></span></div>
+    </aside>
+    <div class="workspace"><header class="topbar"><div class="header-inner"><div class="breadcrumb">Panel klienta <span>/</span> <strong>${VIEWS[state.view]}</strong></div><div class="header-actions"><button class="contact-button" data-action="contact" aria-label="Kontakt z AMG">${icon('support')}<span>Kontakt z AMG</span></button><span class="header-separator"></span><div class="account-label"><strong>Firma przykładowa</strong><span>Konto demonstracyjne</span></div><span class="avatar" aria-label="Konto demonstracyjne">FP</span></div></div></header>
+    <main class="content ${state.view==='tracking'?'tracking-content':''}" id="main-content" tabindex="-1"><div class="preview-note">Podgląd projektu <span>·</span> wszystkie dane są przykładowe</div><div class="view">${renderView()}</div><footer class="page-footer"><span>© 2026 AMG Trans</span><div><button data-view="rules">Zasady AMG Miles</button><button data-action="about-preview">O podglądzie ${icon('arrow')}</button></div></footer></main></div>
   </div>`;
   document.title=`${VIEWS[state.view]} · AMG Miles — podgląd`;
 }
@@ -122,13 +128,16 @@ function orderStatus(o) {
   return `<span class="status ${o.kind==='loading'?'amber':o.active?'':'neutral'}">${esc(o.status)}</span>`;
 }
 
+
 function orderCard(o) {
+  const deliveryLabel=o.active?(o.kind==='loading'?'Planowana dostawa':'Przewidywana dostawa'):'Rozładowano';
   return `<article class="card order-card">
     <div class="order-top"><div class="order-reference"><strong>${o.id}</strong><span>Twój numer: ${o.reference}</span></div>${orderStatus(o)}</div>
-    <div class="order-body"><div class="order-route"><div><h2>${o.from}<span class="country-code">${o.fromCountry}</span></h2></div><span class="route-connector">${icon('right')}</span><div><h2>${o.to}<span class="country-code">${o.toCountry}</span></h2></div></div>
-      <button class="button ${o.active?'button-dark':'button-secondary'}" data-action="order-detail" data-id="${o.id}"><span>${o.active?'Śledź transport':'Zobacz zlecenie'}</span><span class="button-circle">${icon(o.active?'arrow':'right')}</span></button>
+    <div class="order-body"><div class="order-route"><div><span class="route-label">Z</span><h2>${o.from}<span class="country-code">${o.fromCountry}</span></h2></div><span class="route-connector">${icon('right')}</span><div><span class="route-label">Do</span><h2>${o.to}<span class="country-code">${o.toCountry}</span></h2></div></div>
+      <div class="order-eta"><span>${deliveryLabel}</span><strong>${o.deliveryTime}</strong><small>${o.delivery}</small></div>
+      <button class="button ${o.active?'button-primary':'button-secondary'}" data-action="order-detail" data-id="${o.id}"><span>${o.active?'Śledź transport':'Zobacz zlecenie'}</span><span class="button-circle">${icon(o.active?'arrow':'right')}</span></button>
     </div>
-    <div class="order-bottom"><div class="order-time">${icon('calendar')}<div><span>Załadunek</span><strong>${o.load}</strong></div></div><div class="order-time">${icon(o.active?'clock':'check')}<div><span>${o.active?(o.kind==='loading'?'Planowana dostawa':'Przewidywana dostawa'):'Rozładowano'}</span><strong>${o.delivery}, ${o.deliveryTime}</strong></div></div><span class="order-doc-note">${icon(o.active?'document':'check')}${o.active?'Dokumenty po dostawie':'CMR i faktura dostępne'}</span></div>
+    <div class="order-bottom"><span class="order-load">${icon('calendar')}<span>Załadunek <strong>${o.load}</strong></span></span><span class="order-doc-note ${o.documents.length?'has-documents':''}">${icon('document')}${o.documents.length?`Dostępne dokumenty · ${o.documents.length}`:'Dokumenty w przygotowaniu'}</span></div>
   </article>`;
 }
 
@@ -137,16 +146,23 @@ function orderResults() {
   return `${orders.length?orders.map(orderCard).join(''):emptyState('search','Nie ma takich zleceń','Zmień filtr lub wyszukaj inny numer albo miasto.')}<div class="results-count" role="status">${orders.length} z ${demoSource.orders.length} zleceń demonstracyjnych</div>`;
 }
 
+
 function ordersView() {
-  return `${pageHead('Panel klienta','Twoje <em>zlecenia.</em>','Sprawdź, na jakim etapie jest Twój transport.')}
-    <div class="filter-bar"><div class="filters" aria-label="Filtruj zlecenia">${[['active','W realizacji',2],['completed','Zakończone',3],['all','Wszystkie',5]].map(([key,name,count])=>`<button class="filter ${state.orderStatus===key?'active':''}" aria-pressed="${state.orderStatus===key}" data-action="order-filter" data-id="${key}">${name}<span>${count}</span></button>`).join('')}</div><label class="search-field">${icon('search')}<input id="order-search" type="search" placeholder="Numer zlecenia lub miasto" aria-label="Szukaj zlecenia po numerze lub mieście" value="${esc(state.orderSearch)}"></label></div>
+  return `${pageHead('Twoje transporty z AMG','Twoje <em>zlecenia.</em>','Status, termin dostawy i dokumenty — wszystko pod ręką.')}
+    <div class="filter-bar"><div class="filters" aria-label="Filtruj zlecenia">${[['active','W realizacji'],['completed','Zakończone'],['all','Wszystkie']].map(([key,name])=>{const count=demoSource.orders.filter(o=>key==='all'||(key==='active'?o.active:!o.active)).length;return `<button class="filter ${state.orderStatus===key?'active':''}" aria-pressed="${state.orderStatus===key}" data-action="order-filter" data-id="${key}">${name}<span>${count}</span></button>`;}).join('')}</div><label class="search-field">${icon('search')}<input id="order-search" type="search" placeholder="Numer zlecenia lub miasto" aria-label="Szukaj zlecenia po numerze lub mieście" value="${esc(state.orderSearch)}"></label></div>
     <div class="order-list" id="order-results">${orderResults()}</div>
-    <div class="miles-strip"><span class="miles-symbol">${icon('gift')}</span><div><strong>Twoja współpraca daje więcej.</strong><span>Masz ${number(demoSource.balance.available)} punktów AMG Miles w tym podglądzie.</span></div><button class="text-action" data-view="rewards">Zobacz nagrody ${icon('arrow')}</button></div>`;
+    <div class="miles-strip"><span class="miles-symbol">${icon('gift')}</span><div><strong>Z AMG każdy kilometr daje więcej.</strong><span>Sprawdź, na co wymienisz swoje punkty Miles.</span></div><button class="text-action" data-view="rewards">Zobacz nagrody ${icon('arrow')}</button></div>`;
 }
 
-// Schematic illustration only. Production tracking must use the real map and GPS API.
+// Schematic illustration only. Production tracking must use the actual map and GPS data.
+
+function mapViewBox() {
+  const width=900/state.mapZoom, height=550/state.mapZoom;
+  return `${(900-width)/2} ${(550-height)/2} ${width} ${height}`;
+}
+
 function routeMap(o) {
-  return `<svg class="route-map" viewBox="0 0 900 550" role="img" aria-label="Poglądowa mapa demonstracyjnej trasy ${o.from} — ${o.to}. Pozycja przykładowa: ${o.position}.">
+  return `<svg class="route-map" viewBox="${mapViewBox()}" role="img" aria-label="Poglądowa mapa demonstracyjnej trasy ${o.from} — ${o.to}. ${o.position?`Pozycja przykładowa: ${o.position}.`:'Brak pozycji GPS. Pokazano planowaną trasę.'}">
     <defs><pattern id="map-grain" width="42" height="42" patternUnits="userSpaceOnUse"><circle cx="9" cy="14" r="1" fill="#889383" opacity=".11"/></pattern><filter id="marker-shadow" x="-100%" y="-100%" width="300%" height="300%"><feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#15221e" flood-opacity=".15"/></filter></defs>
     <rect width="900" height="550" fill="#edf0e9"/><path d="M0 0h363l-23 46-58 35-30 52-61 11-17 38-60 30L0 224Z" fill="#dce7e5"/>
     <path d="M176 550 205 476 241 445 244 399 291 371 336 316 390 302 425 261 461 227 489 182 480 131 504 78 530 0M627 0 646 94 625 150 661 211 644 277 677 328 659 381 701 433 722 550M0 361 96 348 183 341 240 310 294 324 339 313 397 324 449 346 465 397 482 437 534 451 579 485 637 499 691 479 736 488 790 485 900 509" fill="none" stroke="#cdd4c8" stroke-width="1.5"/>
@@ -160,7 +176,7 @@ function routeMap(o) {
     ${o.traveled?`<path d="${o.traveled}" fill="none" stroke="#e2743d" stroke-width="5" stroke-linecap="round"/>`:''}
     <g fill="#fff" stroke="#273c32" stroke-width="3"><circle cx="${o.fromXY[0]}" cy="${o.fromXY[1]}" r="7"/><circle cx="${o.toXY[0]}" cy="${o.toXY[1]}" r="7"/></g>
     <g font-family="Onest, sans-serif" font-size="16" font-weight="500" fill="#354038"><text x="${o.fromXY[0]+15}" y="${o.fromXY[1]-11}">${o.from}</text><text x="${o.toXY[0]+15}" y="${o.toXY[1]+27}">${o.to}</text></g>
-    <g transform="translate(${o.positionXY[0]},${o.positionXY[1]})" filter="url(#marker-shadow)"><circle r="37" fill="#ff8145" opacity=".14"/><circle r="24" fill="#202923" stroke="#fff" stroke-width="4"/><g transform="translate(-12,-12)" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round">${ICONS.truck}</g><rect x="-61" y="37" width="122" height="31" rx="15.5" fill="#fff"/><text x="0" y="57" text-anchor="middle" font-family="Onest, sans-serif" font-size="12" font-weight="500" fill="#28352d">${o.position.split(',')[0]}</text></g>
+    ${o.positionXY?`<g transform="translate(${o.positionXY[0]},${o.positionXY[1]})" filter="url(#marker-shadow)"><circle r="37" fill="#ff8145" opacity=".14"/><circle r="24" fill="#202923" stroke="#fff" stroke-width="4"/><g transform="translate(-12,-12)" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round">${ICONS.truck}</g><rect x="-61" y="37" width="122" height="31" rx="15.5" fill="#fff"/><text x="0" y="57" text-anchor="middle" font-family="Onest, sans-serif" font-size="12" font-weight="500" fill="#28352d">${o.position.split(',')[0]}</text></g>`: ''}
   </svg>`;
 }
 
@@ -168,15 +184,25 @@ function journey(o) {
   return `<ol class="journey" aria-label="Etapy realizacji zlecenia">${['Przyjęte','Załadunek','W drodze','Dostawa'].map((label,i)=>{const done=i<o.step||(!o.active&&i===o.step); const current=i===o.step&&o.active;return `<li class="${done?'done':current?'current':'upcoming'}" ${current?'aria-current="step"':''}><span class="step-dot">${done?icon('check'):current?icon(o.kind==='loading'?'pin':'truck'):(i+1)}</span><div><strong>${label}</strong><span>${o.journeyDates[i]||'Przed nami'}</span></div></li>`;}).join('')}</ol>`;
 }
 
+
+function orderDocuments(o) {
+  return `<section class="card documents-card" aria-labelledby="documents-title"><div class="card-heading"><div><h2 id="documents-title">Dokumenty zlecenia</h2><p>${o.documents.length?'Dostępne na tym etapie transportu.':'Dodamy je tutaj, gdy będą dostępne.'}</p></div><span class="document-count">${o.documents.length}</span></div>${o.documents.length?`<div class="document-list">${o.documents.map(d=>`<button class="document-button" data-action="document-demo" data-id="${o.id}" data-document="${esc(d.name)}" aria-label="${esc(d.name)}"><span class="document-icon">${icon(d.kind)}</span><span><strong>${d.name}</strong><small>${d.detail}</small></span><span class="document-arrow">${icon('arrow')}</span></button>`).join('')}</div>`:`<div class="document-empty">${icon('document')}<div><strong>Dokumenty w przygotowaniu</strong><span>Obecnie nie ma dokumentów do podglądu.</span></div></div>`}</section>`;
+}
+
+function transportDetails(o) {
+  const stops=o.stops||[['Załadunek',`${o.from}, ${o.fromCountry}`,o.load],['Rozładunek',`${o.to}, ${o.toCountry}`,`${o.delivery}, ${o.deliveryTime}`]];
+  return `<details class="card transport-details"><summary><span>${icon('truck')} Szczegóły transportu</span>${icon('down')}</summary><div class="transport-detail-body"><dl class="transport-facts"><div><dt>Numer referencyjny</dt><dd>${o.reference}</dd></div><div><dt>Pojazd</dt><dd>${o.vehicle}</dd></div><div><dt>Ładunek</dt><dd>${o.cargo}</dd></div></dl><div class="route-points"><h3>Punkty trasy</h3><ol>${stops.map(([label,city,time])=>`<li><span class="route-point-dot"></span><div><small>${label}</small><strong>${city}</strong><span>${time}</span></div></li>`).join('')}</ol></div></div></details>`;
+}
+
 function trackingView() {
   const o=demoSource.orders.find(item=>item.id===state.selectedOrder);
   return `<button class="back-link" data-view="orders">${icon('left')} Wszystkie zlecenia</button>
     ${pageHead(o.id,`${o.from}<span class="title-arrow">${icon('right')}<span class="sr-only"> — </span></span>${o.to}`,`Twój numer: ${o.reference}`,button('Kontakt z AMG','contact','secondary'))}
-    <div class="tracking-grid"><section class="card map-card"><div class="map-heading"><h2>${icon(o.active?'pin':'check')}${o.active?'Pozycja pojazdu':'Dostawa zakończona'}</h2><span class="demo-tag">${o.active?'Mapa poglądowa · demo':'Dokumenty demo'}</span></div>
-      ${o.active?`<div class="map-area">${routeMap(o)}</div><div class="map-footer">${icon('pin')}<strong>${o.position}</strong><span>Przykładowa pozycja · ${o.updated}</span></div>`:`<div class="completed-panel"><span class="completion-icon">${icon('check')}</span><h3>Transport dotarł na miejsce.</h3><p>${o.to} · ${o.delivery}, ${o.deliveryTime}</p><div class="completed-documents"><button class="document-button" data-action="document-demo" data-id="${o.id}" data-document="CMR">${icon('document')} CMR ${icon('arrow')}</button><button class="document-button" data-action="document-demo" data-id="${o.id}" data-document="Faktura">${icon('invoice')} Faktura ${icon('arrow')}</button></div></div>`}
-    </section><section class="card delivery-card"><div class="delivery-card-top">${orderStatus(o)}</div><div class="delivery-estimate"><span>${o.active?(o.kind==='loading'?'Planowana dostawa':'Przewidywana dostawa'):'Rozładowano'}</span><strong>${o.deliveryTime}</strong><span class="delivery-date">${o.delivery}</span><small>${o.active?'Okno dostawy':'Planowane okno'} ${o.window}</small></div><dl class="delivery-facts"><div><dt>Załadunek</dt><dd>${o.load}</dd></div><div><dt>Pojazd</dt><dd>${o.vehicle}</dd></div><div><dt>Ładunek</dt><dd>${o.cargo}</dd></div></dl></section></div>
-    <section class="card progress-card"><div class="card-heading"><h2>Realizacja zlecenia</h2><button class="text-action" data-action="order-history" data-id="${o.id}">${icon('history')} Historia statusów ${icon('arrow')}</button></div>${journey(o)}</section>
-    ${o.active?`<div class="document-note">${icon('document')}<span>CMR i fakturę znajdziesz tutaj po zakończeniu transportu.</span></div>`:''}`;
+    <div class="tracking-grid"><section class="card map-card"><div class="map-heading"><h2>${icon(o.active?'pin':'check')}${o.active?'Pozycja pojazdu':'Dostawa zakończona'}</h2><span class="demo-tag">${o.active?'Mapa poglądowa · demo':'Zlecenie demo'}</span></div>
+      ${o.active?`<div class="map-area">${routeMap(o)}<div class="map-controls" aria-label="Sterowanie mapą poglądową"><button class="icon-button" data-action="map-zoom-in" aria-label="Przybliż mapę" ${state.mapZoom>=2.4?'disabled':''}>${icon('plus')}</button><button class="icon-button" data-action="map-zoom-out" aria-label="Oddal mapę" ${state.mapZoom<=1?'disabled':''}>${icon('minus')}</button><button class="icon-button" data-action="map-reset" aria-label="Pokaż całą trasę">${icon('expand')}</button></div><span class="map-scale">Schemat trasy</span></div><div class="map-footer">${icon('pin')}<div><strong>${o.position||'Pozycja GPS niedostępna'}</strong><span>${o.position?`Przykładowa pozycja · ${o.updated}`:'Pokazujemy planowaną trasę, bez pozycji pojazdu.'}</span></div><span class="map-source">${o.position?'Dane demo':'Brak GPS'}</span></div>`:`<div class="completed-panel"><span class="completion-icon">${icon('check')}</span><h3>Transport dotarł na miejsce.</h3><p>${o.to} · ${o.delivery}, ${o.deliveryTime}</p><span class="completion-caption">Dokumenty znajdziesz poniżej.</span></div>`}
+    </section><section class="card delivery-card"><div class="delivery-card-top">${orderStatus(o)}${icon(o.active?'truck':'check')}</div><div class="delivery-estimate"><span>${o.active?(o.kind==='loading'?'Planowana dostawa':'Przewidywana dostawa'):'Rozładowano'}</span><strong>${o.deliveryTime}</strong><span class="delivery-date">${o.delivery}</span><small>${icon('clock')}${o.active?'Okno dostawy':'Planowane okno'} ${o.window}</small></div>${o.active?`<div class="delivery-confidence">${icon('info')}<span>${o.kind==='driving'?'Godzina szacunkowa. Może się zmienić w trakcie realizacji.':'Termin z planu transportu. Dokładne ETA pojawi się, gdy będzie dostępne.'}</span></div>`:'<p class="delivery-confidence">Dostawa potwierdzona w danych demonstracyjnych.</p>'}<div class="delivery-origin"><span>Załadunek</span><strong>${o.load}</strong></div></section></div>
+    <section class="card progress-card"><div class="card-heading"><h2>Realizacja zlecenia</h2><button class="text-action" data-action="order-history" data-id="${o.id}">${icon('history')} Historia statusów ${icon('arrow')}</button></div>${journey(o)}${o.active&&o.progress!==null?`<div class="transport-progress"><div><span>Postęp transportu <small>· szacunkowy</small></span><strong>${o.progress}%</strong></div><div class="transport-progress-track" role="progressbar" aria-label="Szacunkowy postęp transportu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${o.progress}"><span style="width:${o.progress}%"></span></div></div>`:''}</section>
+    ${orderDocuments(o)}${transportDetails(o)}`;
 }
 
 function orderHistory(id) {
@@ -229,6 +255,7 @@ function navigate(view,focus=true) {
   if (!VIEWS[view]) return;
   state.view=view;
   state.search='';
+  state.mapZoom=1;
   const hash=view==='tracking'?`#tracking/${state.selectedOrder}`:`#${view}`;
   if (window.location.hash!==hash) window.history.pushState(null,'',hash);
   shell();
@@ -269,11 +296,17 @@ document.addEventListener('click',event=>{
   const target=event.target.closest('[data-action],[data-view]'); if(!target)return;
   if(target.dataset.view) {closeDialog(); navigate(target.dataset.view); return;}
   const {action,id}=target.dataset;
+  if(['map-zoom-in','map-zoom-out','map-reset'].includes(action)){
+    state.mapZoom=action==='map-reset'?1:Math.max(1,Math.min(2.4,Math.round((state.mapZoom+(action==='map-zoom-in' ? 0.35 : -0.35))*100)/100));
+    document.querySelector('.route-map').setAttribute('viewBox',mapViewBox());
+    document.querySelector('[data-action="map-zoom-in"]').disabled=state.mapZoom>=2.4;
+    document.querySelector('[data-action="map-zoom-out"]').disabled=state.mapZoom<=1;
+  }
   if(action==='open-rewards')navigate('rewards');
   if(action==='order-detail'){state.selectedOrder=id;navigate('tracking');}
   if(action==='order-filter'){state.orderStatus=id;shell();document.querySelector(`[data-action="order-filter"][data-id="${id}"]`).focus();}
   if(action==='order-history')orderHistory(id);
-  if(action==='document-demo')openDialog('Dokument demonstracyjny',target.dataset.document,`<p class="dialog-copy">W tym podglądzie dokumenty służą do pokazania miejsca, w którym klient otworzy CMR lub fakturę przypisaną do zlecenia.</p><div class="dialog-stats"><div class="dialog-stat"><span>Zlecenie</span><strong>${esc(id)}</strong></div><div class="dialog-stat"><span>Dokument</span><strong>${esc(target.dataset.document)} · demo</strong></div></div>`,button('Wróć','close-dialog','secondary'));
+  if(action==='document-demo')openDialog('Dokument demonstracyjny',target.dataset.document,`<p class="dialog-copy">To podgląd miejsca, w którym otworzysz dokument lub zdjęcie przypisane do zlecenia. Ten przykład nie zawiera rzeczywistego pliku.</p><div class="dialog-stats"><div class="dialog-stat"><span>Zlecenie</span><strong>${esc(id)}</strong></div><div class="dialog-stat"><span>Dokument</span><strong>${esc(target.dataset.document)} · demo</strong></div></div>`,button('Wróć','close-dialog','secondary'));
   if(action==='reward-filter'){state.rewardCategory=id; shell(); document.querySelector(`[data-action="reward-filter"][data-id="${id}"]`).focus();}
   if(action==='invoice-filter'){state.invoiceStatus=id; shell(); document.querySelector(`[data-action="invoice-filter"][data-id="${id}"]`).focus();}
   if(action==='unpaid-invoices'){state.invoiceStatus='unpaid'; navigate('invoices');}
@@ -308,6 +341,7 @@ document.getElementById('detail-dialog').addEventListener('click',event=>{
 });
 function applyRoute() {
   if(document.getElementById('detail-dialog').open)closeDialog();
+  state.mapZoom=1;
   const [view,id]=window.location.hash.slice(1).split('/');
   state.view=view==='overview'?'orders':VIEWS[view]?view:'orders';
   if(state.view==='tracking'){

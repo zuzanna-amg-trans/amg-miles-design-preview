@@ -17,11 +17,13 @@ Pełne testy przeglądarkowe wykonuje GitHub Actions przez pull request. Po inte
 ## Widoki i interakcje
 
 - Lista zleceń z filtrami realizacji/archiwum i wyszukiwaniem numeru, numeru klienta lub miasta.
-- Szczegóły zlecenia: mapa poglądowa, przykładowa pozycja pojazdu, czas dostawy, okno dostawy, etapy i historia statusów.
-- Zlecenie dostarczone z miejscem na podgląd CMR i faktury.
+- Szczegóły zlecenia: mapa poglądowa z przybliżaniem i resetem, przykładowa pozycja pojazdu, czas i okno dostawy, etapy i historia statusów. Termin planowany oraz ETA szacunkowe mają odrębne opisy.
+- Szacunkowy postęp pierwszego transportu, dostępne w trakcie realizacji CMR i zdjęcie załadunku. Zakończone zlecenia pokazują CMR i fakturę. Lista dokumentów pochodzi z osobnego pola danych, niezależnie od statusu.
+- Drugie zlecenie prezentuje brak GPS i dokumenty w przygotowaniu; mapa pokazuje wyłącznie planowaną trasę, bez zastępczej pozycji pojazdu.
+- Rozwijane szczegóły auta, ładunku i punktów trasy, w tym demonstracyjny punkt pośredni.
 - Faktury z filtrowaniem, wyszukiwaniem i szczegółami.
 - Katalog nagród, demonstracyjny wybór celu, historia punktów, moje nagrody i zasady programu.
-- Kontakt, okna szczegółów i obsługa klawiaturą; trzy główne zakładki są widoczne również na telefonie.
+- Kontakt, okna szczegółów i obsługa klawiaturą. Na komputerze trzy zakładki są w bocznym panelu, na telefonie — w stałej nawigacji dolnej. Na telefonie termin dostawy poprzedza mapę.
 
 Wszystkie rekordy w `demoSource` są fikcyjne. Publiczny kod, ilustracje i zrzuty ekranu nie zawierają danych z zalogowanego konta Miles. Prototyp nie uwierzytelnia użytkowników, nie pobiera GPS, nie przelicza rzeczywistych rozliczeń, nie wysyła wiadomości ani nie zamawia nagród. Zapis celu pozostaje w pamięci bieżącej karty i znika po przeładowaniu.
 
@@ -29,7 +31,7 @@ Wszystkie rekordy w `demoSource` są fikcyjne. Publiczny kod, ilustracje i zrzut
 
 Onest, grafit, ciepły pomarańcz `#ff8145`, jasne powierzchnie oraz zaokrąglone przyciski z osobnym kółkiem na ikonę. Logo i font pozyskano z oficjalnej strony AMG Trans 6 października 2026.
 
-Schemat statusów inspirowano rzeczywistym widokiem zleceń i jego historią po zalogowaniu 7 października 2026. Zalogowane konto pokazywało zlecenia archiwalne; rzeczywisty ekran GPS i pola ETA dla aktywnego zlecenia nie zostały jeszcze zweryfikowane. Ilustracja mapy, ETA oraz pola pojazdu i ładunku są propozycją interfejsu, a nie potwierdzonym kontraktem API.
+Układ inspirowano rzeczywistymi widokami aktywnego i archiwalnego zlecenia po zalogowaniu 7 października 2026. W aktywnym zleceniu obejrzano mapę, szacunkowy postęp i dostawę, historię statusów, pojazd, punkty trasy oraz dokumenty dostępne jeszcze podczas transportu. Publiczny projekt odtwarza tę hierarchię na samodzielnie przygotowanych fikcyjnych rekordach. Ilustracja mapy, model danych i komponenty są propozycją interfejsu; nie stanowią potwierdzonego kontraktu API.
 
 Publiczna strona programu podaje 5 punktów za 1 EUR netto, bonus 100% przy płatności do 10 dni, bonus 30% do połowy terminu oraz 12 miesięcy ważności. Prototyp prezentuje te informacje bez implementowania nowej logiki rozliczeń.
 
@@ -41,7 +43,7 @@ Ten katalog nie jest kopią repozytorium dev AMG Miles. Do integracji potrzebny 
 2. Przenieść tokeny i komponenty do istniejącej architektury, zachowując aktualne uprawnienia.
 3. Pobierać listę zleceń i pełną historię statusów z backendu. Cztery etapy w projekcie są wizualnym skrótem; oryginalne statusy i daty muszą być zachowane w historii.
 4. Potwierdzić dostawcę mapy, źródło GPS, częstotliwość aktualizacji oraz dostępność i znaczenie ETA. Pokazać wiek pozycji; dla brakującej pozycji lub ETA wyświetlić jawny stan braku danych.
-5. Udostępniać CMR i faktury według faktycznej dostępności dokumentów i uprawnień, niezależnie od samego statusu transportu.
+5. Udostępniać CMR, zdjęcia i faktury według faktycznej dostępności dokumentów i uprawnień, niezależnie od samego statusu transportu. Potwierdzenie weryfikacji dokumentu i opcje pobrania muszą pochodzić z backendu.
 6. Pobierać kwoty, waluty, statusy płatności, punkty i bonusy z właściwego systemu rozliczeń. Zachować rozróżnienie kwot netto/brutto i istniejące warunki naliczania.
 7. Obsłużyć ładowanie, brak aktywnych zleceń, błędy, brak danych GPS i brak uprawnień bez podstawiania danych demo.
 
