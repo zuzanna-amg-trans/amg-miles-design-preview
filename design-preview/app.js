@@ -49,11 +49,11 @@ const money = value => new Intl.NumberFormat('pl-PL', {style:'currency',currency
 const demoSource = {
   balance: {available:24850,earnedThisMonth:3450,expiring:2000,expiresAt:'31.10.2026',bonusOpportunity:800},
   orders: [
-    {id:'DEMO-261001',fromPostal:"60-001",toPostal:"69007",goods:"Części maszyn",packages:"8 palet",weightKg:3200,loadArrival:{"date":"06.10.2026","time":"13:45","window":"13:00–14:00","confirmed":true},unloadArrival:{"date":"07.10.2026","time":"18:30","window":"18:00–19:00","confirmed":false},reference:'AMG-DEMO-01',from:'Poznań',fromCountry:'PL',to:'Lyon',toCountry:'FR',status:'W drodze na rozładunek',kind:'driving',active:true,step:3,load:'06.10.2026, 14:00',delivery:'07.10.2026',deliveryTime:'18:30',window:'18:00–19:00',progress:75,documents:[{name:'CMR',kind:'document',detail:'Po załadunku · 06.10, 14:12'},{name:'Zdjęcie załadunku',kind:'camera',detail:'06.10, 14:08'}],stops:[['Załadunek','Poznań, PL','06.10.2026, 14:00'],['Punkt pośredni','Karlsruhe, DE','07.10.2026, 11:30 · plan'],['Rozładunek','Lyon, FR','07.10.2026, 18:00–19:00 · plan']],position:'Stuttgart, Niemcy',updated:'07.10.2026, 10:24',vehicle:'Zestaw 13,6 m',cargo:'8 palet · 3 200 kg',fromXY:[752,138],toXY:[263,480],positionXY:[484,340],path:'M752 138 C686 140 650 192 607 225 S550 280 484 340 S344 421 263 480',traveled:'M752 138 C686 140 650 192 607 225 S550 280 484 340',events:[['Zlecenie przyjęte','05.10.2026, 11:20'],['W drodze na załadunek','06.10.2026, 11:35'],['Na załadunku','06.10.2026, 13:45'],['W drodze na rozładunek','06.10.2026, 14:30']],journeyDates:["05.10 · 11:20","06.10 · 11:35","06.10 · 14:00","06.10 · 14:30",null]},
-    {id:'DEMO-261002',fromPostal:"3011 AA",toPostal:"50-001",goods:"Opakowania kartonowe",packages:"12 palet",weightKg:4800,loadArrival:{"date":"07.10.2026","time":"10:00","window":"09:30–10:30","confirmed":false},unloadArrival:{"date":"08.10.2026","time":"11:00","window":"10:00–12:00","confirmed":false},reference:'AMG-DEMO-02',from:'Rotterdam',fromCountry:'NL',to:'Wrocław',toCountry:'PL',status:'W drodze na załadunek',kind:'to-loading',active:true,step:1,load:'07.10.2026, 10:00',delivery:'08.10.2026',deliveryTime:'11:00',window:'10:00–12:00',progress:null,documents:[],stops:[['Załadunek','Rotterdam, NL','07.10.2026, 10:00'],['Rozładunek','Wrocław, PL','08.10.2026, 10:00–12:00 · plan']],position:null,updated:null,vehicle:'Zestaw 13,6 m',cargo:'12 palet · 4 800 kg',fromXY:[373,107],toXY:[739,268],positionXY:null,path:'M373 107 C449 128 498 150 555 176 S672 242 739 268',traveled:null,events:[["Zlecenie przyjęte","06.10.2026, 09:10"],["W drodze na załadunek","07.10.2026, 08:20"]],journeyDates:["06.10 · 09:10","07.10 · 08:20",null,null,null]},
-    {id:'DEMO-260903',fromPostal:"04109",toPostal:"80-001",goods:"Elementy metalowe",packages:"10 palet",weightKg:4000,loadArrival:{"date":"04.10.2026","time":"08:00","window":"08:00–09:00","confirmed":true},unloadArrival:{"date":"05.10.2026","time":"09:15","window":"09:00–10:00","confirmed":true},reference:'AMG-DEMO-03',from:'Leipzig',fromCountry:'DE',to:'Gdańsk',toCountry:'PL',status:'Rozładowane',kind:'completed',active:false,step:4,progress:100,documents:[{name:'CMR',kind:'document',detail:'Po rozładunku · demo'},{name:'Faktura',kind:'invoice',detail:'Przykładowy dokument'}],load:'04.10.2026, 08:00',delivery:'05.10.2026',deliveryTime:'09:15',window:'09:00–10:00',vehicle:'Zestaw 13,6 m',cargo:'10 palet · 4 000 kg',events:[['Zlecenie przyjęte','03.10.2026, 11:00'],['Na załadunku','04.10.2026, 08:00'],['W drodze na rozładunek','04.10.2026, 09:10'],['Na rozładunku','05.10.2026, 08:55'],['Rozładowane','05.10.2026, 09:15']],journeyDates:["03.10 · 11:00","04.10 · 07:10","04.10 · 08:00","04.10 · 09:10","05.10 · 09:15"]},
-    {id:'DEMO-260904',fromPostal:"2000",toPostal:"40-001",goods:"Materiały budowlane",packages:"6 palet",weightKg:2100,loadArrival:{"date":"01.10.2026","time":"12:00","window":"12:00–13:00","confirmed":true},unloadArrival:{"date":"02.10.2026","time":"14:10","window":"14:00–15:00","confirmed":true},reference:'AMG-DEMO-04',from:'Antwerpia',fromCountry:'BE',to:'Katowice',toCountry:'PL',status:'Rozładowane',kind:'completed',active:false,step:4,progress:100,documents:[{name:'CMR',kind:'document',detail:'Po rozładunku · demo'},{name:'Faktura',kind:'invoice',detail:'Przykładowy dokument'}],load:'01.10.2026, 12:00',delivery:'02.10.2026',deliveryTime:'14:10',window:'14:00–15:00',vehicle:'Zestaw 13,6 m',cargo:'6 palet · 2 100 kg',events:[['Zlecenie przyjęte','30.09.2026, 10:00'],['Na załadunku','01.10.2026, 12:00'],['W drodze na rozładunek','01.10.2026, 13:20'],['Rozładowane','02.10.2026, 14:10']],journeyDates:["30.09 · 10:00","01.10 · 11:30","01.10 · 12:00","01.10 · 13:20","02.10 · 14:10"]},
-    {id:'DEMO-260905',fromPostal:"10115",toPostal:"00-001",goods:"Wyposażenie sklepów",packages:"14 palet",weightKg:5400,loadArrival:{"date":"28.09.2026","time":"09:00","window":"09:00–10:00","confirmed":true},unloadArrival:{"date":"29.09.2026","time":"08:45","window":"08:00–10:00","confirmed":true},reference:'AMG-DEMO-05',from:'Berlin',fromCountry:'DE',to:'Warszawa',toCountry:'PL',status:'Rozładowane',kind:'completed',active:false,step:4,progress:100,documents:[{name:'CMR',kind:'document',detail:'Po rozładunku · demo'},{name:'Faktura',kind:'invoice',detail:'Przykładowy dokument'}],load:'28.09.2026, 09:00',delivery:'29.09.2026',deliveryTime:'08:45',window:'08:00–10:00',vehicle:'Zestaw 13,6 m',cargo:'14 palet · 5 400 kg',events:[['Zlecenie przyjęte','27.09.2026, 12:00'],['Na załadunku','28.09.2026, 09:00'],['W drodze na rozładunek','28.09.2026, 10:15'],['Rozładowane','29.09.2026, 08:45']],journeyDates:["27.09 · 12:00","28.09 · 08:20","28.09 · 09:00","28.09 · 10:15","29.09 · 08:45"]},
+    {id:'DEMO-261001',registration:'DEMO 001',fromPostal:"60-001",toPostal:"69007",goods:"Części maszyn",packages:"8 palet",weightKg:3200,loadArrival:{"date":"06.10.2026","time":"13:45","window":"13:00–14:00","confirmed":true},unloadArrival:{"date":"07.10.2026","time":"18:30","window":"18:00–19:00","confirmed":false},reference:'AMG-DEMO-01',from:'Poznań',fromCountry:'PL',to:'Lyon',toCountry:'FR',status:'W drodze na rozładunek',kind:'driving',active:true,step:3,load:'06.10.2026, 14:00',delivery:'07.10.2026',deliveryTime:'18:30',window:'18:00–19:00',progress:75,documents:[{name:'CMR',kind:'document',detail:'Po załadunku · 06.10, 14:12'},{name:'Zdjęcie załadunku',kind:'camera',detail:'06.10, 14:08'}],stops:[['Załadunek','Poznań, PL','06.10.2026, 14:00'],['Punkt pośredni','Karlsruhe, DE','07.10.2026, 11:30 · plan'],['Rozładunek','Lyon, FR','07.10.2026, 18:00–19:00 · plan']],position:'Stuttgart, Niemcy',updated:'07.10.2026, 10:24',vehicle:'Zestaw 13,6 m',cargo:'8 palet · 3 200 kg',fromXY:[752,138],toXY:[263,480],positionXY:[484,340],path:'M752 138 C686 140 650 192 607 225 S550 280 484 340 S344 421 263 480',traveled:'M752 138 C686 140 650 192 607 225 S550 280 484 340',events:[['Zlecenie przyjęte','05.10.2026, 11:20'],['W drodze na załadunek','06.10.2026, 11:35'],['Na załadunku','06.10.2026, 13:45'],['W drodze na rozładunek','06.10.2026, 14:30']],journeyDates:["05.10 · 11:20","06.10 · 11:35","06.10 · 14:00","06.10 · 14:30",null]},
+    {id:'DEMO-261002',registration:'DEMO 002',fromPostal:"3011 AA",toPostal:"50-001",goods:"Opakowania kartonowe",packages:"12 palet",weightKg:4800,loadArrival:{"date":"07.10.2026","time":"10:00","window":"09:30–10:30","confirmed":false},unloadArrival:{"date":"08.10.2026","time":"11:00","window":"10:00–12:00","confirmed":false},reference:'AMG-DEMO-02',from:'Rotterdam',fromCountry:'NL',to:'Wrocław',toCountry:'PL',status:'W drodze na załadunek',kind:'to-loading',active:true,step:1,load:'07.10.2026, 10:00',delivery:'08.10.2026',deliveryTime:'11:00',window:'10:00–12:00',progress:null,documents:[],stops:[['Załadunek','Rotterdam, NL','07.10.2026, 10:00'],['Rozładunek','Wrocław, PL','08.10.2026, 10:00–12:00 · plan']],position:null,updated:null,vehicle:'Zestaw 13,6 m',cargo:'12 palet · 4 800 kg',fromXY:[373,107],toXY:[739,268],positionXY:null,path:'M373 107 C449 128 498 150 555 176 S672 242 739 268',traveled:null,events:[["Zlecenie przyjęte","06.10.2026, 09:10"],["W drodze na załadunek","07.10.2026, 08:20"]],journeyDates:["06.10 · 09:10","07.10 · 08:20",null,null,null]},
+    {id:'DEMO-260903',registration:'DEMO 003',fromPostal:"04109",toPostal:"80-001",goods:"Elementy metalowe",packages:"10 palet",weightKg:4000,loadArrival:{"date":"04.10.2026","time":"08:00","window":"08:00–09:00","confirmed":true},unloadArrival:{"date":"05.10.2026","time":"09:15","window":"09:00–10:00","confirmed":true},reference:'AMG-DEMO-03',from:'Leipzig',fromCountry:'DE',to:'Gdańsk',toCountry:'PL',status:'Rozładowane',kind:'completed',active:false,step:4,progress:100,documents:[{name:'CMR',kind:'document',detail:'Po rozładunku · demo'},{name:'Faktura',kind:'invoice',detail:'Przykładowy dokument'}],load:'04.10.2026, 08:00',delivery:'05.10.2026',deliveryTime:'09:15',window:'09:00–10:00',vehicle:'Zestaw 13,6 m',cargo:'10 palet · 4 000 kg',events:[['Zlecenie przyjęte','03.10.2026, 11:00'],['Na załadunku','04.10.2026, 08:00'],['W drodze na rozładunek','04.10.2026, 09:10'],['Na rozładunku','05.10.2026, 08:55'],['Rozładowane','05.10.2026, 09:15']],journeyDates:["03.10 · 11:00","04.10 · 07:10","04.10 · 08:00","04.10 · 09:10","05.10 · 09:15"]},
+    {id:'DEMO-260904',registration:'DEMO 004',fromPostal:"2000",toPostal:"40-001",goods:"Materiały budowlane",packages:"6 palet",weightKg:2100,loadArrival:{"date":"01.10.2026","time":"12:00","window":"12:00–13:00","confirmed":true},unloadArrival:{"date":"02.10.2026","time":"14:10","window":"14:00–15:00","confirmed":true},reference:'AMG-DEMO-04',from:'Antwerpia',fromCountry:'BE',to:'Katowice',toCountry:'PL',status:'Rozładowane',kind:'completed',active:false,step:4,progress:100,documents:[{name:'CMR',kind:'document',detail:'Po rozładunku · demo'},{name:'Faktura',kind:'invoice',detail:'Przykładowy dokument'}],load:'01.10.2026, 12:00',delivery:'02.10.2026',deliveryTime:'14:10',window:'14:00–15:00',vehicle:'Zestaw 13,6 m',cargo:'6 palet · 2 100 kg',events:[['Zlecenie przyjęte','30.09.2026, 10:00'],['Na załadunku','01.10.2026, 12:00'],['W drodze na rozładunek','01.10.2026, 13:20'],['Rozładowane','02.10.2026, 14:10']],journeyDates:["30.09 · 10:00","01.10 · 11:30","01.10 · 12:00","01.10 · 13:20","02.10 · 14:10"]},
+    {id:'DEMO-260905',registration:'DEMO 005',fromPostal:"10115",toPostal:"00-001",goods:"Wyposażenie sklepów",packages:"14 palet",weightKg:5400,loadArrival:{"date":"28.09.2026","time":"09:00","window":"09:00–10:00","confirmed":true},unloadArrival:{"date":"29.09.2026","time":"08:45","window":"08:00–10:00","confirmed":true},reference:'AMG-DEMO-05',from:'Berlin',fromCountry:'DE',to:'Warszawa',toCountry:'PL',status:'Rozładowane',kind:'completed',active:false,step:4,progress:100,documents:[{name:'CMR',kind:'document',detail:'Po rozładunku · demo'},{name:'Faktura',kind:'invoice',detail:'Przykładowy dokument'}],load:'28.09.2026, 09:00',delivery:'29.09.2026',deliveryTime:'08:45',window:'08:00–10:00',vehicle:'Zestaw 13,6 m',cargo:'14 palet · 5 400 kg',events:[['Zlecenie przyjęte','27.09.2026, 12:00'],['Na załadunku','28.09.2026, 09:00'],['W drodze na rozładunek','28.09.2026, 10:15'],['Rozładowane','29.09.2026, 08:45']],journeyDates:["27.09 · 12:00","28.09 · 08:20","28.09 · 09:00","28.09 · 10:15","29.09 · 08:45"]},
   ],
   invoices: [
     {id:'DEMO/2026/1042',issued:'02.10.2026',amount:160,due:'16.10.2026',status:'unpaid',points:800,bonus:800,fastUntil:'12.10.2026'},
@@ -74,7 +74,7 @@ const demoSource = {
 };
 
 const VIEWS = {orders:'Zlecenia',tracking:'Podgląd zlecenia',invoices:'Faktury',rewards:'Nagrody',history:'Historia punktów',claims:'Moje nagrody',rules:'Zasady programu'};
-let state = {view:'orders',orderStatus:'active',orderSearch:'',selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones',mapZoom:1,expandedOrder:null,openOrderGroup:'active',directoryOpen:false};
+let state = {view:'orders',orderStatus:'active',orderSearch:'',selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones',mapZoom:1,expandedOrder:null};
 let toastTimer;
 let modalTrigger;
 
@@ -99,7 +99,7 @@ function button(label, action, style='primary', extras='') {
 function shell() {
   const active=['orders','tracking'].includes(state.view)?'orders':state.view==='invoices'?'invoices':'rewards';
   const navItem=(view,name,ic)=>`<button class="nav-item ${active===view?'active':''}" data-view="${view}" ${active===view?'aria-current="page"':''}>${icon(ic)}<span>${name}</span></button>`;
-  document.getElementById('app').innerHTML=`<div class="shell">
+  document.getElementById('app').innerHTML=`<div class="shell ${state.view==='orders'&&state.expandedOrder?'has-tracking':''}">
     <header class="topbar"><div class="header-inner">
       <button class="brand" data-view="orders" aria-label="AMG Miles — zlecenia"><img src="assets/amg-logo-white.webp" alt="AMG European Transport"><span class="brand-word">miles<em>.</em></span></button>
       <nav class="primary-nav" aria-label="Nawigacja panelu">${navItem('orders','Zlecenia','truck')}${navItem('invoices','Faktury','invoice')}${navItem('rewards','Nagrody','gift')}</nav>
@@ -118,11 +118,28 @@ function invoiceTable(items,compact=false) {
   return `<div class="table-wrap"><table aria-label="${compact?'Ostatnie faktury — dane demonstracyjne':'Twoje faktury — dane demonstracyjne'}"><thead><tr><th>Faktura</th><th class="numeric">Kwota netto</th><th>Status</th><th class="numeric">Punkty</th>${compact?'':'<th>Termin płatności</th>'}</tr></thead><tbody>${items.map(i=>`<tr><td><button class="row-detail" data-action="invoice-detail" data-id="${i.id}" aria-label="Szczegóły faktury ${i.id}">${i.id}${icon('arrow')}</button><small>${i.issued}</small></td><td class="numeric">${money(i.amount)}</td><td><span class="status ${i.status==='unpaid'?'amber':''}">${i.status==='paid'?'Opłacona':'Do opłacenia'}</span></td><td class="numeric">${i.status==='paid'?`+${number(i.points+i.bonus)}`:number(i.points)}${i.status==='unpaid'?'<small>po płatności</small>':i.bonus?'<small>w tym bonus 100%</small>':'<small>przyznane</small>'}</td>${compact?'':`<td>${i.due}</td>`}</tr>`).join('')}</tbody></table></div>`;
 }
 
-const ORDER_GROUPS=[['active','W realizacji','truck'],['completed','Zakończone','check'],['all','Wszystkie','grid']];
+const ORDER_GROUPS=[['active','W realizacji'],['completed','Zakończone'],['all','Wszystkie']];
+
+function operationStage(o) {
+  return o.active&&!o.loadArrival.confirmed?'load':'unload';
+}
+
+function operationTime(o) {
+  const a=operationStage(o)==='load'?o.loadArrival:o.unloadArrival;
+  if(!a?.date||!a?.time)return Infinity;
+  const [day,month,year]=a.date.split('.').map(Number),[hour,minute]=a.time.split(':').map(Number);
+  const value=Date.UTC(year,month-1,day,hour,minute);
+  return Number.isFinite(value)?value:Infinity;
+}
 
 function ordersInGroup(group,withSearch=true) {
   const query=withSearch?state.orderSearch.trim().toLocaleLowerCase('pl'):'';
-  return demoSource.orders.filter(o=>(group==='all'||(group==='active'?o.active:!o.active))&&`${o.id} ${o.reference} ${o.from} ${o.to} ${o.fromCountry} ${o.fromPostal} ${o.toCountry} ${o.toPostal} ${o.goods}`.toLocaleLowerCase('pl').includes(query));
+  return demoSource.orders.filter(o=>(group==='all'||(group==='active'?o.active:!o.active))&&`${o.id} ${o.reference} ${o.from} ${o.to} ${o.fromCountry} ${o.fromPostal} ${o.toCountry} ${o.toPostal} ${o.goods} ${o.registration}`.toLocaleLowerCase('pl').includes(query)).sort((a,b)=>{
+    if(a.active!==b.active)return a.active?-1:1;
+    const aTime=operationTime(a),bTime=operationTime(b);
+    if(aTime!==bTime)return a.active?aTime-bTime:bTime-aTime;
+    return a.reference.localeCompare(b.reference,'pl');
+  });
 }
 
 function matchingOrders() { return ordersInGroup(state.orderStatus); }
@@ -131,20 +148,8 @@ function orderStatus(o) {
   return `<span class="status ${o.kind==='to-loading'?'amber':o.active?'':'neutral'}">${esc(o.status)}</span>`;
 }
 
-function orderDirectoryItem(o) {
-  return `<button class="order-tree-item ${state.expandedOrder===o.id?'selected':''}" data-action="order-select" data-id="${o.id}" ${state.expandedOrder===o.id?'aria-current="true"':''}>
-    <strong>${esc(o.from)} → ${esc(o.to)}</strong>
-    <span class="order-tree-postals">${esc(o.fromCountry)} ${esc(o.fromPostal)} → ${esc(o.toCountry)} ${esc(o.toPostal)}</span>
-    <span class="order-tree-goods">${esc(o.goods)}</span>
-    <span class="order-tree-cargo">${esc(o.packages)} · ${number(o.weightKg)} kg</span>
-  </button>`;
-}
-
-function orderDirectory() {
-  return `<div class="directory-title"><span>Zlecenia według statusu</span>${icon('grid')}</div>${ORDER_GROUPS.map(([key,name,ic])=>{
-    const items=ordersInGroup(key),count=ordersInGroup(key,false).length,open=state.openOrderGroup===key;
-    return `<div class="order-group"><button class="order-group-toggle ${state.orderStatus===key?'active':''}" data-action="order-filter" data-id="${key}" aria-expanded="${open}" aria-controls="group-${key}" aria-pressed="${state.orderStatus===key}">${icon(ic)}<span>${name}</span><small>${count}</small>${icon('down','group-chevron')}</button><div class="order-group-list" id="group-${key}" ${open?'':'hidden'}>${items.length?items.map(orderDirectoryItem).join(''):'<p class="directory-empty">Brak pasujących zleceń</p>'}</div></div>`;
-  }).join('')}<div class="directory-caption">${icon('info')}<span>Wybierz zlecenie, aby rozwinąć jego śledzenie na liście.</span></div>`;
+function orderFilters() {
+  return ORDER_GROUPS.map(([key,name])=>`<button class="filter ${state.orderStatus===key?'active':''}" data-action="order-filter" data-id="${key}" aria-pressed="${state.orderStatus===key}">${name}<span>${ordersInGroup(key,false).length}</span></button>`).join('');
 }
 
 function arrivalLabel(o,stage) {
@@ -153,34 +158,46 @@ function arrivalLabel(o,stage) {
 }
 
 function arrivalTile(o,stage) {
-  const a=stage==='load'?o.loadArrival:o.unloadArrival;
-  return `<div class="arrival-tile ${a.confirmed?'confirmed':''}" data-arrival="${stage}"><span class="arrival-icon">${icon(a.confirmed?'check':'clock')}</span><div><span class="arrival-label">${arrivalLabel(o,stage)}</span><strong>${a.time}<small>${a.date}</small></strong><span class="arrival-note">${a.confirmed?'Dojazd potwierdzony':'Godzina szacunkowa · demo'}</span></div></div>`;
+  const a=stage==='load'?o.loadArrival:o.unloadArrival,current=o.active&&operationStage(o)===stage;
+  return `<div class="arrival-tile ${a.confirmed?'confirmed':''} ${current?'next-arrival':''}" data-arrival="${stage}"><span class="arrival-icon">${icon(a.confirmed?'check':'clock')}</span><div><span class="arrival-label">${arrivalLabel(o,stage)}</span><strong>${a.time}<small>${a.date}</small></strong><span class="arrival-note">${a.confirmed?'Dojazd potwierdzony':'Godzina szacunkowa · demo'}</span></div></div>`;
 }
 
 function orderCard(o) {
-  const expanded=state.expandedOrder===o.id;
-  return `<article class="card order-card ${expanded?'expanded':''}" data-order-id="${o.id}" aria-labelledby="order-title-${o.id}">
+  const compact=Boolean(state.expandedOrder),selected=state.expandedOrder===o.id;
+  const stage=operationStage(o),arrival=stage==='load'?o.loadArrival:o.unloadArrival;
+  if(compact)return `<article class="card order-card compact-card ${selected?'selected':''}" data-order-id="${o.id}" aria-labelledby="order-title-${o.id}"><h2 id="order-title-${o.id}" class="sr-only">${o.from} — ${o.to}</h2><button class="order-option" data-action="order-select" data-id="${o.id}" aria-label="Zlecenie klienta ${o.reference}: ${o.from} — ${o.to}" aria-pressed="${selected}" aria-controls="order-detail">
+    <span class="compact-reference">${o.reference}${selected?icon('right'):''}</span>
+    <strong class="compact-route">${o.from}<span> → </span>${o.to}</strong>
+    <span class="compact-address">${o.fromCountry} ${o.fromPostal} · ${o.toCountry} ${o.toPostal}</span>
+    ${orderStatus(o)}
+    <span class="compact-cargo">${o.goods} · ${number(o.weightKg)} kg · ${o.packages}</span>
+    <span class="compact-bottom"><span class="compact-operation"><small>${o.active?(stage==='load'?'Załadunek':'Rozładunek'):'Rozładowane'}</small><strong>${arrival.time}</strong><span>${arrival.date}</span></span><span class="compact-plate">${icon('truck')}${o.registration}</span></span>
+  </button></article>`;
+  return `<article class="card order-card" data-order-id="${o.id}" aria-labelledby="order-title-${o.id}">
     <div class="order-top"><div class="order-reference"><span>Numer zlecenia klienta</span><strong>${o.reference}</strong></div>${orderStatus(o)}</div>
     <h2 id="order-title-${o.id}" class="sr-only">${o.from} — ${o.to}</h2>
-    <div class="order-route"><div><span class="route-label">Załadunek</span><h3>${o.from}</h3><span class="route-address">${o.fromCountry} ${o.fromPostal}</span></div><span class="route-connector">${icon('right')}</span><div><span class="route-label">Rozładunek</span><h3>${o.to}</h3><span class="route-address">${o.toCountry} ${o.toPostal}</span></div></div>
-    <div class="order-cargo">${icon('package')}<div><span>Towar</span><strong>${o.goods}</strong></div><div><span>Waga</span><strong>${number(o.weightKg)} kg</strong></div><div><span>Ilość</span><strong>${o.packages}</strong></div></div>
-    <div class="order-arrivals">${arrivalTile(o,'load')}${arrivalTile(o,'unload')}</div>
-    <div class="order-bottom"><span class="order-doc-note ${o.documents.length?'has-documents':''}">${icon('document')}${o.documents.length?`Dostępne dokumenty · ${o.documents.length}`:'Dokumenty w przygotowaniu'}</span><button class="button order-card-action ${expanded?'button-secondary':o.active?'button-primary':'button-secondary'}" data-action="order-detail" data-id="${o.id}" aria-expanded="${expanded}" ${expanded?`aria-controls="tracking-${o.id}"`:''}><span>${expanded?'Zwiń podgląd':o.active?'Śledź transport':'Zobacz zlecenie'}</span><span class="button-circle">${icon(expanded?'down':'arrow')}</span></button></div>
-    ${expanded?`<div class="inline-tracking" id="tracking-${o.id}" role="region" aria-label="Śledzenie zlecenia klienta ${o.reference}">${trackingView(o)}</div>`:''}
+    <div class="order-main"><div class="order-route"><div><span class="route-label">Załadunek</span><h3>${o.from}</h3><span class="route-address">${o.fromCountry} ${o.fromPostal}</span></div><span class="route-connector">${icon('right')}</span><div><span class="route-label">Rozładunek</span><h3>${o.to}</h3><span class="route-address">${o.toCountry} ${o.toPostal}</span></div></div>
+    <div class="order-cargo"><div class="cargo-goods"><span>Towar</span><strong>${icon('package')}${o.goods}</strong></div><div><span>Waga</span><strong>${number(o.weightKg)} kg</strong></div><div><span>Ilość</span><strong>${o.packages}</strong></div><div class="cargo-vehicle"><span>Rejestracja auta</span><strong class="vehicle-plate">${o.registration}</strong></div></div></div>
+    <div class="order-bottom"><div class="order-arrivals">${arrivalTile(o,'load')}${arrivalTile(o,'unload')}</div><button class="button order-card-action ${o.active?'button-primary':'button-secondary'}" data-action="order-detail" data-id="${o.id}"><span>${o.active?'Śledź transport':'Zobacz zlecenie'}</span><span class="button-circle">${icon('arrow')}</span></button></div>
   </article>`;
 }
 
 function orderResults() {
   const orders=matchingOrders();
-  return `${orders.length?orders.map(orderCard).join(''):emptyState('search','Nie ma takich zleceń','Zmień filtr lub wyszukaj inny numer albo miasto.')}<div class="results-count" role="status">${orders.length} z ${demoSource.orders.length} zleceń demonstracyjnych</div>`;
+  return `${orders.length?orders.map(orderCard).join(''):emptyState('search','Nie ma takich zleceń','Zmień filtr lub wyszukaj inny numer, miasto lub rejestrację.')}<div class="results-count" role="status">${orders.length} z ${demoSource.orders.length} zleceń demonstracyjnych</div>`;
+}
+
+function orderWorkspace() {
+  const o=demoSource.orders.find(o=>o.id===state.expandedOrder);
+  const label=ORDER_GROUPS.find(([key])=>key===state.orderStatus)[1];
+  return `<section class="orders-list-pane" aria-label="Lista zleceń"><div class="order-section-head"><h2 id="order-scope-label">${label}</h2><span class="sort-note">${state.orderStatus==='completed'?'Ostatnio zakończone najpierw':'Najbliższa operacja najpierw'}</span></div><div class="order-list" id="order-results">${orderResults()}</div></section>${o?`<section class="order-detail-pane" id="order-detail" role="region" aria-label="Podgląd zlecenia klienta ${o.reference}">${trackingView(o)}</section>`:''}`;
 }
 
 function ordersView() {
-  const label=ORDER_GROUPS.find(([key])=>key===state.orderStatus)[1];
-  return `${pageHead('Twoje transporty z AMG','Twoje <em>zlecenia.</em>','Wybierz zlecenie i śledź je bezpośrednio na liście.')}
-    <div class="order-layout"><aside class="order-directory ${state.directoryOpen?'mobile-open':''}"><button class="directory-mobile-toggle" data-action="directory-toggle" aria-expanded="${state.directoryOpen}" aria-controls="order-directory-content"><span>${icon('grid')} ${label}<small>${ordersInGroup(state.orderStatus,false).length}</small></span>${icon('down')}</button><nav id="order-directory-content" aria-label="Zlecenia według statusu">${orderDirectory()}</nav></aside>
-    <section class="orders-right" aria-label="Lista zleceń"><div class="order-section-head"><h2 id="order-scope-label">${label}</h2><label class="search-field">${icon('search')}<input id="order-search" type="search" placeholder="Numer klienta, miasto lub kod" aria-label="Szukaj zlecenia po numerze lub mieście" value="${esc(state.orderSearch)}"></label></div><div class="order-list" id="order-results">${orderResults()}</div></section></div>
-    <div class="miles-strip"><span class="miles-symbol">${icon('gift')}</span><div><strong>Z AMG każdy kilometr daje więcej.</strong><span>Sprawdź, na co wymienisz swoje punkty Miles.</span></div><button class="text-action" data-view="rewards">Zobacz nagrody ${icon('arrow')}</button></div>`;
+  return `<section class="orders-page">${pageHead('Twoje transporty z AMG','Twoje <em>zlecenia.</em>','Aktywne transporty według najbliższej operacji. Wybierz zlecenie, aby zobaczyć mapę.')}
+    <div class="orders-toolbar"><div class="filters" id="order-filters" aria-label="Filtruj zlecenia">${orderFilters()}</div><label class="search-field">${icon('search')}<input id="order-search" type="search" placeholder="Numer, miasto lub rejestracja" aria-label="Szukaj zlecenia po numerze, mieście lub rejestracji" value="${esc(state.orderSearch)}"></label></div>
+    <div class="orders-workspace ${state.expandedOrder?'has-selection':''}" id="orders-workspace">${orderWorkspace()}</div>
+    <div class="miles-strip"><span class="miles-symbol">${icon('gift')}</span><div><strong>Z AMG każdy kilometr daje więcej.</strong><span>Sprawdź, na co wymienisz swoje punkty Miles.</span></div><button class="text-action" data-view="rewards">Zobacz nagrody ${icon('arrow')}</button></div></section>`;
 }
 
 // Schematic illustration only. Production tracking must use the actual map and GPS data.
@@ -220,16 +237,18 @@ function orderDocuments(o) {
 
 function transportDetails(o) {
   const stops=o.stops||[['Załadunek',`${o.from}, ${o.fromCountry}`,o.load],['Rozładunek',`${o.to}, ${o.toCountry}`,`${o.delivery}, ${o.deliveryTime}`]];
-  return `<details class="card transport-details"><summary><span>${icon('truck')} Szczegóły transportu</span>${icon('down')}</summary><div class="transport-detail-body"><dl class="transport-facts"><div><dt>Numer zlecenia klienta</dt><dd>${o.reference}</dd></div><div><dt>Numer zlecenia AMG</dt><dd>${o.id}</dd></div><div><dt>Towar</dt><dd>${o.goods}</dd></div><div><dt>Pojazd</dt><dd>${o.vehicle}</dd></div><div><dt>Ładunek</dt><dd>${o.cargo}</dd></div></dl><div class="route-points"><h3>Punkty trasy</h3><ol>${stops.map(([label,city,time])=>`<li><span class="route-point-dot"></span><div><small>${label}</small><strong>${city}</strong><span>${time}</span></div></li>`).join('')}</ol></div></div></details>`;
+  return `<details class="card transport-details"><summary><span>${icon('truck')} Szczegóły transportu</span>${icon('down')}</summary><div class="transport-detail-body"><dl class="transport-facts"><div><dt>Numer zlecenia klienta</dt><dd>${o.reference}</dd></div><div><dt>Numer zlecenia AMG</dt><dd>${o.id}</dd></div><div><dt>Towar</dt><dd>${o.goods}</dd></div><div><dt>Rejestracja auta</dt><dd>${o.registration}</dd></div><div><dt>Pojazd</dt><dd>${o.vehicle}</dd></div><div><dt>Ładunek</dt><dd>${o.cargo}</dd></div></dl><div class="route-points"><h3>Punkty trasy</h3><ol>${stops.map(([label,city,time])=>`<li><span class="route-point-dot"></span><div><small>${label}</small><strong>${city}</strong><span>${time}</span></div></li>`).join('')}</ol></div></div></details>`;
 }
 
 function trackingView(order) {
   const o=order||demoSource.orders.find(item=>item.id===state.selectedOrder);
-  const stage=o.kind==='to-loading'?'load':'unload',arrival=stage==='load'?o.loadArrival:o.unloadArrival;
-  return `<div class="inline-heading"><div><h3>Śledzenie transportu</h3><span>Numer AMG: <strong>${o.id}</strong></span></div><button class="text-action" data-action="contact">${icon('support')} Kontakt z AMG</button></div>
+  const stage=operationStage(o),arrival=stage==='load'?o.loadArrival:o.unloadArrival;
+  const otherStage=stage==='load'?'unload':'load',otherArrival=otherStage==='load'?o.loadArrival:o.unloadArrival;
+  return `<div class="detail-heading"><div><div class="eyebrow"><span class="little-dot"></span>Podgląd zlecenia</div><h2>${o.from} <span>→</span> ${o.to}</h2><p><strong>Nr klienta: ${o.reference}</strong><span>Numer AMG: ${o.id}</span></p></div><button class="detail-close" data-action="order-close" aria-label="Wróć do pełnej listy zleceń">${icon('close')}<span>Pełna lista</span></button></div>
+    <section class="card detail-facts" aria-label="Ładunek i pojazd"><div class="detail-goods"><span>${icon('package')} Towar</span><strong>${o.goods}</strong></div><div><span>Waga ładunku</span><strong>${number(o.weightKg)} kg</strong></div><div><span>Ilość</span><strong>${o.packages}</strong></div><div class="detail-vehicle"><span>${icon('truck')} Rejestracja auta</span><strong class="vehicle-plate">${o.registration}</strong><small>${o.vehicle}</small></div></section>
     <div class="tracking-grid"><section class="card map-card"><div class="map-heading"><h3>${icon(o.active?'pin':'check')}${o.active?'Pozycja pojazdu':'Dostawa zakończona'}</h3><span class="demo-tag">${o.active?'Mapa poglądowa · demo':'Zlecenie demo'}</span></div>
       ${o.active?`<div class="map-area">${routeMap(o)}<div class="map-controls" aria-label="Sterowanie mapą poglądową"><button class="icon-button" data-action="map-zoom-in" aria-label="Przybliż mapę" ${state.mapZoom>=2.4?'disabled':''}>${icon('plus')}</button><button class="icon-button" data-action="map-zoom-out" aria-label="Oddal mapę" ${state.mapZoom<=1?'disabled':''}>${icon('minus')}</button><button class="icon-button" data-action="map-reset" aria-label="Pokaż całą trasę">${icon('expand')}</button></div><span class="map-scale">Schemat trasy</span></div><div class="map-footer">${icon('pin')}<div><strong>${o.position||'Pozycja GPS niedostępna'}</strong><span>${o.position?`Przykładowa pozycja · ${o.updated}`:'Pokazujemy planowaną trasę, bez pozycji pojazdu.'}</span></div></div>`:`<div class="completed-panel"><span class="completion-icon">${icon('check')}</span><h3>Transport dotarł na miejsce.</h3><p>${o.to} · ${arrival.date}, ${arrival.time}</p><span class="completion-caption">Dokumenty znajdziesz poniżej.</span></div>`}
-    </section><section class="card delivery-card"><div class="delivery-card-top">${orderStatus(o)}</div><div class="delivery-estimate"><span>${arrivalLabel(o,stage)}</span><strong>${arrival.time}</strong><span class="delivery-date">${arrival.date}</span><small>${icon('clock')}${stage==='load'?'Okno załadunku':'Okno dostawy'} ${arrival.window}</small></div><div class="delivery-confidence">${icon('info')}<span>${arrival.confirmed?'Dojazd potwierdzony w danych demonstracyjnych.':o.position?'Godzina szacunkowa. Może się zmienić w trakcie realizacji.':'Godzina szacunkowa według planu. Brak bieżącej pozycji GPS.'}</span></div></section></div>
+    </section><section class="card delivery-card"><div class="delivery-card-top">${orderStatus(o)}</div><div class="delivery-estimate"><span>${arrivalLabel(o,stage)}</span><strong>${arrival.time}</strong><span class="delivery-date">${arrival.date}</span><small>${icon('clock')}${stage==='load'?'Okno załadunku':'Okno dostawy'} ${arrival.window}</small></div><div class="delivery-confidence">${icon('info')}<span>${arrival.confirmed?'Dojazd potwierdzony w danych demonstracyjnych.':o.position?'Godzina szacunkowa. Może się zmienić w trakcie realizacji.':'Godzina szacunkowa według planu. Brak bieżącej pozycji GPS.'}</span></div><div class="delivery-other"><span>${arrivalLabel(o,otherStage)}</span><strong>${otherArrival.time}<small>${otherArrival.date}</small></strong><span>${otherArrival.confirmed?'Dojazd potwierdzony':'Godzina szacunkowa · demo'}</span></div></section></div>
     <section class="card progress-card"><div class="card-heading"><h3>Realizacja zlecenia</h3><button class="text-action" data-action="order-history" data-id="${o.id}">${icon('history')} Historia statusów ${icon('arrow')}</button></div>${journey(o)}${o.active&&o.progress!==null?`<div class="transport-progress"><div><span>Postęp transportu <small>· szacunkowy</small></span><strong>${o.progress}%</strong></div><div class="transport-progress-track" role="progressbar" aria-label="Szacunkowy postęp transportu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${o.progress}"><span style="width:${o.progress}%"></span></div></div>`:''}</section>
     ${orderDocuments(o)}${transportDetails(o)}`;
 }
@@ -294,28 +313,39 @@ function navigate(view,focus=true) {
   if(focus) document.getElementById('main-content').focus({preventScroll:true});
 }
 
-function refreshOrderContent() {
-  document.getElementById('order-results').innerHTML=orderResults();
-  document.getElementById('order-directory-content').innerHTML=orderDirectory();
-  document.getElementById('order-scope-label').textContent=ORDER_GROUPS.find(([key])=>key===state.orderStatus)[1];
-  const toggle=document.querySelector('.directory-mobile-toggle');
-  toggle.innerHTML=`<span>${icon('grid')} ${ORDER_GROUPS.find(([key])=>key===state.orderStatus)[1]}<small>${ordersInGroup(state.orderStatus,false).length}</small></span>${icon('down')}`;
-  toggle.setAttribute('aria-expanded',state.directoryOpen);
-  document.querySelector('.order-directory').classList.toggle('mobile-open',state.directoryOpen);
+function refreshOrderContent(resetDetail=false) {
+  const listScroll=document.getElementById('order-results')?.scrollTop||0;
+  const listScrollLeft=document.getElementById('order-results')?.scrollLeft||0;
+  const detailScroll=resetDetail?0:document.getElementById('order-detail')?.scrollTop||0;
+  document.getElementById('order-filters').innerHTML=orderFilters();
+  const workspace=document.getElementById('orders-workspace');
+  workspace.classList.toggle('has-selection',Boolean(state.expandedOrder));
+  document.querySelector('.shell').classList.toggle('has-tracking',Boolean(state.expandedOrder));
+  workspace.innerHTML=orderWorkspace();
+  document.getElementById('order-results').scrollTop=listScroll;
+  document.getElementById('order-results').scrollLeft=listScrollLeft;
+  const pane=document.getElementById('order-detail');
+  if(pane)pane.scrollTop=detailScroll;
 }
 
-function selectOrder(id,toggle=true) {
-  const order=demoSource.orders.find(o=>o.id===id);if(!order)return;
-  state.selectedOrder=id;
-  state.expandedOrder=toggle&&state.expandedOrder===id?null:id;
-  state.mapZoom=1;
-  state.directoryOpen=false;
-  const hash=state.expandedOrder?`#tracking/${id}`:'#orders';
+function selectOrder(id) {
+  if(state.expandedOrder===id)return;
+  if(!matchingOrders().some(o=>o.id===id))return;
+  state.selectedOrder=id;state.expandedOrder=id;state.mapZoom=1;
+  const hash=`#tracking/${id}`;
   if(window.location.hash!==hash)window.history.pushState(null,'',hash);
-  refreshOrderContent();
-  const trigger=document.querySelector(`.order-card[data-order-id="${id}"] .order-card-action`);
-  if(trigger)trigger.focus({preventScroll:true});
-  if(state.expandedOrder)document.querySelector(`.order-card[data-order-id="${id}"]`).scrollIntoView({block:'start',behavior:'instant'});
+  refreshOrderContent(true);
+  window.scrollTo({top:0,behavior:'instant'});
+  const trigger=document.querySelector(`.order-option[data-id="${id}"]`);
+  if(trigger){trigger.focus({preventScroll:true});trigger.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});}
+}
+
+function closeOrder() {
+  const id=state.selectedOrder;
+  state.expandedOrder=null;state.mapZoom=1;
+  if(window.location.hash!=='#orders')window.history.pushState(null,'','#orders');
+  refreshOrderContent(true);
+  document.querySelector(`.order-card[data-order-id="${id}"] .order-card-action`)?.focus({preventScroll:true});
 }
 
 function openDialog(eyebrow,title,body,actions='') {
@@ -358,23 +388,16 @@ document.addEventListener('click',event=>{
     document.querySelector('[data-action="map-zoom-out"]').disabled=state.mapZoom<=1;
   }
   if(action==='open-rewards')navigate('rewards');
-  if(action==='order-detail')selectOrder(id);
-  if(action==='order-select')selectOrder(id,false);
-  if(action==='directory-toggle'){
-    state.directoryOpen=!state.directoryOpen;
-    document.querySelector('.order-directory').classList.toggle('mobile-open',state.directoryOpen);
-    target.setAttribute('aria-expanded',state.directoryOpen);
-  }
+  if(action==='order-detail'||action==='order-select')selectOrder(id);
+  if(action==='order-close')closeOrder();
   if(action==='order-filter'){
-    state.openOrderGroup=state.openOrderGroup===id?null:id;
-    state.orderStatus=id;state.directoryOpen=false;
+    state.orderStatus=id;
     if(state.expandedOrder&&!matchingOrders().some(o=>o.id===state.expandedOrder)){
       state.expandedOrder=null;state.mapZoom=1;
       if(window.location.hash!=='#orders')window.history.pushState(null,'','#orders');
     }
     refreshOrderContent();
-    const focus=window.matchMedia('(max-width:760px)').matches?document.querySelector('.directory-mobile-toggle'):document.querySelector(`[data-action="order-filter"][data-id="${id}"]`);
-    focus.focus({preventScroll:true});
+    document.querySelector(`[data-action="order-filter"][data-id="${id}"]`).focus({preventScroll:true});
   }
   if(action==='order-history')orderHistory(id);
   if(action==='document-demo')openDialog('Dokument demonstracyjny',target.dataset.document,`<p class="dialog-copy">To podgląd miejsca, w którym otworzysz dokument lub zdjęcie przypisane do zlecenia. Ten przykład nie zawiera rzeczywistego pliku.</p><div class="dialog-stats"><div class="dialog-stat"><span>Zlecenie</span><strong>${esc(id)}</strong></div><div class="dialog-stat"><span>Dokument</span><strong>${esc(target.dataset.document)} · demo</strong></div></div>`,button('Wróć','close-dialog','secondary'));
@@ -389,6 +412,14 @@ document.addEventListener('click',event=>{
   if(action==='open-history'){closeDialog();navigate('history');}
   if(action==='contact')openDialog('AMG Trans · kontakt','Jesteśmy po drodze.',`<p class="dialog-copy">Porozmawiajmy o Twojej współpracy z AMG.</p><div class="dialog-stats"><div class="dialog-stat"><span>E-mail</span><strong>hello@amg-trans.eu</strong></div><div class="dialog-stat"><span>Telefon</span><strong>+48 508 24 5555</strong></div></div><p class="dialog-copy">Dane kontaktowe z aktualnej strony AMG Trans. Ten podgląd nie wysyła wiadomości.</p>`,button('Zamknij','close-dialog','secondary'));
   if(action==='about-preview')openDialog('AMG Miles · projekt wizualny','Nowy kierunek.<br>Ten sam charakter.',`<p class="dialog-copy">Jasny panel oparty na identyfikacji AMG: Onest, grafit, ciepły pomarańcz i przyciski ze strzałką w osobnym kółku.</p><p class="dialog-copy">To niezależny podgląd wyglądu. Zlecenia, trasy, pozycje pojazdów, czasy dostawy, faktury, saldo i nagrody są demonstracyjne. Podłączenie właściwego backendu i przeniesienie do repozytorium dev są osobnym etapem.</p>`,button('Wróć do panelu','close-dialog','secondary'));
+});
+
+document.addEventListener('keydown',event=>{
+  if(!event.target.matches('.order-option')||!['ArrowDown','ArrowUp','ArrowRight','ArrowLeft','Home','End'].includes(event.key))return;
+  event.preventDefault();
+  const orders=matchingOrders(),index=orders.findIndex(o=>o.id===event.target.dataset.id);
+  const next=event.key==='Home'?0:event.key==='End'?orders.length-1:Math.max(0,Math.min(orders.length-1,index+(['ArrowDown','ArrowRight'].includes(event.key)?1:-1)));
+  selectOrder(orders[next].id);
 });
 
 document.addEventListener('input',event=>{
@@ -428,7 +459,7 @@ function applyRoute() {
     const order=demoSource.orders.find(o=>o.id===id);
     if(order){
       state.selectedOrder=id;state.expandedOrder=id;state.orderSearch='';
-      state.orderStatus=order.active?'active':'completed';state.openOrderGroup=state.orderStatus;
+      state.orderStatus=order.active?'active':'completed';
     }
   }
   shell();
