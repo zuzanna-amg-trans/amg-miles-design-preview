@@ -131,10 +131,19 @@ function orderStatus(o) {
   return `<span class="status ${o.kind==='to-loading'?'amber':o.active?'':'neutral'}">${esc(o.status)}</span>`;
 }
 
+function orderDirectoryItem(o) {
+  return `<button class="order-tree-item ${state.expandedOrder===o.id?'selected':''}" data-action="order-select" data-id="${o.id}" ${state.expandedOrder===o.id?'aria-current="true"':''}>
+    <strong>${esc(o.from)} → ${esc(o.to)}</strong>
+    <span class="order-tree-postals">${esc(o.fromCountry)} ${esc(o.fromPostal)} → ${esc(o.toCountry)} ${esc(o.toPostal)}</span>
+    <span class="order-tree-goods">${esc(o.goods)}</span>
+    <span class="order-tree-cargo">${esc(o.packages)} · ${number(o.weightKg)} kg</span>
+  </button>`;
+}
+
 function orderDirectory() {
   return `<div class="directory-title"><span>Zlecenia według statusu</span>${icon('grid')}</div>${ORDER_GROUPS.map(([key,name,ic])=>{
     const items=ordersInGroup(key),count=ordersInGroup(key,false).length,open=state.openOrderGroup===key;
-    return `<div class="order-group"><button class="order-group-toggle ${state.orderStatus===key?'active':''}" data-action="order-filter" data-id="${key}" aria-expanded="${open}" aria-controls="group-${key}" aria-pressed="${state.orderStatus===key}">${icon(ic)}<span>${name}</span><small>${count}</small>${icon('down','group-chevron')}</button><div class="order-group-list" id="group-${key}" ${open?'':'hidden'}>${items.length?items.map(o=>`<button class="order-tree-item ${state.expandedOrder===o.id?'selected':''}" data-action="order-select" data-id="${o.id}" ${state.expandedOrder===o.id?'aria-current="true"':''}><strong>${o.from} → ${o.to}</strong><span>Nr klienta: ${o.reference}</span></button>`).join(''):'<p class="directory-empty">Brak pasujących zleceń</p>'}</div></div>`;
+    return `<div class="order-group"><button class="order-group-toggle ${state.orderStatus===key?'active':''}" data-action="order-filter" data-id="${key}" aria-expanded="${open}" aria-controls="group-${key}" aria-pressed="${state.orderStatus===key}">${icon(ic)}<span>${name}</span><small>${count}</small>${icon('down','group-chevron')}</button><div class="order-group-list" id="group-${key}" ${open?'':'hidden'}>${items.length?items.map(orderDirectoryItem).join(''):'<p class="directory-empty">Brak pasujących zleceń</p>'}</div></div>`;
   }).join('')}<div class="directory-caption">${icon('info')}<span>Wybierz zlecenie, aby rozwinąć jego śledzenie na liście.</span></div>`;
 }
 
