@@ -1,54 +1,53 @@
 {
-  "verified_at_date": "2026-10-07",
-  "scope": "Independent visual prototype; all sample data fictional",
+  "revision_date": "2026-10-07",
+  "scope": "Independent visual prototype; all sample records fictional",
+  "visual_direction": "Light operational panel with graphite navigation and AMG orange actions",
   "main_navigation": [
     "Zlecenia",
     "Faktury",
     "Nagrody"
   ],
-  "browser_checks": {
-    "active_order_cards": 2,
-    "archived_order_cards": 3,
-    "order_search_lyon_all_results": 1,
-    "order_search_lyon_archived_results": 0,
-    "tracking_detail_opens": true,
-    "history_modal_opens": true,
-    "history_escape_closes_and_restores_focus": true,
-    "archived_order_documents_open_demo_modal": true,
-    "invoice_rows": 6,
-    "invoice_filtered_search_1042_rows": 1,
-    "reward_cards": 6,
-    "electronics_filter_cards": 3,
-    "goal_selection_updates_visible_card_and_focus": true,
-    "point_history_rows": 3,
-    "reward_claims_empty_state": true,
-    "faq_items": 4,
-    "font_onest_loaded": true,
-    "brand_logo_loaded": true,
-    "console_errors": [],
-    "console_warnings": [],
-    "back_navigation_closes_modal": true
+  "production_reference": {
+    "active_order_ui_viewed": true,
+    "archived_order_ui_viewed": true,
+    "scope": "Visual hierarchy and availability states only; no private records or screenshots copied",
+    "observed_components": [
+      "map",
+      "estimated delivery",
+      "estimated progress",
+      "status history",
+      "documents during transport",
+      "vehicle",
+      "route points"
+    ]
   },
-  "responsive": {
-    "desktop": {
-      "viewport_width": 1617,
-      "document_width": 1617
-    },
-    "mobile": {
-      "viewport_width": 390,
-      "document_width": 390,
-      "delivery_summary_precedes_map": true,
-      "invoice_table_viewport_width": 348,
-      "invoice_table_content_width": 635
-    }
+  "demo_scenarios": {
+    "active_orders": 2,
+    "completed_orders": 3,
+    "documents_before_delivery": [
+      "CMR",
+      "Zdjęcie załadunku"
+    ],
+    "missing_gps_order": "DEMO-261002",
+    "missing_gps_has_vehicle_marker": false,
+    "progress_is_estimated": true,
+    "transport_details_initially_collapsed": true
   },
-  "production_tracking_verified": false,
+  "browser_verification": {
+    "executor": "GitHub Actions only",
+    "workflow": ".github/workflows/preview.yml",
+    "tests_per_run": 46,
+    "viewports": [
+      "desktop: 1280 x 900",
+      "mobile: 390 x 844"
+    ],
+    "result_source": "Workflow run for the exact commit, followed by public deployment.json and published-page tests",
+    "local_full_browser_test_runs": 0
+  },
   "backend_integration": false,
+  "api_contract_confirmed": false,
   "private_customer_records_in_public_preview": false,
-  "screenshot_format": "JPEG; file signature verified",
-  "screenshot_source": "Local fictional prototype; no authenticated customer-panel screenshots",
-  "all_screenshot_contents_visually_verified": true,
   "new_screenshots_published": false,
   "existing_documentary_images_preserved": true,
-  "visual_verification": "New local screenshots inspected and kept outside the published repository; four existing documentary images retained"
+  "existing_documentary_images_describe_current_revision": false
 }

@@ -6,18 +6,21 @@ Jasny, klikalny projekt panelu AMG Miles z naciskiem na śledzenie zleceń.
 
 Główne zakładki to **Zlecenia, Faktury i Nagrody**. Ekran startowy pokazuje realizowane transporty. Wybierz „Śledź transport”, aby otworzyć poglądową mapę, przewidywany czas dostawy i etapy realizacji.
 
+Nowy kierunek wizualny łączy grafitową nawigację, jasne karty i pomarańczowe przyciski AMG. Termin dostawy jest wyróżniony w szczegółach zlecenia. Dokumenty są dostępne według danych demonstracyjnych już podczas transportu, a specyfikacja i punkty trasy są rozwijane. Na telefonie zakładki znajdują się na dole ekranu, a termin dostawy poprzedza mapę.
+
 Zlecenia, trasy, pozycje pojazdów, czasy dostawy, dokumenty, kwoty i punkty są fikcyjne i oznaczone jako dane demonstracyjne. To podgląd identyfikacji i interfejsu; mapa nie korzysta z GPS, a repozytorium nie zawiera backendu ani danych klientów.
 
 ## Ekrany do obejrzenia
 
 - [Zlecenia](https://zuzanna-amg-trans.github.io/amg-miles-design-preview/design-preview/#orders)
 - [Śledzenie przykładowego transportu](https://zuzanna-amg-trans.github.io/amg-miles-design-preview/design-preview/#tracking/DEMO-261001)
+- [Zlecenie bez pozycji GPS](https://zuzanna-amg-trans.github.io/amg-miles-design-preview/design-preview/#tracking/DEMO-261002)
 - [Faktury](https://zuzanna-amg-trans.github.io/amg-miles-design-preview/design-preview/#invoices)
 - [Nagrody](https://zuzanna-amg-trans.github.io/amg-miles-design-preview/design-preview/#rewards)
 
 ## Testy i publikacja na GitHubie
 
-Workflow [Test and publish preview](https://github.com/zuzanna-amg-trans/amg-miles-design-preview/actions/workflows/preview.yml) wykonuje pełne testy na maszynach GitHuba. Pull request uruchamia sprawdzenie składni i testy przeglądarkowe w widoku komputerowym oraz mobilnym. Testowany jest gotowy pakiet strony: lista i śledzenie zleceń, faktury, nagrody, historia punktów, moje nagrody i zasady programu. Sprawdzane są filtry, wyszukiwanie, historia statusów, okna dokumentów, wybór celu, FAQ, nawigacja, obsługa klawiaturą, ładowanie zasobów i brak przewijania całej strony w poziomie.
+Workflow [Test and publish preview](https://github.com/zuzanna-amg-trans/amg-miles-design-preview/actions/workflows/preview.yml) wykonuje pełne testy na maszynach GitHuba. Pull request uruchamia sprawdzenie składni i 46 testów przeglądarkowych w widoku komputerowym oraz mobilnym. Testowany jest gotowy pakiet strony: lista i śledzenie zleceń, faktury, nagrody, historia punktów, moje nagrody i zasady programu. Sprawdzane są filtry, wyszukiwanie, historia statusów, dokumenty podczas transportu, brak GPS, przybliżanie i reset mapy, rozwijane szczegóły transportu, kontakt, wybór celu, FAQ, nawigacja, obsługa klawiaturą, ładowanie zasobów i brak przewijania całej strony w poziomie. Aktualny wynik konkretnego wykonania znajduje się w GitHub Actions.
 
 Po zmianie `main` ten sam workflow publikuje przetestowany pakiet przez GitHub Pages, odczytuje publiczny identyfikator commita i sumy kontrolne zasobów oraz ponownie wykonuje testy na publicznej stronie. Nieudane testy przed publikacją blokują nowe wdrożenie. Źródłem Pages jest **GitHub Actions**.
 

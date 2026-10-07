@@ -136,6 +136,81 @@ test('completed transport exposes sample documents and completed steps', async (
   await expect(cmr).toBeFocused();
 });
 
+test('documents are available during transport and estimated progress is explicit', async ({ page }) => {
+  await page.goto('./#tracking/DEMO-261001');
+  await expect(page.locator('.delivery-card')).toContainText('Godzina szacunkowa');
+  await expect(page.locator('.journey [aria-current="step"]')).toContainText('W drodze');
+  const progress = page.getByRole('progressbar', { name: 'Szacunkowy postęp transportu', exact: true });
+  await expect(progress).toHaveAttribute('aria-valuenow', '75');
+  for (const name of ['CMR', 'Zdjęcie załadunku']) {
+    const document = page.getByRole('button', { name, exact: true });
+    await document.click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.getByRole('heading', { name, exact: true })).toBeVisible();
+    await expect(dialog).toContainText('DEMO-261001');
+    await page.keyboard.press('Escape');
+    await expect(document).toBeFocused();
+  }
+});
+
+test('missing GPS and documents show honest empty states while preserving the planned delivery', async ({ page }) => {
+  await page.goto('./#tracking/DEMO-261002');
+  await expect(page.locator('.map-footer')).toContainText('Pozycja GPS niedostępna');
+  await expect(page.locator('.route-map')).toHaveAttribute('aria-label', /Brak pozycji GPS/);
+  await expect(page.locator('.delivery-estimate strong')).toHaveText('11:00');
+  await expect(page.locator('.documents-card')).toContainText('Dokumenty w przygotowaniu');
+  await expect(page.locator('.documents-card button')).toHaveCount(0);
+  await expect(page.getByRole('progressbar')).toHaveCount(0);
+});
+
+test('schematic map zoom is bounded and reset restores the whole route', async ({ page }) => {
+  await page.goto('./#tracking/DEMO-261001');
+  const map = page.locator('.route-map');
+  const zoomIn = page.getByRole('button', { name: 'Przybliż mapę', exact: true });
+  const zoomOut = page.getByRole('button', { name: 'Oddal mapę', exact: true });
+  await expect(zoomOut).toBeDisabled();
+  await expect(map).toHaveAttribute('viewBox', '0 0 900 550');
+  await zoomIn.click();
+  expect(Number((await map.getAttribute('viewBox')).split(' ')[2])).toBeLessThan(900);
+  await expect(zoomOut).toBeEnabled();
+  for (let step = 0; step < 3; step++) await zoomIn.click();
+  await expect(zoomIn).toBeDisabled();
+  await page.getByRole('button', { name: 'Pokaż całą trasę', exact: true }).click();
+  await expect(map).toHaveAttribute('viewBox', '0 0 900 550');
+  await expect(zoomOut).toBeDisabled();
+  await expect(zoomIn).toBeEnabled();
+  await page.getByRole('button', { name: 'Wszystkie zlecenia', exact: true }).click();
+  await page.locator('.order-card').filter({ hasText: 'DEMO-261002' }).getByRole('button', { name: 'Śledź transport', exact: true }).click();
+  await expect(map).toHaveAttribute('viewBox', '0 0 900 550');
+});
+
+test('transport details stay collapsed and can be opened with the keyboard', async ({ page }) => {
+  await page.goto('./#tracking/DEMO-261001');
+  const details = page.locator('.transport-details');
+  const summary = details.locator('summary');
+  await expect(details).toHaveJSProperty('open', false);
+  await expect(details.getByText('8 palet · 3 200 kg', { exact: true })).not.toBeVisible();
+  await summary.focus();
+  await page.keyboard.press('Enter');
+  await expect(details).toHaveJSProperty('open', true);
+  await expect(details.getByText('8 palet · 3 200 kg', { exact: true })).toBeVisible();
+  await expect(details.getByText('Karlsruhe, DE', { exact: true })).toBeVisible();
+  await page.keyboard.press('Enter');
+  await expect(details).toHaveJSProperty('open', false);
+  await expect(summary).toBeFocused();
+});
+
+test('contact remains accessible from the header on desktop and phone', async ({ page }) => {
+  await page.goto('./#orders');
+  const contact = page.locator('.topbar').getByRole('button', { name: 'Kontakt z AMG', exact: true });
+  await contact.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('heading', { name: 'Jesteśmy po drodze.', exact: true })).toBeVisible();
+  await expect(dialog).toContainText('hello@amg-trans.eu');
+  await page.keyboard.press('Escape');
+  await expect(contact).toBeFocused();
+});
+
 test('invoice filters, search, empty state and detail dialog', async ({ page }) => {
   await page.goto('./#invoices');
   const rows = page.locator('#invoice-results tbody tr');
@@ -193,6 +268,13 @@ test('the three primary tabs remain available and rewards have their own subnavi
     await navigate(page, view);
     await expect(tab).toHaveAttribute('aria-current', 'page');
   }
+  await navigate(page, 'rewards');
+  await page.getByRole('button', { name: 'Twoje punkty AMG Miles', exact: true }).click();
+  const balance = page.getByRole('dialog');
+  await expect(balance.getByRole('heading', { name: 'Twoje punkty AMG Miles.', exact: true })).toBeVisible();
+  await balance.getByRole('button', { name: 'Historia punktów', exact: true }).click();
+  await expect(page).toHaveURL(/#history$/);
+  await expect(page.locator('.history-row')).toHaveCount(3);
   await navigate(page, 'rewards');
   await page.getByRole('navigation', { name: 'Program AMG Miles', exact: true }).getByRole('button', { name: 'Moje nagrody', exact: true }).click();
   await expect(page).toHaveURL(/#claims$/);
