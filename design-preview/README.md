@@ -1,6 +1,6 @@
 # AMG Miles — podgląd panelu klienta
 
-Klikalny projekt wizualny panelu. Najważniejszy przepływ: **wybór grupy statusów → zlecenie → śledzenie rozwinięte pod kartą → statusy i dokumenty**. Punktów i nagród można szukać w zakładce Nagrody, a historii punktów i zasad — w jej podrzędnej nawigacji.
+Klikalny projekt wizualny panelu. Najważniejszy przepływ: **aktywne zlecenia według najbliższej operacji → wybór zlecenia → lista po lewej i mapa po prawej → szybkie przełączanie transportów**. Punktów i nagród można szukać w zakładce Nagrody, a historii punktów i zasad — w jej podrzędnej nawigacji.
 
 ## Uruchomienie
 
@@ -16,16 +16,18 @@ Pełne testy przeglądarkowe wykonuje GitHub Actions przez pull request. Po inte
 
 ## Widoki i interakcje
 
-- Menu statusów po lewej i szersza lista po prawej (proporcja około 1:3 na komputerze). Rozwijane grupy „W realizacji”, „Zakończone”, „Wszystkie” pokazują miasta trasy oraz kraje i kody pocztowe załadunku i rozładunku. Opis towaru, liczba palet i waga ułatwiają rozpoznanie zlecenia w skróconym menu. Na telefonie menu ma zwijany nagłówek.
-- Karta zlecenia z numerem klienta, miastami, kodami pocztowymi i krajem, towarem, wagą i liczbą palet. Wyszukiwanie obejmuje numery klienta i AMG, miasta, kody oraz nazwę towaru; współpracuje z wybraną grupą statusów.
-- Dwa osobne terminy: dojazd na załadunek i na rozładunek, z godziną i datą. Nadchodzący termin ma opis „Przewidywany dojazd”; potwierdzony dojazd jest oznaczony jako potwierdzony. Bieżący status rozróżnia jazdę na załadunek i na rozładunek.
-- Śledzenie rozwijane bezpośrednio pod kartą zlecenia: mapa poglądowa z przybliżaniem i resetem, przykładowa pozycja, godzina dojazdu właściwa dla etapu, okno załadunku lub dostawy, pięć etapów i historia statusów. Numer AMG jest w nagłówku podglądu. Jedno rozwinięte zlecenie naraz; link `#tracking/ID` otwiera je w kontekście listy.
+- Pełna lista aktywnych zleceń po wejściu. Transport oczekujący na załadunek jest sortowany po planowanym dojeździe na załadunek; po potwierdzeniu załadunku — po dojeździe na rozładunek. Zakończone zlecenia są uporządkowane od ostatnio rozładowanych. W „Wszystkich” aktywne są przed zakończonymi.
+- Karta zlecenia z numerem klienta, miastami, krajami i kodami pocztowymi, towarem, wagą, liczbą palet i rejestracją auta. Wyszukiwanie obejmuje numery klienta i AMG, miasta, kraje, kody, nazwę towaru i rejestrację; współpracuje z filtrami „W realizacji”, „Zakończone”, „Wszystkie”.
+- Dwa osobne terminy: dojazd na załadunek i na rozładunek, z godziną i datą. Najbliższa operacja jest wyróżniona. Nadchodzący termin ma opis „Przewidywany dojazd”; potwierdzony dojazd jest opisany jako potwierdzony. Status rozróżnia jazdę na załadunek i na rozładunek.
+- Po wyborze zlecenia lista zwęża się do lewej kolumny, a po prawej otwiera się jeden podgląd. Lista i szczegóły mają niezależne przewijanie w wysokości ekranu. Pozostałe zlecenia są stale dostępne, bez przewijania całej strony. Na telefonie lista tworzy poziomy pas nad szczegółami.
+- Towar, waga, palety i rejestracja są widoczne nad mapą. Nagłówek pokazuje numer klienta i numer AMG. Rejestracje „DEMO 001”–„DEMO 005” są fikcyjne.
+- Mapa poglądowa z przybliżaniem i resetem, przykładowa pozycja, ETA właściwe dla etapu i drugi termin, okno załadunku lub dostawy, pięć etapów i historia statusów. Link `#tracking/ID` zachowuje wybrane zlecenie po przeładowaniu. Strzałki oraz Home/End umożliwiają zmianę zlecenia w zwężonej liście; „Pełna lista” przywraca szerokie karty.
 - Szacunkowy postęp pierwszego transportu, dostępne w trakcie realizacji CMR i zdjęcie załadunku. Zakończone zlecenia pokazują CMR i fakturę. Lista dokumentów pochodzi z osobnego pola danych, niezależnie od statusu.
 - Drugie zlecenie prezentuje brak GPS i dokumenty w przygotowaniu; mapa pokazuje wyłącznie planowaną trasę, bez zastępczej pozycji pojazdu.
 - Rozwijane szczegóły auta, ładunku i punktów trasy, w tym demonstracyjny punkt pośredni.
 - Faktury z filtrowaniem, wyszukiwaniem i szczegółami.
 - Katalog nagród, demonstracyjny wybór celu, historia punktów, moje nagrody i zasady programu.
-- Kontakt, okna szczegółów i obsługa klawiaturą. Na komputerze trzy zakładki są w górnym pasku, na telefonie — w stałej nawigacji dolnej. Na telefonie bieżący termin dojazdu poprzedza mapę.
+- Kontakt, okna szczegółów i obsługa klawiaturą. Na komputerze trzy zakładki są w górnym pasku, na telefonie — w stałej nawigacji dolnej. Na telefonie mapa poprzedza oba terminy dojazdu, a lista zleceń pozostaje dostępna podczas przewijania szczegółów.
 
 Wszystkie rekordy w `demoSource` są fikcyjne. Publiczny kod, ilustracje i zrzuty ekranu nie zawierają danych z zalogowanego konta Miles. Prototyp nie uwierzytelnia użytkowników, nie pobiera GPS, nie przelicza rzeczywistych rozliczeń, nie wysyła wiadomości ani nie zamawia nagród. Zapis celu pozostaje w pamięci bieżącej karty i znika po przeładowaniu.
 
@@ -43,7 +45,7 @@ Ten katalog nie jest kopią repozytorium dev AMG Miles. Do integracji potrzebny 
 
 1. Sprawdzić framework, istniejące komponenty, uwierzytelnienie i rzeczywiste odpowiedzi API.
 2. Przenieść tokeny i komponenty do istniejącej architektury, zachowując aktualne uprawnienia.
-3. Pobierać listę zleceń i pełną historię statusów z backendu. Pięć etapów w projekcie rozróżnia jazdę na załadunek i na rozładunek; pełne oryginalne statusy i daty muszą być zachowane w historii. Numer klienta, numer AMG, towar, waga, opakowania i oba adresy z krajami i kodami muszą pochodzić z właściwych pól API.
+3. Pobierać listę zleceń i pełną historię statusów z backendu. Pięć etapów w projekcie rozróżnia jazdę na załadunek i na rozładunek; pełne oryginalne statusy i daty muszą być zachowane w historii. Numer klienta, numer AMG, towar, waga, opakowania, rejestracja oraz oba adresy z krajami i kodami muszą pochodzić z właściwych pól API. Sortowanie trzeba oprzeć na rzeczywistej kolejnej niewykonanej operacji i jej terminie w poprawnej strefie czasowej. Daty demo służą tylko porównaniu kolejności; nie opisują bieżących transportów.
 4. Potwierdzić dostawcę mapy, źródło GPS, częstotliwość aktualizacji oraz dostępność i znaczenie ETA. Potwierdzić osobne czasy dojazdu na załadunek i rozładunek, ich okna oraz faktyczny/planowany charakter. Pokazać wiek pozycji; dla brakującej pozycji lub ETA wyświetlić jawny stan braku danych.
 5. Udostępniać CMR, zdjęcia i faktury według faktycznej dostępności dokumentów i uprawnień, niezależnie od samego statusu transportu. Potwierdzenie weryfikacji dokumentu i opcje pobrania muszą pochodzić z backendu.
 6. Pobierać kwoty, waluty, statusy płatności, punkty i bonusy z właściwego systemu rozliczeń. Zachować rozróżnienie kwot netto/brutto i istniejące warunki naliczania.
