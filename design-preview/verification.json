@@ -1,7 +1,7 @@
 {
   "revision_date": "2026-10-08",
   "scope": "Independent visual prototype; all sample records fictional",
-  "visual_direction": "Nearest operation first: single status in the detail header, focused operation ETA/window beside the map, a separate next-operation strip below, collapsed history",
+  "visual_direction": "Compact separated active-order cards: route and cargo together on the left, one equally tall unloading ETA panel on the right; focused nearest-operation detail remains unchanged",
   "main_navigation": [
     "Zlecenia",
     "Faktury",
@@ -43,10 +43,11 @@
   "browser_verification": {
     "executor": "GitHub Actions only",
     "workflow": ".github/workflows/preview.yml",
-    "tests_per_run": 74,
+    "tests_per_run": 76,
     "viewports": [
       "desktop: 1280 x 900",
-      "mobile: 390 x 844"
+      "mobile: 390 x 844",
+      "narrow mobile order cards: 319 x 728"
     ],
     "result_source": "Workflow run for the exact commit, followed by public deployment.json and published-page tests",
     "local_full_browser_test_runs": 0
@@ -73,7 +74,6 @@
       "weight_kg",
       "packages",
       "vehicle_registration",
-      "load_arrival",
       "unload_arrival"
     ],
     "compact_selector_fields": [
@@ -111,11 +111,14 @@
     "desktop_operation_panel": "Left of the map; nearest operation, ETA time/date and order window only",
     "desktop_filters": "Above the compact order selector",
     "mobile_operation_panel": "Before the map, under prominent cargo information",
-    "card_primary_arrival": "ETA na rozładunek, using the unload time and date; loading remains a separate field",
+    "card_primary_arrival": "One unloading ETA time/date panel only; separate planned arrival removed from the list",
     "client_order_number_position": "Centered in the full card header; status on the left",
     "open_action": "Larger GPS pojazdu button or click anywhere in the full card",
     "next_operation_strip": "Below map and nearest operation; future unload or last-operation notice",
-    "history_presentation": "Collapsed details disclosure; five stages and full history remain accessible"
+    "history_presentation": "Collapsed details disclosure; five stages and full history remain accessible",
+    "card_layout": "Route and cargo grouped vertically; ETA aligned beside both with the same height",
+    "active_card_distinction": "Stronger outer border, narrow accent and 22px gap between full cards",
+    "gps_action_position": "In the desktop card header; below the two-column card body on mobile"
   },
   "map_controls": {
     "zoom": "Vehicle position or route center",

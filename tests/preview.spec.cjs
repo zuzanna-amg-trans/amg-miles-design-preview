@@ -91,10 +91,12 @@ test('active orders fill the entry list and sort by next operation rather than f
   await expect(page.locator('.compact-card')).toHaveCount(0);
   const cards = page.locator('.order-card');
   expect(await cards.evaluateAll(items => items.map(item => item.dataset.orderId))).toEqual(['DEMO-261002', 'DEMO-261001']);
-  await expect(cards.first().locator('.next-arrival')).toHaveAttribute('data-arrival', 'load');
-  await expect(cards.first().locator('.next-arrival')).toContainText('10:00');
-  await expect(cards.nth(1).locator('.next-arrival')).toHaveAttribute('data-arrival', 'unload');
-  await expect(cards.nth(1).locator('.next-arrival')).toContainText('18:30');
+  await expect(cards.first().locator('.order-eta-panel strong')).toHaveText('11:0008.10.2026');
+  await expect(cards.nth(1).locator('.order-eta-panel strong')).toHaveText('18:3007.10.2026');
+  await cards.first().getByRole('button', { name: 'GPS pojazdu', exact: true }).click();
+  await expect(page.locator('.operation-name')).toHaveText('Załadunek');
+  await expect(page.locator('.eta-values>strong')).toHaveText('10:00');
+  await page.getByRole('button', { name: 'Wróć do pełnej listy zleceń', exact: true }).click();
   await filterOrders(page, 'completed');
   expect(await cards.evaluateAll(items => items.map(item => item.dataset.orderId))).toEqual(['DEMO-260903', 'DEMO-260904', 'DEMO-260905']);
   await filterOrders(page, 'all');
@@ -113,14 +115,14 @@ test('order cards expose country postal codes, goods, weight and pallet count be
   await expect(first.locator('.vehicle-plate')).toHaveText('DEMO 001');
   await expect(first).not.toContainText('DEMO-261001');
   await expect(first.locator('.status')).toHaveText('W drodze na rozładunek');
-  await expect(first.locator('[data-arrival="load"]')).toContainText('Załadunek potwierdzony');
+  await expect(first.locator('[data-arrival="load"]')).toHaveCount(0);
   await expect(first.locator('[data-arrival="unload"]')).toContainText('ETA na rozładunek');
   await expect(first.locator('[data-arrival="unload"] strong')).toHaveText('18:3007.10.2026');
   const second = orderCard(page, 'DEMO-261002');
   await expect(second.locator('.route-address')).toHaveText(['NL 3011 AA', 'PL 50-001']);
   await expect(second.locator('.status')).toHaveText('W drodze na załadunek');
-  await expect(second.locator('[data-arrival="load"]')).toContainText('Planowany załadunek');
-  await expect(second.locator('[data-arrival="load"] strong')).toHaveText('10:0007.10.2026');
+  await expect(second.locator('[data-arrival="load"]')).toHaveCount(0);
+  await expect(second).not.toContainText('Planowany załadunek');
   await expect(second.locator('[data-arrival="unload"] strong')).toHaveText('11:0008.10.2026');
 });
 
@@ -679,4 +681,41 @@ test('the vehicle position link opens the coordinate in Maps and stays unavailab
   await expect(page.getByRole('link', { name: 'Link do pozycji pojazdu', exact: true })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Link do pozycji pojazdu', exact: true })).toBeDisabled();
   await expect(page.locator('#vehicle-position-note')).toContainText('po otrzymaniu pozycji GPS');
+});
+
+
+test('separated order cards place cargo below the route and one equally tall ETA panel beside it', async ({ page, isMobile }) => {
+  const sizes = [page.viewportSize()];
+  if (isMobile) sizes.push({ width: 319, height: 728 });
+  for (const size of sizes) {
+    await page.setViewportSize(size);
+    await page.goto('./#orders');
+    await filterOrders(page, 'active');
+    await page.evaluate(() => document.fonts.ready);
+    const cards = page.locator('.order-card');
+    await expect(cards).toHaveCount(2);
+    for (const card of await cards.all()) {
+      await expect(card.locator('.arrival-tile')).toHaveCount(1);
+      await expect(card.locator('[data-arrival="load"]')).toHaveCount(0);
+      await expect(card.locator('.order-card-action')).toBeVisible();
+      const route = await card.locator('.order-route').boundingBox();
+      const cargo = await card.locator('.order-cargo').boundingBox();
+      const journey = await card.locator('.order-journey').boundingBox();
+      const eta = await card.locator('.order-eta-panel').boundingBox();
+      expect(cargo.y).toBeGreaterThan(route.y + route.height);
+      expect(eta.x).toBeGreaterThan(journey.x + journey.width);
+      expect(eta.y).toBeCloseTo(journey.y, 1);
+      expect(eta.height).toBeCloseTo(journey.height, 1);
+      if (isMobile) expect((await card.boundingBox()).height).toBeLessThan(560);
+    }
+    const first = await cards.first().boundingBox();
+    const second = await cards.nth(1).boundingBox();
+    expect(second.y - first.y - first.height).toBeGreaterThanOrEqual(20);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(size.width);
+    await filterOrders(page, 'all');
+    const active = orderCard(page, 'DEMO-261001');
+    const completed = orderCard(page, 'DEMO-260903');
+    expect(await active.evaluate(el => getComputedStyle(el).borderColor)).not.toBe(await completed.evaluate(el => getComputedStyle(el).borderColor));
+    await expect(completed.locator('.arrival-label')).toHaveText('Rozładunek potwierdzony');
+  }
 });
