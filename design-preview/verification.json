@@ -43,13 +43,14 @@
   "browser_verification": {
     "executor": "GitHub Actions only",
     "workflow": ".github/workflows/preview.yml",
-    "tests_per_run": 80,
+    "tests_per_run": 82,
     "viewports": [
       "desktop: 1280 x 900",
       "mobile: 390 x 844",
       "narrow mobile order cards: 319 x 728",
       "short portrait phone: 319 x 568",
-      "landscape phone: 844 x 390"
+      "landscape phone: 844 x 390",
+      "tablet status filters: 768 x 1024, 1024 x 768, 1101 x 834, 1280 x 920, 1366 x 984"
     ],
     "result_source": "Workflow run for the exact commit, followed by public deployment.json and published-page tests",
     "local_full_browser_test_runs": 0
@@ -111,7 +112,7 @@
     "route_heading": "Country and postal code before city",
     "detail_status_in_header": "Actual status once, replacing the preview caption",
     "desktop_operation_panel": "Left of the map; nearest operation, ETA time/date and order window only",
-    "desktop_filters": "Above the compact order selector",
+    "desktop_filters": "Above the compact order selector; three equal status controls in one row, including the narrow iPad sidebar",
     "mobile_operation_panel": "Before the map, under prominent cargo information",
     "card_primary_arrival": "One unloading ETA time/date panel only; separate planned arrival removed from the list",
     "client_order_number_position": "Centered in the full card header; status on the left",

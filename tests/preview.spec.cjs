@@ -648,7 +648,8 @@ test('the larger GPS action and the rest of the order card open the same single 
   await expect(card.locator('.arrival-tile').first()).toHaveAttribute('data-arrival', 'unload');
   expect(await eta.locator('.arrival-label').evaluate(el => Number(getComputedStyle(el).fontWeight))).toBeGreaterThanOrEqual(600);
   expect(await eta.locator('.arrival-label').evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(isMobile ? 15 : 17);
-  expect((await action.boundingBox()).height).toBeGreaterThanOrEqual(58);
+  // DOM rectangles can differ by a fraction of a pixel during hover transitions.
+  expect(Math.round((await action.boundingBox()).height * 100) / 100).toBeGreaterThanOrEqual(58);
   if (!isMobile) {
     const whole = await card.boundingBox();
     const status = await card.locator('.status').boundingBox();
@@ -738,6 +739,36 @@ test('separated order cards group route and cargo with ETA beside desktop conten
     const completed = orderCard(page, 'DEMO-260903');
     expect(await active.evaluate(el => getComputedStyle(el).borderColor)).not.toBe(await completed.evaluate(el => getComputedStyle(el).borderColor));
     await expect(completed.locator('.arrival-label')).toHaveText('Rozładunek potwierdzony');
+  }
+});
+
+test('order status filters stay in one readable row in the compact sidebar and on phones', async ({ page, isMobile }) => {
+  const sizes = isMobile ? [{ width: 319, height: 568 }, { width: 390, height: 844 }] : [{ width: 1101, height: 834 }, { width: 1280, height: 920 }, { width: 1366, height: 984 }, { width: 1024, height: 768 }, { width: 768, height: 1024 }];
+  for (const size of sizes) {
+    await page.setViewportSize(size);
+    await page.goto('./#tracking/DEMO-261002');
+    await page.evaluate(() => document.fonts.ready);
+    await revealOrderTools(page);
+    for (const scope of ['active', 'all']) {
+      await filterOrders(page, scope);
+      const filters = page.locator('#order-filters');
+      const bounds = await filters.boundingBox();
+      const buttons = await filters.locator('button').all();
+      expect(buttons).toHaveLength(3);
+      const boxes = await Promise.all(buttons.map(button => button.boundingBox()));
+      for (let i = 0; i < buttons.length; i++) {
+        await expect(buttons[i]).toBeVisible();
+        expect(boxes[i].y).toBeCloseTo(boxes[0].y, 1);
+        expect(boxes[i].height).toBeCloseTo(boxes[0].height, 1);
+        expect(boxes[i].x + boxes[i].width).toBeLessThanOrEqual(bounds.x + bounds.width + 0.1);
+        expect(await buttons[i].evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+      }
+      await expect(filters.locator(`[data-id="${scope}"]`)).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.locator('.compact-card')).toHaveCount(scope === 'active' ? 2 : 5);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(size.width);
+    }
+    await filterOrders(page, 'completed');
+    await expect(page.locator('.order-card')).toHaveCount(3);
   }
 });
 

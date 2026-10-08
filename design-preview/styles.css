@@ -859,8 +859,9 @@ body { font-size:15px; }
   .has-tracking .orders-page { display:grid; grid-template-columns:minmax(290px,.86fr) minmax(0,2.6fr); grid-template-rows:auto auto minmax(0,1fr); gap:0 22px; }
   .has-tracking .orders-page>.page-head { grid-column:1 / -1; }
   .has-tracking .orders-toolbar { grid-column:1; grid-row:2; flex-direction:column; align-items:stretch; gap:10px; margin-bottom:14px; min-width:0; }
-  .has-tracking .orders-toolbar .filters { border-radius:16px; justify-content:flex-start; }
-  .has-tracking .orders-toolbar .filter { font-size:12px; padding:8px 10px; min-height:40px; }
+  .has-tracking .orders-toolbar .filters { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); width:100%; border-radius:16px; }
+  .has-tracking .orders-toolbar .filter { min-width:0; justify-content:center; gap:4px; font-size:11px; padding:8px 4px; min-height:44px; }
+  .has-tracking .orders-toolbar .filter span { font-size:10px; min-width:16px; padding:1px 3px; }
   .has-tracking .orders-toolbar .search-field { width:100%; }
   .has-tracking .orders-workspace { display:contents; }
   .has-tracking .orders-list-pane { grid-column:1; grid-row:3; }
