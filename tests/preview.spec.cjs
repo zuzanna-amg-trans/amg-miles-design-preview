@@ -668,6 +668,77 @@ test('the larger GPS action and the rest of the order card open the same single 
   await expect(page.locator('.compact-operation small')).toHaveText(['ETA na rozładunek', 'ETA na rozładunek']);
 });
 
+test('GPS, status and the whole ETA tile open one preview by mouse, touch or keyboard', async ({ page, isMobile, context }) => {
+  test.setTimeout(60_000);
+  const selectors = ['.order-card-action', '.order-status-action', '.order-eta-panel'];
+  for (const id of ['DEMO-261002', 'DEMO-261001', 'DEMO-260903']) {
+    await page.goto('./#orders');
+    await filterOrders(page, 'all');
+    const card = orderCard(page, id);
+    for (const selector of selectors) {
+      const control = card.locator(selector);
+      await expect(control).toBeVisible();
+      expect(await control.evaluate(el => el.tagName)).toBe('BUTTON');
+      expect(Math.round((await control.boundingBox()).height)).toBeGreaterThanOrEqual(44);
+      if (selector !== '.order-card-action') await expect(control).toHaveAccessibleName(/otwórz zlecenie AMG-DEMO-/);
+      if (isMobile) await control.tap();
+      else await control.click();
+      await expect(page).toHaveURL(new RegExp('#tracking/' + id + '$'));
+      await expect(page.locator('.order-detail-pane')).toHaveCount(1);
+      await expect(page.locator('.compact-card button button')).toHaveCount(0);
+      expect(context.pages()).toHaveLength(1);
+      await page.getByRole('button', { name: 'Wróć do pełnej listy zleceń', exact: true }).click();
+      await expect(control).toBeFocused();
+    }
+  }
+  await page.goto('./#orders');
+  const card = orderCard(page, 'DEMO-261002');
+  for (const selector of selectors) {
+    for (const key of ['Enter', 'Space']) {
+      const control = card.locator(selector);
+      await control.focus();
+      await page.keyboard.press(key);
+      await expect(page).toHaveURL(/#tracking\/DEMO-261002$/);
+      await expect(page.locator('.order-detail-pane')).toHaveCount(1);
+      await page.getByRole('button', { name: 'Wróć do pełnej listy zleceń', exact: true }).click();
+      await expect(control).toBeFocused();
+    }
+  }
+});
+
+test('status and ETA give a gentle hover cue and retain visible keyboard focus without moving', async ({ page, isMobile }) => {
+  test.setTimeout(60_000);
+  await page.goto('./#orders');
+  await filterOrders(page, 'all');
+  await page.evaluate(() => document.fonts.ready);
+  for (const id of ['DEMO-261002', 'DEMO-261001', 'DEMO-260903']) {
+    const card = orderCard(page, id);
+    for (const selector of ['.order-status-action', '.order-eta-panel']) {
+      const control = card.locator(selector);
+      await expect(control).toHaveCSS('cursor', 'pointer');
+      if (!isMobile) {
+        await page.getByRole('heading', { level: 1 }).hover();
+        const idle = await control.evaluate(el => getComputedStyle(el).backgroundColor);
+        const before = await control.boundingBox();
+        await control.hover();
+        await expect.poll(() => control.evaluate(el => getComputedStyle(el).backgroundColor)).not.toBe(idle);
+        await expect(control).not.toHaveCSS('box-shadow', 'none');
+        const after = await control.boundingBox();
+        expect(after.x).toBeCloseTo(before.x, 1);
+        expect(after.y).toBeCloseTo(before.y, 1);
+        expect(after.width).toBeCloseTo(before.width, 1);
+        expect(after.height).toBeCloseTo(before.height, 1);
+      }
+      await control.focus();
+      await page.keyboard.press('Tab');
+      await page.keyboard.press('Shift+Tab');
+      await expect(control).toBeFocused();
+      await expect(control).toHaveCSS('outline-style', 'solid');
+      await expect(control).toHaveCSS('outline-width', '2px');
+    }
+  }
+});
+
 test('the vehicle position link opens the coordinate in Maps and stays unavailable without GPS', async ({ page, context }) => {
   await page.goto('./#tracking/DEMO-261001');
   const link = page.getByRole('link', { name: 'Link do pozycji pojazdu', exact: true });
