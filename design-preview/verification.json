@@ -1,7 +1,7 @@
 {
   "revision_date": "2026-10-08",
   "scope": "Independent visual prototype; all sample records fictional",
-  "visual_direction": "Readable operational panel with a centered company greeting, prominent country/postal route headings, current status, cargo and vehicle data; operation panel left of the map",
+  "visual_direction": "Nearest operation first: single status in the detail header, focused operation ETA/window beside the map, a separate next-operation strip below, collapsed history",
   "main_navigation": [
     "Zlecenia",
     "Faktury",
@@ -37,12 +37,13 @@
     "journey_stages": 5,
     "arrival_times_separate_by_operation": true,
     "essential_cargo_initially_visible": true,
-    "registrations_fictional": true
+    "registrations_fictional": true,
+    "progress_initially_collapsed": true
   },
   "browser_verification": {
     "executor": "GitHub Actions only",
     "workflow": ".github/workflows/preview.yml",
-    "tests_per_run": 70,
+    "tests_per_run": 74,
     "viewports": [
       "desktop: 1280 x 900",
       "mobile: 390 x 844"
@@ -84,7 +85,7 @@
       "weight_kg",
       "packages",
       "vehicle_registration",
-      "next_operation"
+      "unload_arrival"
     ],
     "tracking_presentation": "Compact list on the left, one map/detail pane on the right; independent scrolling",
     "essential_detail_fields_above_map": [
@@ -106,14 +107,20 @@
     ],
     "company_greeting": "Dzień dobry! + fictional company name; centered on desktop",
     "route_heading": "Country and postal code before city",
-    "detail_status_in_header": true,
-    "desktop_operation_panel": "Left of the map; current status, ETA time/date, order window, next unloading or previous loading",
+    "detail_status_in_header": "Actual status once, replacing the preview caption",
+    "desktop_operation_panel": "Left of the map; nearest operation, ETA time/date and order window only",
     "desktop_filters": "Above the compact order selector",
-    "mobile_operation_panel": "Before the map, under prominent cargo information"
+    "mobile_operation_panel": "Before the map, under prominent cargo information",
+    "card_primary_arrival": "ETA na rozładunek, using the unload time and date; loading remains a separate field",
+    "client_order_number_position": "Centered in the full card header; status on the left",
+    "open_action": "Larger GPS pojazdu button or click anywhere in the full card",
+    "next_operation_strip": "Below map and nearest operation; future unload or last-operation notice",
+    "history_presentation": "Collapsed details disclosure; five stages and full history remain accessible"
   },
   "map_controls": {
     "zoom": "Vehicle position or route center",
     "reset": "Whole route",
-    "expanded_view": "Larger modal map; synchronized zoom, Escape and explicit return restore focus"
+    "expanded_view": "Larger modal map; synchronized zoom, Escape and explicit return restore focus",
+    "google_maps_link": "New tab with fictional latitude/longitude from positionCoordinates; disabled when GPS is missing"
   }
 }
