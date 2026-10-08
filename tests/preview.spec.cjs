@@ -690,6 +690,7 @@ test('separated order cards place cargo below the route and one equally tall ETA
   for (const size of sizes) {
     await page.setViewportSize(size);
     await page.goto('./#orders');
+    await filterOrders(page, 'active');
     await page.evaluate(() => document.fonts.ready);
     const cards = page.locator('.order-card');
     await expect(cards).toHaveCount(2);
