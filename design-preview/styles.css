@@ -1308,6 +1308,8 @@ body { font-size:15px; }
 @media (max-width:360px) {
   .content { padding-left:14px; padding-right:14px; }
   .orders-toolbar .filter,.has-tracking .orders-toolbar .filter { font-size:11px; gap:3px; }
+  .order-card:not(.compact-card) { gap:7px; }
+  .order-main { padding-top:6px; }
   .order-journey .route-code { font-size:16px; }
   .detail-route .route-code { font-size:15px; }
   .reward-card { grid-template-columns:96px minmax(0,1fr); gap:10px; padding:10px; }

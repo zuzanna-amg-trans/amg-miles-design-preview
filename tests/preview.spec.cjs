@@ -708,6 +708,11 @@ test('GPS, status and the whole ETA tile open one preview by mouse, touch or key
 
 test('status and ETA give a gentle hover cue and retain visible keyboard focus without moving', async ({ page, isMobile }) => {
   test.setTimeout(60_000);
+  // Hover scrolls off-screen controls into view; compare their position in the document.
+  const documentBox = control => control.evaluate(el => {
+    const box = el.getBoundingClientRect();
+    return { x: box.x + scrollX, y: box.y + scrollY, width: box.width, height: box.height };
+  });
   await page.goto('./#orders');
   await filterOrders(page, 'all');
   await page.evaluate(() => document.fonts.ready);
@@ -719,11 +724,11 @@ test('status and ETA give a gentle hover cue and retain visible keyboard focus w
       if (!isMobile) {
         await page.getByRole('heading', { level: 1 }).hover();
         const idle = await control.evaluate(el => getComputedStyle(el).backgroundColor);
-        const before = await control.boundingBox();
+        const before = await documentBox(control);
         await control.hover();
         await expect.poll(() => control.evaluate(el => getComputedStyle(el).backgroundColor)).not.toBe(idle);
         await expect(control).not.toHaveCSS('box-shadow', 'none');
-        const after = await control.boundingBox();
+        const after = await documentBox(control);
         expect(after.x).toBeCloseTo(before.x, 1);
         expect(after.y).toBeCloseTo(before.y, 1);
         expect(after.width).toBeCloseTo(before.width, 1);
@@ -789,7 +794,7 @@ test('separated order cards group route and cargo with ETA beside desktop conten
         expect(eta.x).toBeCloseTo(journey.x, 1);
         expect(eta.width).toBeCloseTo(journey.width, 1);
         expect(eta.height).toBeLessThan(100);
-        expect((await card.boundingBox()).height).toBeLessThan(430);
+        expect((await card.boundingBox()).height, `${await card.getAttribute('data-order-id')} at ${size.width}px stays compact`).toBeLessThan(430);
         const ends = await card.locator('.order-route>div').all();
         const load = await ends[0].boundingBox();
         const unload = await ends[1].boundingBox();
