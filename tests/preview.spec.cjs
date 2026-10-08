@@ -742,6 +742,83 @@ test('separated order cards group route and cargo with ETA beside desktop conten
   }
 });
 
+test('GPS buttons and ETA tiles share both edges on active and completed order cards', async ({ page, isMobile }) => {
+  test.setTimeout(60_000);
+  const sizes = isMobile ? [{ width: 319, height: 568 }, { width: 390, height: 844 }, { width: 844, height: 390 }] : [{ width: 1280, height: 920 }, { width: 1101, height: 834 }, { width: 1024, height: 768 }, { width: 768, height: 1024 }];
+  for (const size of sizes) {
+    await page.setViewportSize(size);
+    await page.goto('./#orders');
+    await filterOrders(page, 'all');
+    await page.evaluate(() => document.fonts.ready);
+    const cards = await page.locator('.order-card').evaluateAll(elements => elements.map(card => {
+      const rect = el => {
+        const box = el.getBoundingClientRect();
+        return { x: box.x, y: box.y, width: box.width, right: box.right };
+      };
+      const action = card.querySelector('.order-card-action');
+      return {
+        id: card.getAttribute('data-order-id'),
+        action: rect(action),
+        eta: rect(card.querySelector('.order-eta-panel')),
+        actionFits: action.scrollWidth <= action.clientWidth,
+        routeEnds: [...card.querySelectorAll('.order-route>div')].map(rect),
+      };
+    }));
+    expect(cards).toHaveLength(5);
+    for (const card of cards) {
+      const label = `${card.id} at ${size.width}px`;
+      expect(card.action.x, label + ': same left edge').toBeCloseTo(card.eta.x, 1);
+      expect(card.action.right, label + ': same right edge').toBeCloseTo(card.eta.right, 1);
+      expect(card.action.width, label + ': same width').toBeCloseTo(card.eta.width, 1);
+      expect(card.actionFits, label + ': the button text is not clipped').toBe(true);
+      expect(card.routeEnds[0].y, label + ': route endpoints share a top edge').toBeCloseTo(card.routeEnds[1].y, 1);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(size.width);
+  }
+});
+
+test('operation time and date align with cargo labels and values kept on common rows', async ({ page, isMobile }) => {
+  test.setTimeout(60_000);
+  const sizes = isMobile ? [{ width: 319, height: 568 }, { width: 390, height: 844 }] : [{ width: 1280, height: 920 }, { width: 1101, height: 834 }, { width: 768, height: 1024 }];
+  for (const size of sizes) {
+    await page.setViewportSize(size);
+    for (const id of ['DEMO-261002', 'DEMO-261001', 'DEMO-260903']) {
+      await page.goto('./#tracking/' + id);
+      await page.evaluate(() => document.fonts.ready);
+      const layout = await page.locator('#order-detail').evaluate(pane => {
+        const rect = el => {
+          const box = el.getBoundingClientRect();
+          return { x: box.x, y: box.y, right: box.right, bottom: box.bottom };
+        };
+        return {
+          time: rect(pane.querySelector('.eta-values>strong')),
+          date: rect(pane.querySelector('.delivery-date')),
+          estimate: rect(pane.querySelector('.delivery-estimate')),
+          facts: [...pane.querySelectorAll('.detail-facts>div')].map(fact => ({
+            block: rect(fact), label: rect(fact.querySelector('span')), value: rect(fact.querySelector('strong')),
+          })),
+          routeEnds: [...pane.querySelectorAll('.detail-route>.route-location')].map(rect),
+        };
+      });
+      const label = `${id} at ${size.width}px`;
+      expect(layout.time.x, label + ': ETA and date share the left edge').toBeCloseTo(layout.date.x, 1);
+      expect(layout.date.y, label + ': the date sits below the time').toBeGreaterThanOrEqual(layout.time.bottom);
+      expect(layout.time.right, label + ': ETA stays inside its column').toBeLessThanOrEqual(layout.estimate.right + 1);
+      expect(layout.routeEnds[0].y, label + ': route endpoints share a top edge').toBeCloseTo(layout.routeEnds[1].y, 1);
+      for (let i = 0; i < layout.facts.length; i++) {
+        for (let j = i + 1; j < layout.facts.length; j++) {
+          const a = layout.facts[i], b = layout.facts[j];
+          if (Math.abs(a.block.y - b.block.y) < 1) {
+            expect(a.label.y, label + ': cargo labels align within their row').toBeCloseTo(b.label.y, 1);
+            expect(a.value.y, label + ': cargo values align within their row').toBeCloseTo(b.value.y, 1);
+          }
+        }
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(size.width);
+    }
+  }
+});
+
 test('order status filters stay in one readable row in the compact sidebar and on phones', async ({ page, isMobile }) => {
   const sizes = isMobile ? [{ width: 319, height: 568 }, { width: 390, height: 844 }] : [{ width: 1101, height: 834 }, { width: 1280, height: 920 }, { width: 1366, height: 984 }, { width: 1024, height: 768 }, { width: 768, height: 1024 }];
   for (const size of sizes) {
