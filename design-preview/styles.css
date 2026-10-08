@@ -1013,7 +1013,7 @@ body { font-size:15px; }
 .detail-current-status .status { font-size:16px; font-weight:600; padding:7px 11px; }
 .has-selection .tracking-grid { align-items:stretch; }
 .has-selection .delivery-confidence { margin-top:auto; padding-top:6px; }
-.map-heading { flex-wrap:nowrap; gap:10px; }
+.map-heading { flex-wrap:nowrap; gap:10px; padding:14px 18px; }
 .map-heading-actions { display:flex; flex-direction:column; align-items:flex-end; gap:7px; }
 .vehicle-position-link { display:inline-flex; align-items:center; justify-content:center; gap:7px; border:1px solid #edc7ae; border-radius:999px; padding:10px 12px; min-height:44px; font-size:13px; font-weight:600; color:#a14c27; background:#fff7f0; text-decoration:none; white-space:nowrap; }
 .vehicle-position-link .icon { width:18px; height:18px; flex-shrink:0; }
