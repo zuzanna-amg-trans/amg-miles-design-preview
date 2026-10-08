@@ -1,7 +1,7 @@
 {
   "revision_date": "2026-10-08",
   "scope": "Independent visual prototype; all sample records fictional",
-  "visual_direction": "Tighter separated active-order cards: loading and unloading grouped within one compact route area, cargo directly below, one equally tall unloading ETA panel on the right",
+  "visual_direction": "Phone-specific order cards with side-by-side route points, full-width cargo and an ETA strip below; compact persistent order switching, expandable tools, readable invoice and reward cards",
   "main_navigation": [
     "Zlecenia",
     "Faktury",
@@ -43,11 +43,13 @@
   "browser_verification": {
     "executor": "GitHub Actions only",
     "workflow": ".github/workflows/preview.yml",
-    "tests_per_run": 76,
+    "tests_per_run": 80,
     "viewports": [
       "desktop: 1280 x 900",
       "mobile: 390 x 844",
-      "narrow mobile order cards: 319 x 728"
+      "narrow mobile order cards: 319 x 728",
+      "short portrait phone: 319 x 568",
+      "landscape phone: 844 x 390"
     ],
     "result_source": "Workflow run for the exact commit, followed by public deployment.json and published-page tests",
     "local_full_browser_test_runs": 0
@@ -96,7 +98,7 @@
       "vehicle_type"
     ],
     "internal_order_number": "Detail heading and transport details",
-    "mobile_selector": "Horizontal compact order list above independently scrolling detail pane",
+    "mobile_selector": "Short horizontal list with route, client reference and cargo above the independently scrolling detail pane",
     "keyboard_switching": [
       "ArrowUp",
       "ArrowDown",
@@ -116,14 +118,22 @@
     "open_action": "Larger GPS pojazdu button or click anywhere in the full card",
     "next_operation_strip": "Below map and nearest operation; future unload or last-operation notice",
     "history_presentation": "Collapsed details disclosure; five stages and full history remain accessible",
-    "card_layout": "Loading and unloading grouped within a 400px desktop route area; smaller vertical gaps to cargo and a narrower, equally tall ETA panel; text sizes preserved",
+    "card_layout": "Desktop: compact route and cargo with an equally tall adjacent ETA. Phone: route points side by side, cargo across the full width and a short ETA strip underneath.",
     "active_card_distinction": "Stronger outer border, narrow accent and 22px gap between full cards",
-    "gps_action_position": "In the desktop card header; below the two-column card body on mobile"
+    "gps_action_position": "In the desktop card header; below the two-column card body on mobile",
+    "mobile_detail_tools": "Filters and search open through a 44px disclosure button, remain keyboard accessible and retain scope across order changes"
   },
   "map_controls": {
     "zoom": "Vehicle position or route center",
     "reset": "Whole route",
     "expanded_view": "Larger modal map; synchronized zoom, Escape and explicit return restore focus",
     "google_maps_link": "New tab with fictional latitude/longitude from positionCoordinates; disabled when GPS is missing"
+  },
+  "mobile_accessibility": {
+    "search_font_px": 16,
+    "touch_control_minimum_px": 44,
+    "invoice_layout": "Stacked rows with field labels and preserved table roles",
+    "reward_layout": "Full-width illustrated cards",
+    "short_screen_detail_remains_scrollable": true
   }
 }

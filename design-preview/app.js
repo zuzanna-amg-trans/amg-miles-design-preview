@@ -75,7 +75,7 @@ const demoSource = {
 };
 
 const VIEWS = {orders:'Zlecenia',tracking:'Podgląd zlecenia',invoices:'Faktury',rewards:'Nagrody',history:'Historia punktów',claims:'Moje nagrody',rules:'Zasady programu'};
-let state = {view:'orders',orderStatus:'active',orderSearch:'',selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones',mapZoom:1,expandedOrder:null};
+let state = {view:'orders',orderStatus:'active',orderSearch:'',orderToolsOpen:false,selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones',mapZoom:1,expandedOrder:null};
 let toastTimer;
 let modalTrigger;
 
@@ -116,7 +116,7 @@ function pageHead(eyebrow,title,description,cta='') {
 }
 
 function invoiceTable(items,compact=false) {
-  return `<div class="table-wrap"><table aria-label="${compact?'Ostatnie faktury — dane demonstracyjne':'Twoje faktury — dane demonstracyjne'}"><thead><tr><th>Faktura</th><th class="numeric">Kwota netto</th><th>Status</th><th class="numeric">Punkty</th>${compact?'':'<th>Termin płatności</th>'}</tr></thead><tbody>${items.map(i=>`<tr><td><button class="row-detail" data-action="invoice-detail" data-id="${i.id}" aria-label="Szczegóły faktury ${i.id}">${i.id}${icon('arrow')}</button><small>${i.issued}</small></td><td class="numeric">${money(i.amount)}</td><td><span class="status ${i.status==='unpaid'?'amber':''}">${i.status==='paid'?'Opłacona':'Do opłacenia'}</span></td><td class="numeric">${i.status==='paid'?`+${number(i.points+i.bonus)}`:number(i.points)}${i.status==='unpaid'?'<small>po płatności</small>':i.bonus?'<small>w tym bonus 100%</small>':'<small>przyznane</small>'}</td>${compact?'':`<td>${i.due}</td>`}</tr>`).join('')}</tbody></table></div>`;
+  return `<div class="table-wrap"><table role="table" aria-label="${compact?'Ostatnie faktury — dane demonstracyjne':'Twoje faktury — dane demonstracyjne'}"><thead role="rowgroup"><tr role="row"><th scope="col">Faktura</th><th scope="col" class="numeric">Kwota netto</th><th scope="col">Status</th><th scope="col" class="numeric">Punkty</th>${compact?'':'<th scope="col">Termin płatności</th>'}</tr></thead><tbody role="rowgroup">${items.map(i=>`<tr role="row"><td role="cell" data-label="Faktura"><button class="row-detail" data-action="invoice-detail" data-id="${i.id}" aria-label="Szczegóły faktury ${i.id}">${i.id}${icon('arrow')}</button><small>${i.issued}</small></td><td role="cell" class="numeric" data-label="Kwota netto">${money(i.amount)}</td><td role="cell" data-label="Status"><span class="status ${i.status==='unpaid'?'amber':''}">${i.status==='paid'?'Opłacona':'Do opłacenia'}</span></td><td role="cell" class="numeric" data-label="Punkty">${i.status==='paid'?`+${number(i.points+i.bonus)}`:number(i.points)}${i.status==='unpaid'?'<small>po płatności</small>':i.bonus?'<small>w tym bonus 100%</small>':'<small>przyznane</small>'}</td>${compact?'':`<td role="cell" data-label="Termin płatności">${i.due}</td>`}</tr>`).join('')}</tbody></table></div>`;
 }
 
 const ORDER_GROUPS=[['active','W realizacji'],['completed','Zakończone'],['all','Wszystkie']];
@@ -197,8 +197,9 @@ function orderWorkspace() {
 }
 
 function ordersView() {
-  return `<section class="orders-page">${pageHead('Twoje transporty z AMG','Twoje <em>zlecenia.</em>','Aktywne transporty według najbliższej operacji. Wybierz zlecenie, aby zobaczyć mapę.',`<div class='company-welcome'><span>Dzień dobry!</span><strong>${esc(demoSource.customer.companyName)}</strong></div>`)}
-    <div class="orders-toolbar"><div class="filters" id="order-filters" aria-label="Filtruj zlecenia">${orderFilters()}</div><label class="search-field">${icon('search')}<input id="order-search" type="search" placeholder="Numer, miasto lub rejestracja" aria-label="Szukaj zlecenia po numerze, mieście lub rejestracji" value="${esc(state.orderSearch)}"></label></div>
+  return `<section class="orders-page ${state.orderToolsOpen?'mobile-tools-open':''}">${pageHead('Twoje transporty z AMG','Twoje <em>zlecenia.</em>','Aktywne transporty według najbliższej operacji. Wybierz zlecenie, aby zobaczyć mapę.',`<div class='company-welcome'><span>Dzień dobry!</span><strong>${esc(demoSource.customer.companyName)}</strong></div>`)}
+    <button class="mobile-order-tools" data-action="order-tools" aria-expanded="${state.orderToolsOpen}" aria-controls="order-toolbar">${icon('search')}<span>Filtry i wyszukiwanie</span>${icon('down')}</button>
+    <div class="orders-toolbar" id="order-toolbar"><div class="filters" id="order-filters" aria-label="Filtruj zlecenia">${orderFilters()}</div><label class="search-field">${icon('search')}<input id="order-search" type="search" placeholder="Numer, miasto lub rejestracja" aria-label="Szukaj zlecenia po numerze, mieście lub rejestracji" value="${esc(state.orderSearch)}"></label></div>
     <div class="orders-workspace ${state.expandedOrder?'has-selection':''}" id="orders-workspace">${orderWorkspace()}</div>
     <div class="miles-strip"><span class="miles-symbol">${icon('gift')}</span><div><strong>Z AMG każdy kilometr daje więcej.</strong><span>Sprawdź, na co wymienisz swoje punkty Miles.</span></div><button class="text-action" data-view="rewards">Zobacz nagrody ${icon('arrow')}</button></div></section>`;
 }
@@ -346,11 +347,17 @@ function navigate(view,focus=true) {
   state.search='';
   state.mapZoom=1;
   state.expandedOrder=null;
+  state.orderToolsOpen=false;
   const hash=`#${state.view}`;
   if (window.location.hash!==hash) window.history.pushState(null,'',hash);
   shell();
   window.scrollTo({top:0,behavior:'instant'});
   if(focus) document.getElementById('main-content').focus({preventScroll:true});
+}
+
+function updateOrderTools() {
+  document.querySelector('.orders-page')?.classList.toggle('mobile-tools-open',state.orderToolsOpen);
+  document.querySelector('.mobile-order-tools')?.setAttribute('aria-expanded',String(state.orderToolsOpen));
 }
 
 function refreshOrderContent(resetDetail=false) {
@@ -361,6 +368,7 @@ function refreshOrderContent(resetDetail=false) {
   const workspace=document.getElementById('orders-workspace');
   workspace.classList.toggle('has-selection',Boolean(state.expandedOrder));
   document.querySelector('.shell').classList.toggle('has-tracking',Boolean(state.expandedOrder));
+  updateOrderTools();
   workspace.innerHTML=orderWorkspace();
   document.getElementById('order-results').scrollTop=listScroll;
   document.getElementById('order-results').scrollLeft=listScrollLeft;
@@ -371,7 +379,7 @@ function refreshOrderContent(resetDetail=false) {
 function selectOrder(id) {
   if(state.expandedOrder===id)return;
   if(!matchingOrders().some(o=>o.id===id))return;
-  state.selectedOrder=id;state.expandedOrder=id;state.mapZoom=1;
+  state.selectedOrder=id;state.expandedOrder=id;state.mapZoom=1;state.orderToolsOpen=false;
   const hash=`#tracking/${id}`;
   if(window.location.hash!==hash)window.history.pushState(null,'',hash);
   refreshOrderContent(true);
@@ -382,7 +390,7 @@ function selectOrder(id) {
 
 function closeOrder() {
   const id=state.selectedOrder;
-  state.expandedOrder=null;state.mapZoom=1;
+  state.expandedOrder=null;state.mapZoom=1;state.orderToolsOpen=false;
   if(window.location.hash!=='#orders')window.history.pushState(null,'','#orders');
   refreshOrderContent(true);
   document.querySelector(`.order-card[data-order-id="${id}"] .order-card-action`)?.focus({preventScroll:true});
@@ -432,6 +440,7 @@ document.addEventListener('click',event=>{
   if(action==='open-rewards')navigate('rewards');
   if(action==='order-detail'||action==='order-select')selectOrder(id);
   if(action==='order-close')closeOrder();
+  if(action==='order-tools'){state.orderToolsOpen=!state.orderToolsOpen;updateOrderTools();}
   if(action==='order-filter'){
     state.orderStatus=id;
     if(state.expandedOrder&&!matchingOrders().some(o=>o.id===state.expandedOrder)){
@@ -495,6 +504,7 @@ function applyRoute() {
   if(document.getElementById('detail-dialog').open)closeDialog();
   state.mapZoom=1;
   state.expandedOrder=null;
+  state.orderToolsOpen=false;
   const [view,id]=window.location.hash.slice(1).split('/');
   state.view=view==='overview'||view==='tracking'?'orders':VIEWS[view]?view:'orders';
   if(view==='tracking'){
