@@ -113,20 +113,20 @@ test('order cards expose country postal codes, goods, weight and pallet count be
   await expect(first.locator('.vehicle-plate')).toHaveText('DEMO 001');
   await expect(first).not.toContainText('DEMO-261001');
   await expect(first.locator('.status')).toHaveText('W drodze na rozładunek');
-  await expect(first.locator('[data-arrival="load"]')).toContainText('Dojazd na załadunek');
-  await expect(first.locator('[data-arrival="unload"]')).toContainText('Przewidywany dojazd na rozładunek');
+  await expect(first.locator('[data-arrival="load"]')).toContainText('Załadunek potwierdzony');
+  await expect(first.locator('[data-arrival="unload"]')).toContainText('ETA na rozładunek');
   await expect(first.locator('[data-arrival="unload"] strong')).toHaveText('18:3007.10.2026');
   const second = orderCard(page, 'DEMO-261002');
   await expect(second.locator('.route-address')).toHaveText(['NL 3011 AA', 'PL 50-001']);
   await expect(second.locator('.status')).toHaveText('W drodze na załadunek');
-  await expect(second.locator('[data-arrival="load"]')).toContainText('Przewidywany dojazd na załadunek');
+  await expect(second.locator('[data-arrival="load"]')).toContainText('Planowany załadunek');
   await expect(second.locator('[data-arrival="load"] strong')).toHaveText('10:0007.10.2026');
   await expect(second.locator('[data-arrival="unload"] strong')).toHaveText('11:0008.10.2026');
 });
 
 test('choosing an order narrows the list beside its map; history restores focus and back closes it', async ({ page, isMobile, context }) => {
   await page.goto('./');
-  await orderCard(page, 'DEMO-261001').getByRole('button', { name: 'Śledź transport', exact: true }).click();
+  await orderCard(page, 'DEMO-261001').getByRole('button', { name: 'GPS pojazdu', exact: true }).click();
   await expect(page).toHaveURL(/#tracking\/DEMO-261001$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twoje zlecenia.');
   await expect(page.locator('.compact-card')).toHaveCount(2);
@@ -151,6 +151,11 @@ test('choosing an order narrows the list beside its map; history restores focus 
   await expect(panel.locator('.map-footer')).toContainText('Przykładowa pozycja');
   await expect(panel.locator('.journey li')).toHaveCount(5);
   await expect(panel.locator('.journey [aria-current="step"] strong')).toHaveText('W drodze na rozładunek');
+  await expect(panel.locator('.progress-card')).toHaveJSProperty('open', false);
+  await expect(panel.locator('.journey')).not.toBeVisible();
+  await panel.locator('.progress-card>summary').focus();
+  await page.keyboard.press('Enter');
+  await expect(panel.locator('.journey')).toBeVisible();
   const history = panel.getByRole('button', { name: 'Historia statusów', exact: true });
   await history.click();
   const dialog = page.getByRole('dialog');
@@ -185,7 +190,7 @@ test('a shared tracking link retains the selected order on reload and can return
   await expect(page.locator('.order-detail-pane')).toHaveCount(0);
   await expect(page.locator('.compact-card')).toHaveCount(0);
   await expect(page.locator('.order-card')).toHaveCount(2);
-  await expect(second.getByRole('button', { name: 'Śledź transport', exact: true })).toBeFocused();
+  await expect(second.getByRole('button', { name: 'GPS pojazdu', exact: true })).toBeFocused();
 });
 
 test('compact selection switches one detail pane and keeps route, cargo and search context', async ({ page }) => {
@@ -235,6 +240,7 @@ test('completed transport exposes sample documents and five completed steps in t
 test('documents are available during transport and estimated progress is explicit', async ({ page }) => {
   await page.goto('./#tracking\/DEMO-261001');
   await expect(page.locator('.delivery-card')).toContainText('Godzina szacunkowa');
+  await page.locator('.progress-card>summary').click();
   await expect(page.locator('.journey [aria-current="step"]')).toContainText('W drodze na rozładunek');
   const progress = page.getByRole('progressbar', { name: 'Szacunkowy postęp transportu', exact: true });
   await expect(progress).toHaveAttribute('aria-valuenow', '75');
@@ -255,7 +261,7 @@ test('missing GPS and documents preserve separate planned load and unload arriva
   await expect(page.locator('.route-map')).toHaveAttribute('aria-label', /Brak pozycji GPS/);
   await expect(page.locator('.delivery-estimate strong')).toHaveText('10:00');
   await expect(page.locator('.delivery-card')).toContainText('Brak bieżącej pozycji GPS');
-  await expect(page.locator('.delivery-other')).toContainText('Przewidywany dojazd na rozładunek');
+  await expect(page.locator('.next-operation-strip')).toContainText('ETA na rozładunek');
   await expect(page.locator('.next-arrival-time>strong')).toHaveText('11:00');
   await expect(page.locator('.next-arrival-time>small')).toHaveText('08.10.2026');
   await expect(page.locator('.documents-card')).toContainText('Dokumenty w przygotowaniu');
@@ -396,42 +402,52 @@ test('company greeting remains visible alongside the orders heading in both list
 
 test('detail header leads with country postal codes and the actual status of the selected order', async ({ page }) => {
   const cases = [
-    ['DEMO-261002', ['NL 3011 AA', 'PL 50-001'], 'W drodze na załadunek'],
-    ['DEMO-261001', ['PL 60-001', 'FR 69007'], 'W drodze na rozładunek'],
-    ['DEMO-260903', ['DE 04109', 'PL 80-001'], 'Rozładowane'],
+    ['DEMO-261002', ['NL 3011 AA', 'PL 50-001'], 'W drodze na załadunek', 'Załadunek'],
+    ['DEMO-261001', ['PL 60-001', 'FR 69007'], 'W drodze na rozładunek', 'Rozładunek'],
+    ['DEMO-260903', ['DE 04109', 'PL 80-001'], 'Rozładowane', 'Rozładunek'],
   ];
-  for (const [id, codes, status] of cases) {
+  for (const [id, codes, status, operation] of cases) {
     await page.goto('./#tracking/' + id);
     await expect(page.locator('.detail-route .route-code')).toHaveText(codes);
     await expect(page.locator('.detail-current-status')).toContainText('Aktualny status');
     await expect(page.locator('.detail-current-status .status')).toHaveText(status);
-    await expect(page.locator('.operation-status')).toHaveText(status);
+    await expect(page.locator('.detail-heading .status')).toHaveCount(1);
+    await expect(page.locator('.detail-heading')).not.toContainText('Podgląd zlecenia');
+    await expect(page.locator('.operation-name')).toHaveText(operation);
   }
 });
 
-test('operation panel exposes readable status, ETA date, order window and next unloading beside the map', async ({ page, isMobile }) => {
+test('the nearest operation leads and the next operation stays below the map in its own strip', async ({ page, isMobile }) => {
   await page.goto('./#tracking/DEMO-261002');
   const operation = page.getByRole('region', { name: 'Dane operacji', exact: true });
-  await expect(operation.locator('.operation-status')).toHaveText('W drodze na załadunek');
-  await expect(operation.locator('.eta-label')).toHaveText('ETA');
+  const next = page.getByRole('region', { name: 'Następna operacja', exact: true });
+  await expect(operation.locator('.operation-current')).toContainText('Najbliższa operacja');
+  await expect(operation.locator('.operation-name')).toHaveText('Załadunek');
   await expect(operation.locator('.eta-values>strong')).toHaveText('10:00');
   await expect(operation.locator('.delivery-date')).toHaveText('07.10.2026');
-  await expect(operation.locator('.delivery-window')).toContainText('Okno załadunku ze zlecenia');
   await expect(operation.locator('.delivery-window strong')).toHaveText('09:30–10:30');
-  await expect(operation.locator('.delivery-other')).toContainText('Następna operacja');
-  await expect(operation.locator('.next-operation-name')).toHaveText('Rozładunek');
-  await expect(operation.locator('.next-arrival-time>strong')).toHaveText('11:00');
-  await expect(operation.locator('.next-arrival-time>small')).toHaveText('08.10.2026');
-  for (const [selector, minimum] of [['.operation-status', 20], ['.delivery-date', 18], ['.delivery-window strong', 20], ['.next-operation-name', 20]]) {
+  await expect(operation).not.toContainText('Następna operacja');
+  await expect(next.locator('.next-operation-name')).toHaveText('Rozładunek');
+  await expect(next.locator('.next-arrival-time>strong')).toHaveText('11:00');
+  await expect(next.locator('.next-arrival-time>small')).toHaveText('08.10.2026');
+  await expect(next).toContainText('PL 50-001');
+  for (const [selector, minimum] of [['.operation-name', 24], ['.delivery-date', 18], ['.delivery-window strong', 20]]) {
     expect(await operation.locator(selector).evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(minimum);
   }
-  if (!isMobile) {
-    const info = await operation.boundingBox();
-    const map = await page.locator('.map-card').boundingBox();
-    expect(info.x + info.width).toBeLessThan(map.x);
-    const next = await operation.locator('.next-arrival-time').boundingBox();
-    expect(next.y + next.height).toBeLessThan(page.viewportSize().height);
-  }
+  const info = await operation.boundingBox();
+  const map = await page.locator('.map-card').boundingBox();
+  const following = await next.boundingBox();
+  expect(following.y).toBeGreaterThan(map.y + map.height);
+  expect(following.y).toBeGreaterThan(info.y + info.height);
+  if (!isMobile) expect(info.x + info.width).toBeLessThan(map.x);
+  await orderCard(page, 'DEMO-261001').locator('.order-option').click();
+  await expect(operation.locator('.operation-name')).toHaveText('Rozładunek');
+  await expect(operation.locator('.eta-values>strong')).toHaveText('18:30');
+  await expect(next).toContainText('To ostatnia operacja w zleceniu');
+  await expect(next).not.toContainText('Załadunek');
+  await filterOrders(page, 'completed');
+  await orderCard(page, 'DEMO-260903').getByRole('button', { name: 'Zobacz zlecenie', exact: true }).click();
+  await expect(page.locator('.next-operation-strip')).toHaveCount(0);
 });
 
 test('enlarging the map opens a larger usable map and closing restores the control and order context', async ({ page }) => {
@@ -608,4 +624,59 @@ test('site entry preserves the requested view and identifies the tested commit',
   expect(manifest.commit).toBe(process.env.GITHUB_SHA);
   expect(manifest.run_id).toBe(process.env.GITHUB_RUN_ID);
   expect(manifest.data).toBe('fictional-demo-only');
+});
+
+
+test('the larger GPS action and the rest of the order card open the same single preview', async ({ page, isMobile, context }) => {
+  await page.goto('./#orders');
+  const card = orderCard(page, 'DEMO-261002');
+  const action = card.getByRole('button', { name: 'GPS pojazdu', exact: true });
+  const eta = card.locator('[data-arrival="unload"]');
+  await expect(eta.locator('.arrival-label')).toHaveText('ETA na rozładunek');
+  await expect(eta.locator('strong')).toHaveText('11:0008.10.2026');
+  await expect(card.locator('.arrival-tile').first()).toHaveAttribute('data-arrival', 'unload');
+  expect(await eta.locator('.arrival-label').evaluate(el => Number(getComputedStyle(el).fontWeight))).toBeGreaterThanOrEqual(600);
+  expect(await eta.locator('.arrival-label').evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(isMobile ? 15 : 17);
+  expect((await action.boundingBox()).height).toBeGreaterThanOrEqual(58);
+  if (!isMobile) {
+    const whole = await card.boundingBox();
+    const status = await card.locator('.status').boundingBox();
+    const reference = await card.locator('.order-reference').boundingBox();
+    expect(status.x).toBeLessThan(reference.x);
+    expect(reference.x + reference.width / 2).toBeCloseTo(whole.x + whole.width / 2, 0);
+  }
+  await card.locator('.cargo-goods strong').click();
+  await expect(page).toHaveURL(/#tracking\/DEMO-261002$/);
+  await expect(page.locator('.order-detail-pane')).toHaveCount(1);
+  expect(context.pages()).toHaveLength(1);
+  await page.getByRole('button', { name: 'Wróć do pełnej listy zleceń', exact: true }).click();
+  await expect(action).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/#tracking\/DEMO-261002$/);
+  await expect(page.locator('.compact-operation small')).toHaveText(['ETA na rozładunek', 'ETA na rozładunek']);
+});
+
+test('the vehicle position link opens the coordinate in Maps and stays unavailable without GPS', async ({ page, context }) => {
+  await page.goto('./#tracking/DEMO-261001');
+  const link = page.getByRole('link', { name: 'Link do pozycji pojazdu', exact: true });
+  await expect(link).toBeVisible();
+  const url = new URL(await link.getAttribute('href'));
+  expect(url.origin).toBe('https://www.google.com');
+  expect(url.pathname).toBe('/maps/search/');
+  expect(url.searchParams.get('api')).toBe('1');
+  expect(url.searchParams.get('query')).toBe('48.7758,9.1829');
+  await expect(link).toHaveAttribute('target', '_blank');
+  await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  await context.route('https://www.google.com/maps/search/**', route => route.fulfill({ status: 200, contentType: 'text/html', body: '<html><title>Maps destination</title><body>Coordinate link destination</body></html>' }));
+  const popupPromise = page.waitForEvent('popup');
+  await link.click();
+  const popup = await popupPromise;
+  await popup.waitForLoadState('domcontentloaded');
+  expect(new URL(popup.url()).searchParams.get('query')).toBe('48.7758,9.1829');
+  await popup.close();
+  await expect(page).toHaveURL(/#tracking\/DEMO-261001$/);
+  await orderCard(page, 'DEMO-261002').locator('.order-option').click();
+  await expect(page.getByRole('link', { name: 'Link do pozycji pojazdu', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Link do pozycji pojazdu', exact: true })).toBeDisabled();
+  await expect(page.locator('#vehicle-position-note')).toContainText('po otrzymaniu pozycji GPS');
 });
