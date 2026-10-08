@@ -1,7 +1,7 @@
 {
   "revision_date": "2026-10-08",
   "scope": "Independent visual prototype; all sample records fictional",
-  "visual_direction": "Compact separated active-order cards: route and cargo together on the left, one equally tall unloading ETA panel on the right; focused nearest-operation detail remains unchanged",
+  "visual_direction": "Tighter separated active-order cards: loading and unloading grouped within one compact route area, cargo directly below, one equally tall unloading ETA panel on the right",
   "main_navigation": [
     "Zlecenia",
     "Faktury",
@@ -116,7 +116,7 @@
     "open_action": "Larger GPS pojazdu button or click anywhere in the full card",
     "next_operation_strip": "Below map and nearest operation; future unload or last-operation notice",
     "history_presentation": "Collapsed details disclosure; five stages and full history remain accessible",
-    "card_layout": "Route and cargo grouped vertically; ETA aligned beside both with the same height",
+    "card_layout": "Loading and unloading grouped within a 400px desktop route area; smaller vertical gaps to cargo and a narrower, equally tall ETA panel; text sizes preserved",
     "active_card_distinction": "Stronger outer border, narrow accent and 22px gap between full cards",
     "gps_action_position": "In the desktop card header; below the two-column card body on mobile"
   },

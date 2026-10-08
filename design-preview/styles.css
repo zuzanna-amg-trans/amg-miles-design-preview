@@ -1058,25 +1058,27 @@ body { font-size:15px; }
 
 /* Compact order cards: route and cargo together, one equally tall ETA panel. */
 .orders-workspace:not(.has-selection) .order-list { gap:22px; }
-.order-card:not(.compact-card) { padding:18px 22px; border-color:#e1ded5; box-shadow:0 3px 14px #23272204; }
+.order-card:not(.compact-card) { padding:16px 20px; border-color:#e1ded5; box-shadow:0 3px 14px #23272204; }
 .order-card.active-order:not(.compact-card) { border-color:#d4cdbf; box-shadow:0 5px 18px #23272208; }
 .order-card.active-order:not(.compact-card)::before { content:''; position:absolute; top:18px; bottom:18px; left:0; width:3px; border-radius:0 3px 3px 0; background:var(--orange); }
 .order-card:not(.compact-card):hover { border-color:#bdb5a7; box-shadow:0 6px 20px #2327220c; }
 .order-card:not(.compact-card) .order-top { min-height:58px; }
 .order-card:not(.compact-card) .order-card-action { justify-self:end; margin-left:auto; }
 .order-section-head h2 { font-size:18px; font-weight:600; }
-.order-main { grid-template-columns:minmax(0,1fr) 260px; align-items:stretch; gap:24px; padding:14px 0 0; }
-.order-journey { min-width:0; display:flex; flex-direction:column; gap:14px; }
-.order-journey .order-route { max-width:none; grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr); gap:16px; }
-.order-journey .order-cargo { display:flex; flex-direction:column; align-items:flex-start; gap:7px; padding:12px 0 0; border-left:0; border-top:1px solid #eeebe3; }
+.order-main { grid-template-columns:minmax(0,1fr) 220px; align-items:stretch; gap:18px; padding:10px 0 0; }
+.order-journey { min-width:0; display:flex; flex-direction:column; gap:10px; }
+.order-journey .order-route { width:100%; max-width:400px; grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr); gap:12px; }
+.order-journey .route-label { margin-bottom:2px; }
+.order-journey .route-city { margin-top:1px; }
+.order-journey .order-cargo { display:flex; flex-direction:column; align-items:flex-start; gap:5px; padding:8px 0 0; border-left:0; border-top:1px solid #eeebe3; }
 .order-journey .cargo-goods strong { font-size:18px; font-weight:500; line-height:1.4; }
-.cargo-meta { display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px; }
+.cargo-meta { display:flex; flex-wrap:wrap; align-items:center; gap:6px 14px; }
 .order-journey .cargo-meta>span { display:inline-flex; align-items:center; gap:7px; color:#5f6a75; font-size:15px; line-height:1.4; margin:0; }
 .order-journey .cargo-meta .cargo-vehicle { flex-wrap:wrap; }
 .cargo-meta .icon { width:18px; height:18px; color:#8c9a9f; }
 .order-journey .cargo-meta .vehicle-plate { font-size:14px; padding:3px 7px; }
 .cargo-meta .vehicle-type { display:inline; margin:0; font-size:12px; color:#8b949c; }
-.order-eta-panel { box-sizing:border-box; height:100%; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:5px; padding:16px 20px; background:#f5f3ed; border:1px solid #e6e1d7; border-radius:16px; }
+.order-eta-panel { box-sizing:border-box; height:100%; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:5px; padding:12px 16px; background:#f5f3ed; border:1px solid #e6e1d7; border-radius:16px; }
 .order-eta-panel .arrival-label { font-size:17px; font-weight:600; color:#9f522c; line-height:1.4; }
 .order-eta-panel strong { display:flex; flex-direction:column; align-items:flex-start; gap:5px; margin:4px 0; font-size:38px; font-weight:500; line-height:1.1; color:#303943; }
 .order-eta-panel strong small { font-size:16px; font-weight:400; line-height:1.4; color:#65717d; margin:0; }
@@ -1084,32 +1086,32 @@ body { font-size:15px; }
 .order-eta-panel.confirmed .arrival-label { color:#60736b; }
 .compact-card.active-order:not(.selected) { border-color:#ded8cc; }
 @media (max-width:1100px) and (min-width:761px) {
-  .order-main { grid-template-columns:minmax(0,1fr) 220px; gap:18px; }
+  .order-main { grid-template-columns:minmax(0,1fr) 200px; gap:16px; }
   .order-journey .order-route { gap:12px; }
 }
 @media (max-width:760px) {
   .orders-workspace:not(.has-selection) .order-list { gap:22px; }
-  .order-card:not(.compact-card) { display:grid; grid-template-columns:minmax(0,1fr); gap:14px; padding:18px 16px; }
+  .order-card:not(.compact-card) { display:grid; grid-template-columns:minmax(0,1fr); gap:10px; padding:16px 14px; }
   .order-card:not(.compact-card) .order-top { display:contents; }
   .order-card:not(.compact-card) .order-top>.status { grid-row:1; justify-self:start; }
   .order-card:not(.compact-card) .order-reference { grid-column:1; grid-row:2; justify-self:center; }
   .order-card:not(.compact-card) .order-card-action { grid-column:1; grid-row:4; width:100%; margin:0; }
-  .order-main { grid-row:3; grid-template-columns:minmax(0,1fr) 110px; gap:14px; padding:14px 0 0; border-top:1px solid #eeebe3; }
-  .order-journey { gap:12px; }
-  .order-journey .order-route { grid-template-columns:minmax(0,1fr); gap:12px; }
+  .order-main { grid-row:3; grid-template-columns:minmax(0,1fr) 110px; gap:12px; padding:10px 0 0; border-top:1px solid #eeebe3; }
+  .order-journey { gap:8px; }
+  .order-journey .order-route { grid-template-columns:minmax(0,1fr); gap:8px; }
   .order-journey .route-connector { display:none; }
   .order-journey .route-code { font-size:20px; }
   .order-journey .route-city { font-size:18px; }
   .order-journey .route-label { font-size:11px; }
-  .order-journey .order-cargo { padding-top:12px; gap:7px; }
+  .order-journey .order-cargo { padding-top:8px; gap:4px; }
   .order-journey .cargo-goods strong { font-size:16px; }
   .order-journey .cargo-goods .icon { width:18px; height:18px; }
-  .cargo-meta { gap:7px 10px; }
+  .cargo-meta { gap:5px 10px; }
   .order-journey .cargo-meta>span { font-size:14px; }
   .order-journey .cargo-meta .cargo-vehicle { flex-basis:100%; gap:5px; }
   .order-journey .cargo-meta .vehicle-plate { font-size:13px; padding:3px 6px; }
   .cargo-meta .vehicle-type { font-size:11px; }
-  .order-eta-panel { padding:14px 11px; gap:5px; }
+  .order-eta-panel { padding:12px 10px; gap:5px; }
   .order-eta-panel .arrival-label { font-size:15px; overflow-wrap:anywhere; }
   .order-eta-panel strong { font-size:32px; gap:7px; }
   .order-eta-panel strong small { font-size:14px; }
@@ -1117,7 +1119,7 @@ body { font-size:15px; }
   .order-section-head h2 { font-size:16px; }
 }
 @media (max-width:360px) {
-  .order-main { grid-template-columns:minmax(0,1fr) 106px; gap:12px; }
+  .order-main { grid-template-columns:minmax(0,1fr) 106px; gap:10px; }
   .order-eta-panel { padding-left:10px; padding-right:10px; }
 }
 
