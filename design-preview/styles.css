@@ -1244,10 +1244,12 @@ body { font-size:15px; }
   .next-operation-strip .next-arrival-time>strong { font-size:25px; }
   .primary-nav { padding:6px 14px calc(6px + env(safe-area-inset-bottom)); }
   .nav-item { min-height:52px; }
-  .miles-strip { margin-top:22px; gap:10px; }
+  .miles-strip { display:grid; grid-template-columns:40px minmax(0,1fr); margin-top:22px; gap:8px 10px; }
+  .miles-strip>div { min-width:0; }
   .miles-strip strong { font-size:12px; }
   .miles-strip div>span { font-size:11px; }
-  .miles-strip .text-action { margin-left:50px; font-size:12px; min-height:44px; }
+  .miles-strip .text-action { grid-column:2; justify-self:start; margin-left:0; font-size:12px; min-height:44px; }
+  .progress-card .card-heading .text-action { font-size:12px; min-height:44px; }
   .page-footer { margin-top:24px; }
   .page-footer>div { flex-wrap:wrap; gap:8px 16px; }
   .page-footer button { min-height:44px; font-size:11px; }

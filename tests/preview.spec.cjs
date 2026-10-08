@@ -788,6 +788,12 @@ test('all views fit small portrait and landscape phones, with readable invoice a
       expect(await page.evaluate(() => document.documentElement.scrollWidth), view + ': no horizontal page scrolling').toBeLessThanOrEqual(size.width);
       await expect(page.locator('.primary-nav [aria-current="page"]')).toBeVisible();
       if (isMobile) expect((await page.locator('.contact-button').boundingBox()).height).toBeGreaterThanOrEqual(44);
+      if (view === 'orders' && size.width <= 760) {
+        const promo = page.locator('.miles-strip');
+        expect((await promo.locator(':scope>div').boundingBox()).width).toBeGreaterThanOrEqual(200);
+        expect((await promo.boundingBox()).height).toBeLessThan(150);
+        await expect(promo.getByRole('button', { name: 'Zobacz nagrody', exact: true })).toBeVisible();
+      }
       if (view === 'invoices' && size.width <= 760) {
         const table = page.locator('.table-wrap').first();
         expect(await table.evaluate(el => el.scrollWidth)).toBeLessThanOrEqual(size.width - 20);
