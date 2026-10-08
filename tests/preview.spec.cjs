@@ -758,7 +758,7 @@ test('order status filters stay in one readable row in the compact sidebar and o
       const boxes = await Promise.all(buttons.map(button => button.boundingBox()));
       for (let i = 0; i < buttons.length; i++) {
         await expect(buttons[i]).toBeVisible();
-        expect(boxes[i].y).toBeCloseTo(boxes[0].y, 1);
+        expect(boxes[i].y, `${size.width}px ${scope}: all status filters share one row`).toBeCloseTo(boxes[0].y, 1);
         expect(boxes[i].height).toBeCloseTo(boxes[0].height, 1);
         expect(boxes[i].x + boxes[i].width).toBeLessThanOrEqual(bounds.x + bounds.width + 0.1);
         expect(await buttons[i].evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
