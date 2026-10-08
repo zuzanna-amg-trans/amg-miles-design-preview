@@ -78,6 +78,7 @@ const VIEWS = {orders:'Zlecenia',tracking:'Podgląd zlecenia',invoices:'Faktury'
 let state = {view:'orders',orderStatus:'active',orderSearch:'',orderToolsOpen:false,selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones',mapZoom:1,expandedOrder:null};
 let toastTimer;
 let modalTrigger;
+let orderReturnEntry='gps';
 
 // Original vector product studies: illustrative placeholders, not a real catalog.
 function productArt(kind) {
@@ -145,8 +146,10 @@ function ordersInGroup(group,withSearch=true) {
 
 function matchingOrders() { return ordersInGroup(state.orderStatus); }
 
-function orderStatus(o) {
-  return `<span class="status ${o.kind==='to-loading'?'amber':o.active?'':'neutral'}">${esc(o.status)}</span>`;
+function orderStatus(o,clickable=false) {
+  const tag=clickable?'button':'span';
+  const action=clickable?` type="button" data-action="order-detail" data-id="${esc(o.id)}" data-order-entry="status" aria-label="${esc(o.status)} — otwórz zlecenie ${esc(o.reference)}"`:'';
+  return `<${tag} class="status ${o.kind==='to-loading'?'amber':o.active?'':'neutral'}${clickable?' order-status-action':''}"${action}>${esc(o.status)}</${tag}>`;
 }
 
 function orderFilters() {
@@ -164,7 +167,7 @@ function arrivalLabel(o,stage) {
 
 function orderArrivalPanel(o) {
   const arrival=o.unloadArrival;
-  return `<div class='arrival-tile order-eta-panel ${arrival.confirmed?'confirmed':''}' data-arrival='unload'><span class='arrival-label'>${arrival.confirmed?'Rozładunek potwierdzony':'ETA na rozładunek'}</span><strong><span class='eta-hour'>${arrival.time}</span><small>${arrival.date}</small></strong><span class='arrival-note'>${arrival.confirmed?'Dojazd potwierdzony':'Godzina szacunkowa'}</span></div>`;
+  return `<button type='button' class='arrival-tile order-eta-panel ${arrival.confirmed?'confirmed':''}' data-arrival='unload' data-action='order-detail' data-id='${esc(o.id)}' data-order-entry='eta' aria-label='${arrival.confirmed?'Rozładunek potwierdzony':'ETA na rozładunek'} ${esc(arrival.time)}, ${esc(arrival.date)} — otwórz zlecenie ${esc(o.reference)}'><span class='arrival-label'>${arrival.confirmed?'Rozładunek potwierdzony':'ETA na rozładunek'}</span><strong><span class='eta-hour'>${arrival.time}</span><small>${arrival.date}</small></strong><span class='arrival-note'>${arrival.confirmed?'Dojazd potwierdzony':'Godzina szacunkowa'}</span></button>`;
 }
 
 function orderCard(o) {
@@ -178,7 +181,7 @@ function orderCard(o) {
     <span class="compact-bottom"><span class="compact-operation"><small>${arrival.confirmed?'Rozładunek potwierdzony':'ETA na rozładunek'}</small><strong>${arrival.time}</strong><span>${arrival.date}</span></span><span class="compact-plate">${icon('truck')}${o.registration}</span></span>
   </button></article>`;
   return `<article class="card order-card ${o.active?'active-order':'completed-order'}" data-order-id="${o.id}" data-action="order-detail" data-id="${o.id}" aria-labelledby="order-title-${o.id}">
-    <div class="order-top">${orderStatus(o)}<div class="order-reference"><span>Numer zlecenia klienta</span><strong>${o.reference}</strong></div><button class="button order-card-action ${o.active?'button-primary':'button-secondary'}" data-action="order-detail" data-id="${o.id}"><span>${o.active?'GPS pojazdu':'Zobacz zlecenie'}</span><span class="button-circle">${icon('arrow')}</span></button></div>
+    <div class="order-top">${orderStatus(o,true)}<div class="order-reference"><span>Numer zlecenia klienta</span><strong>${o.reference}</strong></div><button class="button order-card-action ${o.active?'button-primary':'button-secondary'}" data-action="order-detail" data-id="${o.id}" data-order-entry="gps"><span>${o.active?'GPS pojazdu':'Zobacz zlecenie'}</span><span class="button-circle">${icon('arrow')}</span></button></div>
     <h2 id="order-title-${o.id}" class="sr-only">${o.from} — ${o.to}</h2>
     <div class="order-main"><div class='order-journey'><div class='order-route'><div><span class='route-label'>Załadunek</span><h3>${routeLocation(o.from,o.fromCountry,o.fromPostal)}</h3></div><span class='route-connector'>${icon('right')}</span><div><span class='route-label'>Rozładunek</span><h3>${routeLocation(o.to,o.toCountry,o.toPostal)}</h3></div></div>
     <div class="order-cargo"><div class="cargo-goods"><span class='sr-only'>Towar</span><strong>${icon('package')}${o.goods}</strong></div><div class='cargo-meta'><span>${number(o.weightKg)} kg</span><span>${o.packages}</span><span class='cargo-vehicle'>${icon('truck')}<strong class='vehicle-plate'>${o.registration}</strong><small class='vehicle-type'>${o.vehicle}</small></span></div></div></div>${orderArrivalPanel(o)}</div>
@@ -376,9 +379,10 @@ function refreshOrderContent(resetDetail=false) {
   if(pane)pane.scrollTop=detailScroll;
 }
 
-function selectOrder(id) {
+function selectOrder(id,entry='gps') {
   if(state.expandedOrder===id)return;
   if(!matchingOrders().some(o=>o.id===id))return;
+  if(!state.expandedOrder)orderReturnEntry=entry;
   state.selectedOrder=id;state.expandedOrder=id;state.mapZoom=1;state.orderToolsOpen=false;
   const hash=`#tracking/${id}`;
   if(window.location.hash!==hash)window.history.pushState(null,'',hash);
@@ -393,7 +397,7 @@ function closeOrder() {
   state.expandedOrder=null;state.mapZoom=1;state.orderToolsOpen=false;
   if(window.location.hash!=='#orders')window.history.pushState(null,'','#orders');
   refreshOrderContent(true);
-  document.querySelector(`.order-card[data-order-id="${id}"] .order-card-action`)?.focus({preventScroll:true});
+  document.querySelector(`.order-card[data-order-id="${id}"] [data-order-entry="${orderReturnEntry}"]`)?.focus({preventScroll:true});
 }
 
 function openDialog(eyebrow,title,body,actions='') {
@@ -438,7 +442,7 @@ document.addEventListener('click',event=>{
   }
   if(action==='map-expand')expandedMap();
   if(action==='open-rewards')navigate('rewards');
-  if(action==='order-detail'||action==='order-select')selectOrder(id);
+  if(action==='order-detail'||action==='order-select')selectOrder(id,target.dataset.orderEntry||'gps');
   if(action==='order-close')closeOrder();
   if(action==='order-tools'){state.orderToolsOpen=!state.orderToolsOpen;updateOrderTools();}
   if(action==='order-filter'){
