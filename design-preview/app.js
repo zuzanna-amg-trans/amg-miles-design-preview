@@ -162,28 +162,26 @@ function arrivalLabel(o,stage) {
   return `${arrival.confirmed?'Dojazd':'Przewidywany dojazd'} na ${stage==='load'?'załadunek':'rozładunek'}`;
 }
 
-function arrivalTile(o,stage) {
-  const a=stage==='load'?o.loadArrival:o.unloadArrival,current=o.active&&operationStage(o)===stage;
-  const label=a.confirmed?`${stage==='load'?'Załadunek':'Rozładunek'} potwierdzony`:stage==='unload'?'ETA na rozładunek':'Planowany załadunek';
-  return `<div class="arrival-tile ${stage==='unload'?'unload-arrival':''} ${a.confirmed?'confirmed':''} ${current?'next-arrival':''}" data-arrival="${stage}"><span class="arrival-icon">${icon(a.confirmed?'check':'clock')}</span><div><span class="arrival-label">${label}</span><strong>${a.time}<small>${a.date}</small></strong><span class="arrival-note">${a.confirmed?'Dojazd potwierdzony':'Godzina szacunkowa · demo'}</span></div></div>`;
+function orderArrivalPanel(o) {
+  const arrival=o.unloadArrival;
+  return `<div class='arrival-tile order-eta-panel ${arrival.confirmed?'confirmed':''}' data-arrival='unload'><span class='arrival-label'>${arrival.confirmed?'Rozładunek potwierdzony':'ETA na rozładunek'}</span><strong><span class='eta-hour'>${arrival.time}</span><small>${arrival.date}</small></strong><span class='arrival-note'>${arrival.confirmed?'Dojazd potwierdzony':'Godzina szacunkowa'}</span></div>`;
 }
 
 function orderCard(o) {
   const compact=Boolean(state.expandedOrder),selected=state.expandedOrder===o.id;
   const arrival=o.unloadArrival;
-  if(compact)return `<article class="card order-card compact-card ${selected?'selected':''}" data-order-id="${o.id}" aria-labelledby="order-title-${o.id}"><h2 id="order-title-${o.id}" class="sr-only">${o.from} — ${o.to}</h2><button class="order-option" data-action="order-select" data-id="${o.id}" aria-label="Zlecenie klienta ${o.reference}: ${o.from} — ${o.to}" aria-pressed="${selected}" aria-controls="order-detail">
+  if(compact)return `<article class="card order-card compact-card ${o.active?'active-order':'completed-order'} ${selected?'selected':''}" data-order-id="${o.id}" aria-labelledby="order-title-${o.id}"><h2 id="order-title-${o.id}" class="sr-only">${o.from} — ${o.to}</h2><button class="order-option" data-action="order-select" data-id="${o.id}" aria-label="Zlecenie klienta ${o.reference}: ${o.from} — ${o.to}" aria-pressed="${selected}" aria-controls="order-detail">
     <span class="compact-reference">${o.reference}${selected?icon('right'):''}</span>
     <span class='compact-route'><span class='route-location'>${routeLocation(o.from,o.fromCountry,o.fromPostal)}</span><span class='route-divider'>${icon('right')}</span><span class='route-location'>${routeLocation(o.to,o.toCountry,o.toPostal)}</span></span>
     ${orderStatus(o)}
     <span class="compact-cargo">${o.goods} · ${number(o.weightKg)} kg · ${o.packages}</span>
     <span class="compact-bottom"><span class="compact-operation"><small>${arrival.confirmed?'Rozładunek potwierdzony':'ETA na rozładunek'}</small><strong>${arrival.time}</strong><span>${arrival.date}</span></span><span class="compact-plate">${icon('truck')}${o.registration}</span></span>
   </button></article>`;
-  return `<article class="card order-card" data-order-id="${o.id}" data-action="order-detail" data-id="${o.id}" aria-labelledby="order-title-${o.id}">
-    <div class="order-top">${orderStatus(o)}<div class="order-reference"><span>Numer zlecenia klienta</span><strong>${o.reference}</strong></div></div>
+  return `<article class="card order-card ${o.active?'active-order':'completed-order'}" data-order-id="${o.id}" data-action="order-detail" data-id="${o.id}" aria-labelledby="order-title-${o.id}">
+    <div class="order-top">${orderStatus(o)}<div class="order-reference"><span>Numer zlecenia klienta</span><strong>${o.reference}</strong></div><button class="button order-card-action ${o.active?'button-primary':'button-secondary'}" data-action="order-detail" data-id="${o.id}"><span>${o.active?'GPS pojazdu':'Zobacz zlecenie'}</span><span class="button-circle">${icon('arrow')}</span></button></div>
     <h2 id="order-title-${o.id}" class="sr-only">${o.from} — ${o.to}</h2>
-    <div class="order-main"><div class='order-route'><div><span class='route-label'>Załadunek</span><h3>${routeLocation(o.from,o.fromCountry,o.fromPostal)}</h3></div><span class='route-connector'>${icon('right')}</span><div><span class='route-label'>Rozładunek</span><h3>${routeLocation(o.to,o.toCountry,o.toPostal)}</h3></div></div>
-    <div class="order-cargo"><div class="cargo-goods"><span>Towar</span><strong>${icon('package')}${o.goods}</strong></div><div><span>Waga</span><strong>${number(o.weightKg)} kg</strong></div><div><span>Palety</span><strong>${o.packages}</strong></div><div class='cargo-vehicle'><span>Pojazd</span><strong class='vehicle-plate'>${o.registration}</strong><small class='vehicle-type'>${o.vehicle}</small></div></div></div>
-    <div class="order-bottom"><div class="order-arrivals">${arrivalTile(o,'unload')}${arrivalTile(o,'load')}</div><button class="button order-card-action ${o.active?'button-primary':'button-secondary'}" data-action="order-detail" data-id="${o.id}"><span>${o.active?'GPS pojazdu':'Zobacz zlecenie'}</span><span class="button-circle">${icon('arrow')}</span></button></div>
+    <div class="order-main"><div class='order-journey'><div class='order-route'><div><span class='route-label'>Załadunek</span><h3>${routeLocation(o.from,o.fromCountry,o.fromPostal)}</h3></div><span class='route-connector'>${icon('right')}</span><div><span class='route-label'>Rozładunek</span><h3>${routeLocation(o.to,o.toCountry,o.toPostal)}</h3></div></div>
+    <div class="order-cargo"><div class="cargo-goods"><span class='sr-only'>Towar</span><strong>${icon('package')}${o.goods}</strong></div><div class='cargo-meta'><span>${number(o.weightKg)} kg</span><span>${o.packages}</span><span class='cargo-vehicle'>${icon('truck')}<strong class='vehicle-plate'>${o.registration}</strong><small class='vehicle-type'>${o.vehicle}</small></span></div></div></div>${orderArrivalPanel(o)}</div>
   </article>`;
 }
 
