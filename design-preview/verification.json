@@ -1,7 +1,7 @@
 {
   "revision_date": "2026-10-08",
   "scope": "Independent visual prototype; all sample records fictional",
-  "visual_direction": "Light operational panel with graphite top navigation, full active list on entry, compact order selector and map side by side after selection",
+  "visual_direction": "Readable operational panel with a centered company greeting, prominent country/postal route headings, current status, cargo and vehicle data; operation panel left of the map",
   "main_navigation": [
     "Zlecenia",
     "Faktury",
@@ -42,7 +42,7 @@
   "browser_verification": {
     "executor": "GitHub Actions only",
     "workflow": ".github/workflows/preview.yml",
-    "tests_per_run": 60,
+    "tests_per_run": 70,
     "viewports": [
       "desktop: 1280 x 900",
       "mobile: 390 x 844"
@@ -103,6 +103,17 @@
       "ArrowRight",
       "Home",
       "End"
-    ]
+    ],
+    "company_greeting": "Dzień dobry! + fictional company name; centered on desktop",
+    "route_heading": "Country and postal code before city",
+    "detail_status_in_header": true,
+    "desktop_operation_panel": "Left of the map; current status, ETA time/date, order window, next unloading or previous loading",
+    "desktop_filters": "Above the compact order selector",
+    "mobile_operation_panel": "Before the map, under prominent cargo information"
+  },
+  "map_controls": {
+    "zoom": "Vehicle position or route center",
+    "reset": "Whole route",
+    "expanded_view": "Larger modal map; synchronized zoom, Escape and explicit return restore focus"
   }
 }

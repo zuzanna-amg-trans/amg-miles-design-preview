@@ -47,6 +47,7 @@ const number = value => new Intl.NumberFormat('pl-PL', {useGrouping:'always'}).f
 const money = value => new Intl.NumberFormat('pl-PL', {style:'currency',currency:'EUR'}).format(value);
 
 const demoSource = {
+  customer: {companyName:'Firma przykładowa'},
   balance: {available:24850,earnedThisMonth:3450,expiring:2000,expiresAt:'31.10.2026',bonusOpportunity:800},
   orders: [
     {id:'DEMO-261001',registration:'DEMO 001',fromPostal:"60-001",toPostal:"69007",goods:"Części maszyn",packages:"8 palet",weightKg:3200,loadArrival:{"date":"06.10.2026","time":"13:45","window":"13:00–14:00","confirmed":true},unloadArrival:{"date":"07.10.2026","time":"18:30","window":"18:00–19:00","confirmed":false},reference:'AMG-DEMO-01',from:'Poznań',fromCountry:'PL',to:'Lyon',toCountry:'FR',status:'W drodze na rozładunek',kind:'driving',active:true,step:3,load:'06.10.2026, 14:00',delivery:'07.10.2026',deliveryTime:'18:30',window:'18:00–19:00',progress:75,documents:[{name:'CMR',kind:'document',detail:'Po załadunku · 06.10, 14:12'},{name:'Zdjęcie załadunku',kind:'camera',detail:'06.10, 14:08'}],stops:[['Załadunek','Poznań, PL','06.10.2026, 14:00'],['Punkt pośredni','Karlsruhe, DE','07.10.2026, 11:30 · plan'],['Rozładunek','Lyon, FR','07.10.2026, 18:00–19:00 · plan']],position:'Stuttgart, Niemcy',updated:'07.10.2026, 10:24',vehicle:'Zestaw 13,6 m',cargo:'8 palet · 3 200 kg',fromXY:[752,138],toXY:[263,480],positionXY:[484,340],path:'M752 138 C686 140 650 192 607 225 S550 280 484 340 S344 421 263 480',traveled:'M752 138 C686 140 650 192 607 225 S550 280 484 340',events:[['Zlecenie przyjęte','05.10.2026, 11:20'],['W drodze na załadunek','06.10.2026, 11:35'],['Na załadunku','06.10.2026, 13:45'],['W drodze na rozładunek','06.10.2026, 14:30']],journeyDates:["05.10 · 11:20","06.10 · 11:35","06.10 · 14:00","06.10 · 14:30",null]},
@@ -103,7 +104,7 @@ function shell() {
     <header class="topbar"><div class="header-inner">
       <button class="brand" data-view="orders" aria-label="AMG Miles — zlecenia"><img src="assets/amg-logo-white.webp" alt="AMG European Transport"><span class="brand-word">miles<em>.</em></span></button>
       <nav class="primary-nav" aria-label="Nawigacja panelu">${navItem('orders','Zlecenia','truck')}${navItem('invoices','Faktury','invoice')}${navItem('rewards','Nagrody','gift')}</nav>
-      <div class="header-actions"><button class="header-points" data-action="open-balance" aria-label="Twoje punkty demonstracyjne: ${number(demoSource.balance.available)}">${icon('spark')}<strong>${number(demoSource.balance.available)}</strong><span>pkt</span></button><button class="contact-button" data-action="contact" aria-label="Kontakt z AMG">${icon('support')}<span>Kontakt z AMG</span></button><span class="header-separator"></span><div class="account-label"><strong>Firma przykładowa</strong><span>Konto demonstracyjne</span></div><span class="avatar" aria-label="Konto demonstracyjne">FP</span></div>
+      <div class="header-actions"><button class="header-points" data-action="open-balance" aria-label="Twoje punkty demonstracyjne: ${number(demoSource.balance.available)}">${icon('spark')}<strong>${number(demoSource.balance.available)}</strong><span>pkt</span></button><button class="contact-button" data-action="contact" aria-label="Kontakt z AMG">${icon('support')}<span>Kontakt z AMG</span></button><span class="header-separator"></span><div class="account-label"><strong>${esc(demoSource.customer.companyName)}</strong><span>Konto demonstracyjne</span></div><span class="avatar" aria-label="Konto demonstracyjne">FP</span></div>
     </div></header>
     <main class="content ${state.view==='orders'?'orders-content':''}" id="main-content" tabindex="-1"><div class="preview-note">Podgląd projektu <span>·</span> wszystkie dane są przykładowe</div><div class="view">${renderView()}</div><footer class="page-footer"><span>© 2026 AMG Trans</span><div><button data-view="rules">Zasady AMG Miles</button><button data-action="about-preview">O podglądzie ${icon('arrow')}</button></div></footer></main>
   </div>`;
@@ -152,6 +153,10 @@ function orderFilters() {
   return ORDER_GROUPS.map(([key,name])=>`<button class="filter ${state.orderStatus===key?'active':''}" data-action="order-filter" data-id="${key}" aria-pressed="${state.orderStatus===key}">${name}<span>${ordersInGroup(key,false).length}</span></button>`).join('');
 }
 
+function routeLocation(city,country,postal) {
+  return `<span class='route-code route-address'>${esc(country)} ${esc(postal)}</span><span class='route-city'>${esc(city)}</span>`;
+}
+
 function arrivalLabel(o,stage) {
   const arrival=stage==='load'?o.loadArrival:o.unloadArrival;
   return `${arrival.confirmed?'Dojazd':'Przewidywany dojazd'} na ${stage==='load'?'załadunek':'rozładunek'}`;
@@ -167,8 +172,7 @@ function orderCard(o) {
   const stage=operationStage(o),arrival=stage==='load'?o.loadArrival:o.unloadArrival;
   if(compact)return `<article class="card order-card compact-card ${selected?'selected':''}" data-order-id="${o.id}" aria-labelledby="order-title-${o.id}"><h2 id="order-title-${o.id}" class="sr-only">${o.from} — ${o.to}</h2><button class="order-option" data-action="order-select" data-id="${o.id}" aria-label="Zlecenie klienta ${o.reference}: ${o.from} — ${o.to}" aria-pressed="${selected}" aria-controls="order-detail">
     <span class="compact-reference">${o.reference}${selected?icon('right'):''}</span>
-    <strong class="compact-route">${o.from}<span> → </span>${o.to}</strong>
-    <span class="compact-address">${o.fromCountry} ${o.fromPostal} · ${o.toCountry} ${o.toPostal}</span>
+    <span class='compact-route'><span class='route-location'>${routeLocation(o.from,o.fromCountry,o.fromPostal)}</span><span class='route-divider'>${icon('right')}</span><span class='route-location'>${routeLocation(o.to,o.toCountry,o.toPostal)}</span></span>
     ${orderStatus(o)}
     <span class="compact-cargo">${o.goods} · ${number(o.weightKg)} kg · ${o.packages}</span>
     <span class="compact-bottom"><span class="compact-operation"><small>${o.active?(stage==='load'?'Załadunek':'Rozładunek'):'Rozładowane'}</small><strong>${arrival.time}</strong><span>${arrival.date}</span></span><span class="compact-plate">${icon('truck')}${o.registration}</span></span>
@@ -176,8 +180,8 @@ function orderCard(o) {
   return `<article class="card order-card" data-order-id="${o.id}" aria-labelledby="order-title-${o.id}">
     <div class="order-top"><div class="order-reference"><span>Numer zlecenia klienta</span><strong>${o.reference}</strong></div>${orderStatus(o)}</div>
     <h2 id="order-title-${o.id}" class="sr-only">${o.from} — ${o.to}</h2>
-    <div class="order-main"><div class="order-route"><div><span class="route-label">Załadunek</span><h3>${o.from}</h3><span class="route-address">${o.fromCountry} ${o.fromPostal}</span></div><span class="route-connector">${icon('right')}</span><div><span class="route-label">Rozładunek</span><h3>${o.to}</h3><span class="route-address">${o.toCountry} ${o.toPostal}</span></div></div>
-    <div class="order-cargo"><div class="cargo-goods"><span>Towar</span><strong>${icon('package')}${o.goods}</strong></div><div><span>Waga</span><strong>${number(o.weightKg)} kg</strong></div><div><span>Ilość</span><strong>${o.packages}</strong></div><div class="cargo-vehicle"><span>Rejestracja auta</span><strong class="vehicle-plate">${o.registration}</strong></div></div></div>
+    <div class="order-main"><div class='order-route'><div><span class='route-label'>Załadunek</span><h3>${routeLocation(o.from,o.fromCountry,o.fromPostal)}</h3></div><span class='route-connector'>${icon('right')}</span><div><span class='route-label'>Rozładunek</span><h3>${routeLocation(o.to,o.toCountry,o.toPostal)}</h3></div></div>
+    <div class="order-cargo"><div class="cargo-goods"><span>Towar</span><strong>${icon('package')}${o.goods}</strong></div><div><span>Waga</span><strong>${number(o.weightKg)} kg</strong></div><div><span>Palety</span><strong>${o.packages}</strong></div><div class='cargo-vehicle'><span>Pojazd</span><strong class='vehicle-plate'>${o.registration}</strong><small class='vehicle-type'>${o.vehicle}</small></div></div></div>
     <div class="order-bottom"><div class="order-arrivals">${arrivalTile(o,'load')}${arrivalTile(o,'unload')}</div><button class="button order-card-action ${o.active?'button-primary':'button-secondary'}" data-action="order-detail" data-id="${o.id}"><span>${o.active?'Śledź transport':'Zobacz zlecenie'}</span><span class="button-circle">${icon('arrow')}</span></button></div>
   </article>`;
 }
@@ -194,7 +198,7 @@ function orderWorkspace() {
 }
 
 function ordersView() {
-  return `<section class="orders-page">${pageHead('Twoje transporty z AMG','Twoje <em>zlecenia.</em>','Aktywne transporty według najbliższej operacji. Wybierz zlecenie, aby zobaczyć mapę.')}
+  return `<section class="orders-page">${pageHead('Twoje transporty z AMG','Twoje <em>zlecenia.</em>','Aktywne transporty według najbliższej operacji. Wybierz zlecenie, aby zobaczyć mapę.',`<div class='company-welcome'><span>Dzień dobry!</span><strong>${esc(demoSource.customer.companyName)}</strong></div>`)}
     <div class="orders-toolbar"><div class="filters" id="order-filters" aria-label="Filtruj zlecenia">${orderFilters()}</div><label class="search-field">${icon('search')}<input id="order-search" type="search" placeholder="Numer, miasto lub rejestracja" aria-label="Szukaj zlecenia po numerze, mieście lub rejestracji" value="${esc(state.orderSearch)}"></label></div>
     <div class="orders-workspace ${state.expandedOrder?'has-selection':''}" id="orders-workspace">${orderWorkspace()}</div>
     <div class="miles-strip"><span class="miles-symbol">${icon('gift')}</span><div><strong>Z AMG każdy kilometr daje więcej.</strong><span>Sprawdź, na co wymienisz swoje punkty Miles.</span></div><button class="text-action" data-view="rewards">Zobacz nagrody ${icon('arrow')}</button></div></section>`;
@@ -203,8 +207,24 @@ function ordersView() {
 // Schematic illustration only. Production tracking must use the actual map and GPS data.
 
 function mapViewBox() {
-  const width=900/state.mapZoom, height=550/state.mapZoom;
-  return `${(900-width)/2} ${(550-height)/2} ${width} ${height}`;
+  if(state.mapZoom===1)return '0 0 900 550';
+  const o=demoSource.orders.find(o=>o.id===state.selectedOrder);
+  const width=900/state.mapZoom,height=550/state.mapZoom;
+  const center=o?.positionXY||[o?(o.fromXY[0]+o.toXY[0])/2:450,o?(o.fromXY[1]+o.toXY[1])/2:275];
+  const x=Math.max(0,Math.min(900-width,center[0]-width/2));
+  const y=Math.max(0,Math.min(550-height,center[1]-height/2));
+  return `${x} ${y} ${width} ${height}`;
+}
+
+function mapControls(expanded=false) {
+  return `<div class='map-controls' aria-label='Sterowanie mapą poglądową'><button class='icon-button' data-action='map-zoom-in' aria-label='Przybliż mapę' ${state.mapZoom>=2.4?'disabled':''}>${icon('plus')}</button><button class='icon-button' data-action='map-zoom-out' aria-label='Oddal mapę' ${state.mapZoom<=1?'disabled':''}>${icon('minus')}</button><button class='icon-button' data-action='map-reset' aria-label='Pokaż całą trasę'>${icon('target')}</button>${expanded?'':`<button class='icon-button' data-action='map-expand' aria-label='Powiększ mapę'>${icon('expand')}</button>`}</div>`;
+}
+
+function expandedMap() {
+  const o=demoSource.orders.find(o=>o.id===state.selectedOrder);
+  if(!o?.active)return;
+  openDialog('Mapa poglądowa · dane przykładowe',`${o.fromCountry} ${o.fromPostal} ${o.from} → ${o.toCountry} ${o.toPostal} ${o.to}`,`<div class='expanded-map-body'><div class='map-area'>${routeMap(o)}${mapControls(true)}<span class='map-scale'>Schemat trasy</span></div><div class='map-footer'>${icon('pin')}<div><strong>${o.position||'Pozycja GPS niedostępna'}</strong><span>${o.position?`Przykładowa pozycja · ${o.updated}`:'Pokazujemy planowaną trasę, bez pozycji pojazdu.'}</span></div></div></div>`,button('Wróć do zlecenia','close-dialog','secondary'));
+  document.getElementById('detail-dialog').classList.add('map-dialog');
 }
 
 function routeMap(o) {
@@ -221,8 +241,8 @@ function routeMap(o) {
     <path d="${o.path}" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round"/><path d="${o.path}" fill="none" stroke="#aab4a6" stroke-width="5" stroke-linecap="round" stroke-dasharray="6 7"/>
     ${o.traveled?`<path d="${o.traveled}" fill="none" stroke="#e2743d" stroke-width="5" stroke-linecap="round"/>`:''}
     <g fill="#fff" stroke="#273c32" stroke-width="3"><circle cx="${o.fromXY[0]}" cy="${o.fromXY[1]}" r="7"/><circle cx="${o.toXY[0]}" cy="${o.toXY[1]}" r="7"/></g>
-    <g font-family="Onest, sans-serif" font-size="16" font-weight="500" fill="#354038"><text x="${o.fromXY[0]+15}" y="${o.fromXY[1]-11}">${o.from}</text><text x="${o.toXY[0]+15}" y="${o.toXY[1]+27}">${o.to}</text></g>
-    ${o.positionXY?`<g transform="translate(${o.positionXY[0]},${o.positionXY[1]})" filter="url(#marker-shadow)"><circle r="37" fill="#ff8145" opacity=".14"/><circle r="24" fill="#202923" stroke="#fff" stroke-width="4"/><g transform="translate(-12,-12)" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round">${ICONS.truck}</g><rect x="-61" y="37" width="122" height="31" rx="15.5" fill="#fff"/><text x="0" y="57" text-anchor="middle" font-family="Onest, sans-serif" font-size="12" font-weight="500" fill="#28352d">${o.position.split(',')[0]}</text></g>`: ''}
+    <g font-family="Onest, sans-serif" font-size="19" font-weight="500" fill="#354038"><text x="${o.fromXY[0]+15}" y="${o.fromXY[1]-11}">${o.from}</text><text x="${o.toXY[0]+15}" y="${o.toXY[1]+27}">${o.to}</text></g>
+    ${o.positionXY?`<g class='vehicle-marker' transform="translate(${o.positionXY[0]},${o.positionXY[1]})" filter="url(#marker-shadow)"><circle r="37" fill="#ff8145" opacity=".14"/><circle class='vehicle-marker-core' r="26" fill="#202923" stroke="#fff" stroke-width="4"/><g transform="translate(-12,-12)" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round">${ICONS.truck}</g><rect x="-61" y="37" width="122" height="31" rx="15.5" fill="#fff"/><text x="0" y="57" text-anchor="middle" font-family="Onest, sans-serif" font-size="14" font-weight="500" fill="#28352d">${o.position.split(',')[0]}</text></g>`: ''}
   </svg>`;
 }
 
@@ -240,16 +260,21 @@ function transportDetails(o) {
   return `<details class="card transport-details"><summary><span>${icon('truck')} Szczegóły transportu</span>${icon('down')}</summary><div class="transport-detail-body"><dl class="transport-facts"><div><dt>Numer zlecenia klienta</dt><dd>${o.reference}</dd></div><div><dt>Numer zlecenia AMG</dt><dd>${o.id}</dd></div><div><dt>Towar</dt><dd>${o.goods}</dd></div><div><dt>Rejestracja auta</dt><dd>${o.registration}</dd></div><div><dt>Pojazd</dt><dd>${o.vehicle}</dd></div><div><dt>Ładunek</dt><dd>${o.cargo}</dd></div></dl><div class="route-points"><h3>Punkty trasy</h3><ol>${stops.map(([label,city,time])=>`<li><span class="route-point-dot"></span><div><small>${label}</small><strong>${city}</strong><span>${time}</span></div></li>`).join('')}</ol></div></div></details>`;
 }
 
-function trackingView(order) {
-  const o=order||demoSource.orders.find(item=>item.id===state.selectedOrder);
+function operationPanel(o) {
   const stage=operationStage(o),arrival=stage==='load'?o.loadArrival:o.unloadArrival;
   const otherStage=stage==='load'?'unload':'load',otherArrival=otherStage==='load'?o.loadArrival:o.unloadArrival;
-  return `<div class="detail-heading"><div><div class="eyebrow"><span class="little-dot"></span>Podgląd zlecenia</div><h2>${o.from} <span>→</span> ${o.to}</h2><p><strong>Nr klienta: ${o.reference}</strong><span>Numer AMG: ${o.id}</span></p></div><button class="detail-close" data-action="order-close" aria-label="Wróć do pełnej listy zleceń">${icon('close')}<span>Pełna lista</span></button></div>
-    <section class="card detail-facts" aria-label="Ładunek i pojazd"><div class="detail-goods"><span>${icon('package')} Towar</span><strong>${o.goods}</strong></div><div><span>Waga ładunku</span><strong>${number(o.weightKg)} kg</strong></div><div><span>Ilość</span><strong>${o.packages}</strong></div><div class="detail-vehicle"><span>${icon('truck')} Rejestracja auta</span><strong class="vehicle-plate">${o.registration}</strong><small>${o.vehicle}</small></div></section>
-    <div class="tracking-grid"><section class="card map-card"><div class="map-heading"><h3>${icon(o.active?'pin':'check')}${o.active?'Pozycja pojazdu':'Dostawa zakończona'}</h3><span class="demo-tag">${o.active?'Mapa poglądowa · demo':'Zlecenie demo'}</span></div>
-      ${o.active?`<div class="map-area">${routeMap(o)}<div class="map-controls" aria-label="Sterowanie mapą poglądową"><button class="icon-button" data-action="map-zoom-in" aria-label="Przybliż mapę" ${state.mapZoom>=2.4?'disabled':''}>${icon('plus')}</button><button class="icon-button" data-action="map-zoom-out" aria-label="Oddal mapę" ${state.mapZoom<=1?'disabled':''}>${icon('minus')}</button><button class="icon-button" data-action="map-reset" aria-label="Pokaż całą trasę">${icon('expand')}</button></div><span class="map-scale">Schemat trasy</span></div><div class="map-footer">${icon('pin')}<div><strong>${o.position||'Pozycja GPS niedostępna'}</strong><span>${o.position?`Przykładowa pozycja · ${o.updated}`:'Pokazujemy planowaną trasę, bez pozycji pojazdu.'}</span></div></div>`:`<div class="completed-panel"><span class="completion-icon">${icon('check')}</span><h3>Transport dotarł na miejsce.</h3><p>${o.to} · ${arrival.date}, ${arrival.time}</p><span class="completion-caption">Dokumenty znajdziesz poniżej.</span></div>`}
-    </section><section class="card delivery-card"><div class="delivery-card-top">${orderStatus(o)}</div><div class="delivery-estimate"><span>${arrivalLabel(o,stage)}</span><strong>${arrival.time}</strong><span class="delivery-date">${arrival.date}</span><small>${icon('clock')}${stage==='load'?'Okno załadunku':'Okno dostawy'} ${arrival.window}</small></div><div class="delivery-confidence">${icon('info')}<span>${arrival.confirmed?'Dojazd potwierdzony w danych demonstracyjnych.':o.position?'Godzina szacunkowa. Może się zmienić w trakcie realizacji.':'Godzina szacunkowa według planu. Brak bieżącej pozycji GPS.'}</span></div><div class="delivery-other"><span>${arrivalLabel(o,otherStage)}</span><strong>${otherArrival.time}<small>${otherArrival.date}</small></strong><span>${otherArrival.confirmed?'Dojazd potwierdzony':'Godzina szacunkowa · demo'}</span></div></section></div>
-    <section class="card progress-card"><div class="card-heading"><h3>Realizacja zlecenia</h3><button class="text-action" data-action="order-history" data-id="${o.id}">${icon('history')} Historia statusów ${icon('arrow')}</button></div>${journey(o)}${o.active&&o.progress!==null?`<div class="transport-progress"><div><span>Postęp transportu <small>· szacunkowy</small></span><strong>${o.progress}%</strong></div><div class="transport-progress-track" role="progressbar" aria-label="Szacunkowy postęp transportu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${o.progress}"><span style="width:${o.progress}%"></span></div></div>`:''}</section>
+  return `<section class='card delivery-card' aria-label='Dane operacji'><div class='operation-current'><span class='operation-label'>Aktualny status</span><strong class='operation-status'>${esc(o.status)}</strong></div><div class='delivery-estimate'><span>${arrivalLabel(o,stage)}</span><div class='eta-values'><span class='eta-label'>${arrival.confirmed?'Dojazd':'ETA'}</span><strong>${arrival.time}</strong><span class='delivery-date'>${arrival.date}</span></div></div><div class='delivery-window'><span class='operation-label'>Okno ${stage==='load'?'załadunku':'dostawy'} ze zlecenia</span><strong>${arrival.window}</strong></div><div class='delivery-other'><span class='operation-label'>${stage==='load'?'Następna operacja':'Poprzednia operacja'}</span><strong class='next-operation-name'>${otherStage==='load'?'Załadunek':'Rozładunek'}</strong><span class='next-arrival-label'>${arrivalLabel(o,otherStage)}</span><div class='next-arrival-time'><strong>${otherArrival.time}</strong><small>${otherArrival.date}</small></div><span class='operation-note'>${otherArrival.confirmed?'Dojazd potwierdzony':'Godzina szacunkowa · demo'}</span></div><div class='delivery-confidence'>${icon('info')}<span>${arrival.confirmed?'Dojazd potwierdzony w danych demonstracyjnych.':o.position?'Godzina szacunkowa. Może się zmienić w trakcie realizacji.':'Godzina szacunkowa według planu. Brak bieżącej pozycji GPS.'}</span></div></section>`;
+}
+
+function trackingView(order) {
+  const o=order||demoSource.orders.find(item=>item.id===state.selectedOrder);
+  const arrival=o.unloadArrival;
+  return `<div class='detail-heading'><div><div class='detail-kicker'><div class='eyebrow'><span class='little-dot'></span>Podgląd zlecenia</div><div class='detail-current-status'><span>Aktualny status</span>${orderStatus(o)}</div></div><h2 class='detail-route'><span class='route-location'>${routeLocation(o.from,o.fromCountry,o.fromPostal)}</span><span class='route-divider'>${icon('right')}</span><span class='route-location'>${routeLocation(o.to,o.toCountry,o.toPostal)}</span></h2><p><strong>Nr klienta: ${o.reference}</strong><span>Numer AMG: ${o.id}</span></p></div><button class='detail-close' data-action='order-close' aria-label='Wróć do pełnej listy zleceń'>${icon('close')}<span>Pełna lista</span></button></div>
+    <section class='card detail-facts' aria-label='Ładunek i pojazd'><div class='detail-goods'><span>${icon('package')} Towar</span><strong>${o.goods}</strong></div><div><span>Waga ładunku</span><strong>${number(o.weightKg)} kg</strong></div><div><span>Ilość palet</span><strong>${o.packages}</strong></div><div class='detail-vehicle'><span>${icon('truck')} Pojazd</span><strong class='vehicle-plate'>${o.registration}</strong><small class='vehicle-type'>${o.vehicle}</small></div></section>
+    <div class='tracking-grid'>${operationPanel(o)}<section class='card map-card'><div class='map-heading'><h3>${icon(o.active?'pin':'check')}${o.active?'Pozycja pojazdu':'Dostawa zakończona'}</h3><span class='demo-tag'>${o.active?'Mapa poglądowa · demo':'Zlecenie demo'}</span></div>
+      ${o.active?`<div class='map-area'>${routeMap(o)}${mapControls()}<span class='map-scale'>Schemat trasy</span></div><div class='map-footer'>${icon('pin')}<div><strong>${o.position||'Pozycja GPS niedostępna'}</strong><span>${o.position?`Przykładowa pozycja · ${o.updated}`:'Pokazujemy planowaną trasę, bez pozycji pojazdu.'}</span></div></div>`:`<div class='completed-panel'><span class='completion-icon'>${icon('check')}</span><h3>Transport dotarł na miejsce.</h3><p>${o.to} · ${arrival.date}, ${arrival.time}</p><span class='completion-caption'>Dokumenty znajdziesz poniżej.</span></div>`}
+    </section></div>
+    <section class='card progress-card'><div class='card-heading'><h3>Realizacja zlecenia</h3><button class='text-action' data-action='order-history' data-id='${o.id}'>${icon('history')} Historia statusów ${icon('arrow')}</button></div>${journey(o)}${o.active&&o.progress!==null?`<div class='transport-progress'><div><span>Postęp transportu <small>· szacunkowy</small></span><strong>${o.progress}%</strong></div><div class='transport-progress-track' role='progressbar' aria-label='Szacunkowy postęp transportu' aria-valuemin='0' aria-valuemax='100' aria-valuenow='${o.progress}'><span style='width:${o.progress}%'></span></div></div>`:''}</section>
     ${orderDocuments(o)}${transportDetails(o)}`;
 }
 
@@ -350,6 +375,7 @@ function closeOrder() {
 
 function openDialog(eyebrow,title,body,actions='') {
   const dialog=document.getElementById('detail-dialog');
+  dialog.classList.remove('map-dialog');
   modalTrigger=document.activeElement;
   dialog.innerHTML=`<div class="dialog-heading"><div><div class="eyebrow">${eyebrow}</div><h2 id="dialog-title">${title}</h2></div><button class="icon-button" data-action="close-dialog" aria-label="Zamknij okno">${icon('close')}</button></div>${body}${actions?`<div class="dialog-actions">${actions}</div>`:''}`;
   if(!dialog.open) dialog.showModal();
@@ -383,10 +409,11 @@ document.addEventListener('click',event=>{
   const {action,id}=target.dataset;
   if(['map-zoom-in','map-zoom-out','map-reset'].includes(action)){
     state.mapZoom=action==='map-reset'?1:Math.max(1,Math.min(2.4,Math.round((state.mapZoom+(action==='map-zoom-in' ? 0.35 : -0.35))*100)/100));
-    document.querySelector('.route-map').setAttribute('viewBox',mapViewBox());
-    document.querySelector('[data-action="map-zoom-in"]').disabled=state.mapZoom>=2.4;
-    document.querySelector('[data-action="map-zoom-out"]').disabled=state.mapZoom<=1;
+    document.querySelectorAll('.route-map').forEach(map=>map.setAttribute('viewBox',mapViewBox()));
+    document.querySelectorAll('[data-action="map-zoom-in"]').forEach(control=>control.disabled=state.mapZoom>=2.4);
+    document.querySelectorAll('[data-action="map-zoom-out"]').forEach(control=>control.disabled=state.mapZoom<=1);
   }
+  if(action==='map-expand')expandedMap();
   if(action==='open-rewards')navigate('rewards');
   if(action==='order-detail'||action==='order-select')selectOrder(id);
   if(action==='order-close')closeOrder();
