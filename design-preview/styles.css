@@ -1123,6 +1123,179 @@ body { font-size:15px; }
   .order-eta-panel { padding-left:10px; padding-right:10px; }
 }
 
+/* Phone layout: full-width route, short ETA strip and persistent order switching. */
+.mobile-order-tools { display:none; }
+@media (pointer:coarse) {
+  button { min-height:44px; }
+  .icon-button { min-width:44px; width:44px; height:44px; }
+  input { font-size:16px!important; }
+}
+@media (max-width:760px) {
+  .header-inner { min-height:64px; padding:0 16px; gap:12px; }
+  .brand img { width:74px; }
+  .brand-word { font-size:27px; }
+  .header-actions { gap:8px; }
+  .contact-button { width:44px; min-height:44px; }
+  .content { padding:14px 16px calc(86px + env(safe-area-inset-bottom)); }
+  .orders-content .preview-note { margin-bottom:14px; font-size:9px; }
+  .orders-page>.page-head { display:flex; flex-direction:column; align-items:flex-start; gap:5px; margin-bottom:16px; }
+  .orders-page h1 { font-size:29px; line-height:1.2; }
+  .company-welcome { display:flex; flex-wrap:wrap; align-items:baseline; gap:5px; text-align:left; }
+  .company-welcome>span { margin:0; font-size:12px; }
+  .company-welcome>strong { font-size:15px; }
+  .orders-toolbar,.has-tracking .orders-toolbar { gap:8px; margin-bottom:16px; }
+  .orders-toolbar .filters { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); width:100%; gap:3px; border-radius:16px; }
+  .orders-toolbar .filter,.has-tracking .orders-toolbar .filter { justify-content:center; min-height:44px; padding:7px 4px; font-size:12px; gap:4px; border-radius:12px; }
+  .orders-toolbar .filter span { font-size:10px; min-width:16px; padding:1px 3px; }
+  .search-field,.orders-toolbar .search-field,.has-tracking .orders-toolbar .search-field { min-height:46px; padding:10px 13px; }
+  .search-field input,.orders-toolbar .search-field input { font-size:16px; }
+  .order-section-head { margin-bottom:10px; }
+  .order-section-head h2 { font-size:16px; }
+  .sort-note { font-size:10px; max-width:130px; }
+  .order-card:not(.compact-card) { padding:14px; gap:10px; }
+  .order-card:not(.compact-card) .order-reference { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:center; gap:4px 7px; }
+  .order-reference span { font-size:10px; margin:0; }
+  .order-reference strong { font-size:15px; }
+  .order-main { grid-template-columns:minmax(0,1fr); gap:10px; padding-top:10px; }
+  .order-journey .order-route { max-width:none; grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr); gap:8px; }
+  .order-journey .route-connector { display:block; }
+  .order-journey .route-connector .icon { width:18px; height:18px; }
+  .order-journey .route-code { font-size:18px; }
+  .order-journey .route-city { font-size:16px; }
+  .order-journey .route-label { font-size:11px; }
+  .order-journey .cargo-meta .cargo-vehicle { flex-basis:auto; }
+  .order-eta-panel { height:auto; display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-rows:auto auto; gap:2px 12px; padding:11px 13px; border-radius:12px; }
+  .order-eta-panel .arrival-label { grid-column:1; grid-row:1; font-size:15px; align-self:end; }
+  .order-eta-panel .arrival-note { grid-column:1; grid-row:2; font-size:11px; align-self:start; }
+  .order-eta-panel strong { grid-column:2; grid-row:1 / 3; margin:0; align-items:flex-end; font-size:30px; gap:2px; }
+  .order-eta-panel strong small { font-size:13px; }
+  .order-card:not(.compact-card) .order-card-action { min-height:58px; }
+  .has-tracking .content { padding:10px 14px calc(78px + env(safe-area-inset-bottom)); }
+  .has-tracking .orders-page>.page-head { flex-direction:row; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
+  .has-tracking .orders-page h1 { font-size:21px; }
+  .has-tracking .company-welcome { display:block; max-width:128px; text-align:right; }
+  .has-tracking .company-welcome>span { display:none; }
+  .has-tracking .company-welcome>strong { font-size:13px; }
+  .has-tracking .mobile-order-tools { display:flex; align-items:center; gap:8px; flex-shrink:0; padding:8px 12px; margin-bottom:8px; border:1px solid var(--line); border-radius:12px; background:#fff; font-size:13px; min-height:44px; }
+  .mobile-order-tools>.icon:last-child { margin-left:auto; width:18px; height:18px; }
+  .mobile-order-tools[aria-expanded=true]>.icon:last-child { transform:rotate(180deg); }
+  .has-tracking .orders-toolbar { display:none; margin-bottom:10px; }
+  .has-tracking .mobile-tools-open .orders-toolbar { display:flex; }
+  .orders-workspace.has-selection { gap:10px; }
+  .has-tracking .orders-list-pane { height:138px; }
+  .has-selection .order-section-head { min-height:18px; margin-bottom:5px; }
+  .has-selection .order-section-head h2 { font-size:12px; }
+  .has-selection .sort-note { display:none; }
+  .has-tracking #order-results { gap:8px; padding:2px 2px 5px; scroll-snap-type:x mandatory; }
+  .has-selection .compact-card { width:min(260px,calc(100vw - 74px)); }
+  .order-option { padding:9px 11px; }
+  .compact-reference { font-size:10px; padding:0 16px; }
+  .compact-route { margin-top:4px; gap:6px; }
+  .compact-route .route-code { font-size:14px; }
+  .compact-route .route-city { font-size:13px; }
+  .compact-cargo { margin-top:5px; font-size:11px; }
+  .compact-card .status,.compact-bottom { display:none; }
+  .order-detail-pane { padding:2px 2px 18px; }
+  .detail-heading { gap:8px; margin-bottom:12px; }
+  .detail-current-status { gap:5px; }
+  .detail-current-status>span { font-size:11px; }
+  .detail-current-status .status { font-size:12px; padding:5px 8px; white-space:normal; }
+  .detail-route { grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr); gap:6px; }
+  .detail-route .route-code { font-size:17px; }
+  .detail-route .route-city { font-size:15px; }
+  .detail-route .route-divider .icon { width:16px; height:16px; }
+  .detail-heading p { font-size:11px; margin-top:6px; }
+  .detail-heading p strong { font-size:12px; }
+  .detail-close { width:44px; height:44px; min-height:44px; flex-shrink:0; border-radius:12px; }
+  .detail-facts { grid-template-columns:minmax(0,1fr) minmax(0,1fr); padding:13px; gap:11px 14px; margin-bottom:12px; }
+  .detail-goods,.detail-vehicle { grid-column:1 / -1; }
+  .detail-goods { display:flex; align-items:center; gap:8px; }
+  .detail-goods>span { flex-shrink:0; margin:0; }
+  .detail-vehicle { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+  .detail-vehicle>span { margin:0; }
+  .detail-facts>div>span { font-size:11px; margin-bottom:3px; }
+  .detail-facts strong,.detail-goods strong { font-size:17px; }
+  .detail-vehicle .vehicle-type { display:inline-block; margin:0; font-size:12px; }
+  .has-selection .delivery-card { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); padding:16px; gap:12px; }
+  .operation-current { grid-column:1; grid-row:1; }
+  .operation-name { font-size:23px; margin-top:3px; }
+  .delivery-estimate { grid-column:2; grid-row:1 / 3; }
+  .delivery-estimate>span:first-child { font-size:12px; }
+  .eta-values { display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 6px; }
+  .eta-label { font-size:11px; }
+  .eta-values>strong { font-size:40px; }
+  .eta-values .delivery-date { flex-basis:100%; font-size:14px; }
+  .delivery-window { grid-column:1; grid-row:2; padding-top:8px; }
+  .operation-label { font-size:11px; }
+  .delivery-window strong { font-size:17px; }
+  .has-selection .delivery-confidence { grid-column:1 / -1; border-top:1px solid #ffffff20; padding-top:10px; font-size:11px; }
+  .has-selection .tracking-grid { gap:12px; }
+  .has-selection .map-area { height:260px; }
+  .map-heading { padding:13px; }
+  .map-heading h3 { font-size:14px; }
+  .map-heading-actions { width:100%; }
+  .vehicle-position-link { width:100%; font-size:13px; min-height:44px; }
+  .map-footer { padding:12px 13px; }
+  .map-footer strong { font-size:13px; }
+  .map-footer div>span { font-size:11px; }
+  .icon-button { min-width:44px; width:44px; height:44px; }
+  .next-operation-strip { padding:13px; gap:10px; }
+  .next-operation-strip .next-operation-name { font-size:18px; }
+  .next-operation-strip .next-arrival-time>strong { font-size:25px; }
+  .primary-nav { padding:6px 14px calc(6px + env(safe-area-inset-bottom)); }
+  .nav-item { min-height:52px; }
+  .miles-strip { margin-top:22px; gap:10px; }
+  .miles-strip strong { font-size:12px; }
+  .miles-strip div>span { font-size:11px; }
+  .miles-strip .text-action { margin-left:50px; font-size:12px; min-height:44px; }
+  .page-footer { margin-top:24px; }
+  .page-footer>div { flex-wrap:wrap; gap:8px 16px; }
+  .page-footer button { min-height:44px; font-size:11px; }
+  .filter-bar .filter { min-height:44px; font-size:12px; }
+  .table-wrap { overflow:visible; }
+  .table-wrap table { white-space:normal; }
+  .table-wrap thead { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); }
+  .table-wrap tbody { display:block; }
+  .table-wrap tbody tr { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); padding:8px; border-bottom:1px solid var(--line); }
+  .table-wrap td { border:0; padding:7px 9px; font-size:15px; text-align:left; }
+  .table-wrap td::before { content:attr(data-label); display:block; color:#818a92; font-size:11px; font-weight:400; margin-bottom:3px; }
+  .table-wrap td:first-child { grid-column:1 / -1; }
+  .row-detail { min-height:44px; font-size:16px; }
+  .table-wrap .status { font-size:12px; }
+  .table-footer { flex-wrap:wrap; padding:14px; font-size:12px; }
+  .reward-grid { grid-template-columns:minmax(0,1fr); gap:14px; }
+  .reward-card { display:grid; grid-template-columns:110px minmax(0,1fr); align-items:center; gap:12px; padding:12px; }
+  .reward-art { height:150px; margin:0; }
+  .reward-category { top:8px; left:8px; font-size:9px; }
+  .goal-label { top:auto; bottom:8px; left:8px; right:8px; text-align:center; font-size:9px; }
+  .reward-body { padding:0; }
+  .reward-card h2 { font-size:16px; }
+  .reward-card p { font-size:12px; min-height:0; margin-bottom:12px; }
+  .reward-bottom { flex-wrap:wrap; gap:6px; padding-top:10px; }
+  .reward-bottom strong { font-size:17px; }
+  .reward-nav { margin-bottom:18px; }
+  .reward-nav button { min-height:44px; font-size:12px; }
+  dialog { width:calc(100vw - 24px); max-height:calc(100dvh - 28px); padding:18px; }
+  .dialog-heading h2 { font-size:22px; }
+  .dialog-actions { flex-wrap:wrap; }
+  .dialog-actions .button { width:100%; }
+}
+@media (max-width:360px) {
+  .content { padding-left:14px; padding-right:14px; }
+  .orders-toolbar .filter,.has-tracking .orders-toolbar .filter { font-size:11px; gap:3px; }
+  .order-journey .route-code { font-size:16px; }
+  .detail-route .route-code { font-size:15px; }
+  .reward-card { grid-template-columns:96px minmax(0,1fr); gap:10px; padding:10px; }
+}
+@media (max-height:500px) and (min-width:761px) and (max-width:960px) {
+  .has-tracking .header-inner { min-height:56px; }
+  .has-tracking .content { padding-top:8px; padding-bottom:8px; }
+  .has-tracking .orders-page>.page-head { margin-bottom:8px; }
+  .has-tracking .orders-page h1 { font-size:23px; }
+  .has-tracking .company-welcome>strong { font-size:16px; }
+  .has-tracking .orders-toolbar { margin-bottom:8px; }
+}
+
 @media (prefers-reduced-motion:reduce) {
   *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
 }

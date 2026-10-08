@@ -25,7 +25,15 @@ async function navigate(page, view) {
   await expect(page).toHaveURL(new RegExp(`#${view}$`));
 }
 
+async function revealOrderTools(page) {
+  const toggle = page.getByRole('button', { name: 'Filtry i wyszukiwanie', exact: true });
+  if (await toggle.isVisible() && await toggle.getAttribute('aria-expanded') === 'false') {
+    await toggle.click();
+  }
+}
+
 async function filterOrders(page, group) {
+  await revealOrderTools(page);
   await page.locator(`[data-action="order-filter"][data-id="${group}"]`).click();
 }
 
@@ -208,6 +216,7 @@ test('compact selection switches one detail pane and keeps route, cargo and sear
   await expect(page.locator('#order-detail .vehicle-plate')).toHaveText('DEMO 002');
   await orderCard(page, 'DEMO-261002').locator('.order-option').click();
   await expect(page.locator('.order-detail-pane')).toHaveCount(1);
+  await revealOrderTools(page);
   const search = page.getByRole('searchbox', { name: 'Szukaj zlecenia po numerze, mieście lub rejestracji', exact: true });
   await search.fill('50-001');
   await expect(search).toBeFocused();
@@ -684,7 +693,7 @@ test('the vehicle position link opens the coordinate in Maps and stays unavailab
 });
 
 
-test('separated order cards place cargo below the route and one equally tall ETA panel beside it', async ({ page, isMobile }) => {
+test('separated order cards group route and cargo with ETA beside desktop content or below it on a phone', async ({ page, isMobile }) => {
   const sizes = [page.viewportSize()];
   if (isMobile) sizes.push({ width: 319, height: 728 });
   for (const size of sizes) {
@@ -703,10 +712,22 @@ test('separated order cards place cargo below the route and one equally tall ETA
       const journey = await card.locator('.order-journey').boundingBox();
       const eta = await card.locator('.order-eta-panel').boundingBox();
       expect(cargo.y).toBeGreaterThan(route.y + route.height);
-      expect(eta.x).toBeGreaterThan(journey.x + journey.width);
-      expect(eta.y).toBeCloseTo(journey.y, 1);
-      expect(eta.height).toBeCloseTo(journey.height, 1);
-      if (isMobile) expect((await card.boundingBox()).height).toBeLessThan(560);
+      if (isMobile) {
+        expect(eta.y).toBeGreaterThan(journey.y + journey.height);
+        expect(eta.x).toBeCloseTo(journey.x, 1);
+        expect(eta.width).toBeCloseTo(journey.width, 1);
+        expect(eta.height).toBeLessThan(100);
+        expect((await card.boundingBox()).height).toBeLessThan(430);
+        const ends = await card.locator('.order-route>div').all();
+        const load = await ends[0].boundingBox();
+        const unload = await ends[1].boundingBox();
+        expect(unload.x).toBeGreaterThan(load.x + load.width);
+        expect(unload.y).toBeCloseTo(load.y, 1);
+      } else {
+        expect(eta.x).toBeGreaterThan(journey.x + journey.width);
+        expect(eta.y).toBeCloseTo(journey.y, 1);
+        expect(eta.height).toBeCloseTo(journey.height, 1);
+      }
     }
     const first = await cards.first().boundingBox();
     const second = await cards.nth(1).boundingBox();
@@ -717,5 +738,69 @@ test('separated order cards place cargo below the route and one equally tall ETA
     const completed = orderCard(page, 'DEMO-260903');
     expect(await active.evaluate(el => getComputedStyle(el).borderColor)).not.toBe(await completed.evaluate(el => getComputedStyle(el).borderColor));
     await expect(completed.locator('.arrival-label')).toHaveText('Rozładunek potwierdzony');
+  }
+});
+
+test('phone tools and order switching remain available while the detail scrolls on a short screen', async ({ page, isMobile }) => {
+  if (isMobile) await page.setViewportSize({ width: 319, height: 568 });
+  await page.goto('./#tracking/DEMO-261001');
+  const toggle = page.getByRole('button', { name: 'Filtry i wyszukiwanie', exact: true });
+  if (isMobile) {
+    await expect(toggle).toBeVisible();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator('#order-toolbar')).not.toBeVisible();
+    expect((await page.locator('#order-detail').boundingBox()).height).toBeGreaterThan(160);
+    expect((await page.locator('.orders-list-pane').boundingBox()).height).toBeLessThan(160);
+  } else {
+    await expect(toggle).not.toBeVisible();
+    await expect(page.locator('#order-toolbar')).toBeVisible();
+  }
+  await filterOrders(page, 'all');
+  await expect(page.locator('.compact-card')).toHaveCount(5);
+  if (isMobile) {
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await toggle.click();
+    await expect(page.locator('#order-toolbar')).not.toBeVisible();
+  }
+  const pane = page.locator('#order-detail');
+  await pane.evaluate(el => { el.scrollTop = el.scrollHeight; });
+  expect(await pane.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+  expect(await page.evaluate(() => scrollY)).toBe(0);
+  await orderCard(page, 'DEMO-261002').locator('.order-option').click();
+  await expect(page).toHaveURL(/#tracking\/DEMO-261002$/);
+  expect(await pane.evaluate(el => el.scrollTop)).toBe(0);
+  await revealOrderTools(page);
+  await page.locator('#order-search').fill('60-001');
+  await expect(page).toHaveURL(/#orders$/);
+  await expect(page.locator('.compact-card')).toHaveCount(0);
+  await expect(orderCard(page, 'DEMO-261001')).toBeVisible();
+  await expect(page.locator('#order-search')).toBeFocused();
+});
+
+test('all views fit small portrait and landscape phones, with readable invoice and reward cards', async ({ page, isMobile }) => {
+  test.setTimeout(60_000);
+  const sizes = isMobile ? [{ width: 319, height: 568 }, { width: 390, height: 844 }, { width: 844, height: 390 }] : [page.viewportSize()];
+  for (const size of sizes) {
+    await page.setViewportSize(size);
+    for (const [view] of views) {
+      await page.goto('./#' + view);
+      await page.evaluate(() => document.fonts.ready);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth), view + ': no horizontal page scrolling').toBeLessThanOrEqual(size.width);
+      await expect(page.locator('.primary-nav [aria-current="page"]')).toBeVisible();
+      if (isMobile) expect((await page.locator('.contact-button').boundingBox()).height).toBeGreaterThanOrEqual(44);
+      if (view === 'invoices' && size.width <= 760) {
+        const table = page.locator('.table-wrap').first();
+        expect(await table.evaluate(el => el.scrollWidth)).toBeLessThanOrEqual(size.width - 20);
+        await expect(table.locator('tbody tr').first().locator('[data-label]')).toHaveCount(5);
+        await expect(table.locator('.row-detail').first()).toBeVisible();
+        await table.locator('.row-detail').first().click();
+        await expect(page.getByRole('dialog')).toBeVisible();
+        await page.getByRole('button', { name: 'Zamknij okno', exact: true }).click();
+      }
+      if (view === 'rewards' && size.width <= 760) {
+        await expect(page.locator('.reward-card')).toHaveCount(6);
+        expect((await page.locator('.reward-card').first().boundingBox()).width).toBeGreaterThan(size.width - 60);
+      }
+    }
   }
 });
