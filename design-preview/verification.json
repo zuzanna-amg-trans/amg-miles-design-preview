@@ -44,7 +44,7 @@
   "browser_verification": {
     "executor": "GitHub Actions only",
     "workflow": ".github/workflows/preview.yml",
-    "tests_per_run": 92,
+    "tests_per_run": 94,
     "viewports": [
       "desktop: 1280 x 900",
       "mobile: 390 x 844",
