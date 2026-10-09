@@ -42,6 +42,7 @@ function orderCard(page, id) {
 }
 
 const views = [
+  ['home', 'Dzień dobry, Firma przykładowa.', 'home'],
   ['orders', 'Twoje zlecenia.', 'orders'],
   ['tracking/DEMO-261001', 'Twoje zlecenia.', 'orders'],
   ['invoices', 'Twoje faktury.', 'invoices'],
@@ -56,7 +57,7 @@ for (const [view, heading, primaryView] of views) {
     await page.goto(`./#${view}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(heading);
     await expect(page.locator('.preview-note')).toHaveText('Podgląd projektu · wszystkie dane są przykładowe');
-    await expect(page.locator('.primary-nav button')).toHaveCount(3);
+    await expect(page.locator('.primary-nav button')).toHaveCount(4);
     await expect(page.locator(`.primary-nav [data-view="${primaryView}"]`)).toHaveAttribute('aria-current', 'page');
     await page.evaluate(() => document.fonts.ready);
     await expect.poll(() => page.locator('.brand img').evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
@@ -70,8 +71,26 @@ for (const [view, heading, primaryView] of views) {
   });
 }
 
-test('orders are the entry view; filters and search keep their combined scope', async ({ page }) => {
+test('the refreshed home is the entry view and leads to the nearest operation', async ({ page }) => {
   await page.goto('./');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dzień dobry, Firma przykładowa.');
+  await expect(page.locator('.primary-nav [data-view="home"]')).toHaveAttribute('aria-current', 'page');
+  await expect(page.locator('.home-summary .home-metric')).toHaveCount(3);
+  await expect(page.locator('.home-next-operation')).toContainText('Załadunek');
+  await expect(page.locator('.home-next-operation')).toContainText('NL 3011 AA');
+  await expect(page.locator('.home-next-operation')).toContainText('10:00');
+  await expect(page.locator('.home-invoice-panel')).toContainText('DEMO/2026/1042');
+  await expect(page.locator('.home-goal-panel')).toContainText('Słuchawki bezprzewodowe');
+  await page.getByRole('button', { name: 'Otwórz transport', exact: true }).click();
+  await expect(page).toHaveURL(/#tracking\/DEMO-261002$/);
+  await expect(page.locator('.order-detail-pane')).toHaveCount(1);
+  await page.locator('.brand').click();
+  await expect(page).toHaveURL(/#home$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dzień dobry, Firma przykładowa.');
+});
+
+test('order filters and search keep their combined scope', async ({ page }) => {
+  await page.goto('./#orders');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twoje zlecenia.');
   const cards = page.locator('.order-card');
   await expect(cards).toHaveCount(2);
@@ -135,7 +154,7 @@ test('order cards expose country postal codes, goods, weight and pallet count be
 });
 
 test('choosing an order narrows the list beside its map; history restores focus and back closes it', async ({ page, isMobile, context }) => {
-  await page.goto('./');
+  await page.goto('./#orders');
   await orderCard(page, 'DEMO-261001').getByRole('button', { name: 'GPS pojazdu', exact: true }).click();
   await expect(page).toHaveURL(/#tracking\/DEMO-261001$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twoje zlecenia.');
@@ -568,9 +587,9 @@ test('reward categories, detail and temporary goal selection', async ({ page }) 
   await expect(cards.filter({ hasText: 'Słuchawki bezprzewodowe' }).locator('.goal-label')).toHaveText('Twój cel');
 });
 
-test('the three primary tabs remain available and rewards have their own subnavigation', async ({ page }) => {
+test('the four primary tabs remain available and rewards have their own subnavigation', async ({ page }) => {
   await page.goto('./');
-  for (const view of ['invoices', 'rewards', 'orders']) {
+  for (const view of ['home', 'orders', 'invoices', 'rewards']) {
     const tab = page.locator(`.primary-nav [data-view="${view}"]`);
     await expect(tab).toBeVisible();
     await navigate(page, view);
@@ -602,12 +621,13 @@ test('the keyboard skip link focuses content without changing the route', async 
   await expect(page.locator('#invoice-results tbody tr')).toHaveCount(6);
 });
 
-test('old dashboard and unknown tracking links fall back to the order list', async ({ page }) => {
-  for (const hash of ['overview', 'tracking/unknown-order']) {
-    await page.goto(`./#${hash}`);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twoje zlecenia.');
-    await expect(page.locator('.order-card')).toHaveCount(2);
-  }
+test('the old dashboard alias opens the new home and an unknown tracking link falls back to orders', async ({ page }) => {
+  await page.goto('./#overview');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dzień dobry, Firma przykładowa.');
+  await expect(page.locator('.primary-nav [data-view="home"]')).toHaveAttribute('aria-current', 'page');
+  await page.goto('./#tracking/unknown-order');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twoje zlecenia.');
+  await expect(page.locator('.order-card')).toHaveCount(2);
 });
 
 test('program FAQ expands and closes', async ({ page }) => {

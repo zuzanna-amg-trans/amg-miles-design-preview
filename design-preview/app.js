@@ -74,8 +74,8 @@ const demoSource = {
   ],
 };
 
-const VIEWS = {orders:'Zlecenia',tracking:'Podgląd zlecenia',invoices:'Faktury',rewards:'Nagrody',history:'Historia punktów',claims:'Moje nagrody',rules:'Zasady programu'};
-let state = {view:'orders',orderStatus:'active',orderSearch:'',orderToolsOpen:false,selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones',mapZoom:1,expandedOrder:null};
+const VIEWS = {home:'Strona główna',orders:'Zlecenia',tracking:'Podgląd zlecenia',invoices:'Faktury',rewards:'Nagrody',history:'Historia punktów',claims:'Moje nagrody',rules:'Zasady programu'};
+let state = {view:'home',orderStatus:'active',orderSearch:'',orderToolsOpen:false,selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones',mapZoom:1,expandedOrder:null};
 let toastTimer;
 let modalTrigger;
 let orderReturnEntry='gps';
@@ -99,15 +99,15 @@ function button(label, action, style='primary', extras='') {
 
 
 function shell() {
-  const active=['orders','tracking'].includes(state.view)?'orders':state.view==='invoices'?'invoices':'rewards';
+  const active=['orders','tracking'].includes(state.view)?'orders':state.view==='invoices'?'invoices':['rewards','history','claims','rules'].includes(state.view)?'rewards':'home';
   const navItem=(view,name,ic)=>`<button class="nav-item ${active===view?'active':''}" data-view="${view}" ${active===view?'aria-current="page"':''}>${icon(ic)}<span>${name}</span></button>`;
   document.getElementById('app').innerHTML=`<div class="shell ${state.view==='orders'&&state.expandedOrder?'has-tracking':''}">
     <header class="topbar"><div class="header-inner">
-      <button class="brand" data-view="orders" aria-label="AMG Miles — zlecenia"><img src="assets/amg-logo-white.webp" alt="AMG European Transport"><span class="brand-word">miles<em>.</em></span></button>
-      <nav class="primary-nav" aria-label="Nawigacja panelu">${navItem('orders','Zlecenia','truck')}${navItem('invoices','Faktury','invoice')}${navItem('rewards','Nagrody','gift')}</nav>
+      <button class="brand" data-view="home" aria-label="AMG Miles — strona główna"><img src="assets/amg-logo-white.webp" alt="AMG European Transport"><span class="brand-word">miles<em>.</em></span></button>
+      <nav class="primary-nav" aria-label="Nawigacja panelu">${navItem('home','Start','grid')}${navItem('orders','Zlecenia','truck')}${navItem('invoices','Faktury','invoice')}${navItem('rewards','Nagrody','gift')}</nav>
       <div class="header-actions"><button class="header-points" data-action="open-balance" aria-label="Twoje punkty demonstracyjne: ${number(demoSource.balance.available)}">${icon('spark')}<strong>${number(demoSource.balance.available)}</strong><span>pkt</span></button><button class="contact-button" data-action="contact" aria-label="Kontakt z AMG">${icon('support')}<span>Kontakt z AMG</span></button><span class="header-separator"></span><div class="account-label"><strong>${esc(demoSource.customer.companyName)}</strong><span>Konto demonstracyjne</span></div><span class="avatar" aria-label="Konto demonstracyjne">FP</span></div>
     </div></header>
-    <main class="content ${state.view==='orders'?'orders-content':''}" id="main-content" tabindex="-1"><div class="preview-note">Podgląd projektu <span>·</span> wszystkie dane są przykładowe</div><div class="view">${renderView()}</div><footer class="page-footer"><span>© 2026 AMG Trans</span><div><button data-view="rules">Zasady AMG Miles</button><button data-action="about-preview">O podglądzie ${icon('arrow')}</button></div></footer></main>
+    <main class="content ${state.view==='orders'?'orders-content':state.view==='home'?'home-content':''}" id="main-content" tabindex="-1"><div class="preview-note">Podgląd projektu <span>·</span> wszystkie dane są przykładowe</div><div class="view">${renderView()}</div><footer class="page-footer"><span>© 2026 AMG Trans</span><div><button data-view="rules">Zasady AMG Miles</button><button data-action="about-preview">O podglądzie ${icon('arrow')}</button></div></footer></main>
   </div>`;
   document.title=`${VIEWS[state.view]} · AMG Miles — podgląd`;
 }
@@ -197,6 +197,57 @@ function orderWorkspace() {
   const o=demoSource.orders.find(o=>o.id===state.expandedOrder);
   const label=ORDER_GROUPS.find(([key])=>key===state.orderStatus)[1];
   return `<section class="orders-list-pane" aria-label="Lista zleceń"><div class="order-section-head"><h2 id="order-scope-label">${label}</h2><span class="sort-note">${state.orderStatus==='completed'?'Ostatnio zakończone najpierw':'Najbliższa operacja najpierw'}</span></div><div class="order-list" id="order-results">${orderResults()}</div></section>${o?`<section class="order-detail-pane" id="order-detail" role="region" aria-label="Podgląd zlecenia klienta ${o.reference}">${trackingView(o)}</section>`:''}`;
+}
+
+function homeView() {
+  const activeOrders=ordersInGroup('active',false);
+  const nextOrder=activeOrders[0];
+  const nextStage=operationStage(nextOrder);
+  const nextArrival=nextStage==='load'?nextOrder.loadArrival:nextOrder.unloadArrival;
+  const unpaid=demoSource.invoices.filter(invoice=>invoice.status==='unpaid');
+  const reward=demoSource.rewards.find(item=>item.id===state.goal) || demoSource.rewards[0];
+  const missingPoints=Math.max(0,reward.points-demoSource.balance.available);
+  const progress=Math.min(100,Math.round((demoSource.balance.available/reward.points)*100));
+  return `<section class="home-page" aria-labelledby="home-title">
+    <section class="home-hero">
+      <div class="home-hero-copy">
+        <div class="home-kicker"><span class="home-kicker-dot"></span>Panel klienta AMG Miles</div>
+        <h1 id="home-title">Dzień dobry, <em>${esc(demoSource.customer.companyName)}.</em></h1>
+        <p>Transporty, rozliczenia i korzyści z programu Miles — najważniejsze informacje masz teraz w jednym, czytelnym miejscu.</p>
+        <div class="home-hero-actions"><button class="button button-primary" data-view="orders"><span>Zobacz zlecenia</span><span class="button-circle">${icon('arrow')}</span></button><button class="home-text-link" data-view="invoices">Przejdź do faktur ${icon('arrow')}</button></div>
+      </div>
+      <article class="home-next-operation" aria-label="Najbliższa operacja transportowa">
+        <div class="home-card-top"><span>Najbliższa operacja</span>${orderStatus(nextOrder)}</div>
+        <div class="home-operation-name">${nextStage==='load'?'Załadunek':'Rozładunek'}</div>
+        <div class="home-route">
+          <div><span>${nextStage==='load'?'Miejsce operacji':'Rozładunek'}</span><strong>${nextStage==='load'?`${nextOrder.fromCountry} ${nextOrder.fromPostal}`:`${nextOrder.toCountry} ${nextOrder.toPostal}`}</strong><small>${nextStage==='load'?nextOrder.from:nextOrder.to}</small></div>
+          <span class="home-route-icon">${icon('pin')}</span>
+        </div>
+        <div class="home-eta"><div><span>${nextArrival.confirmed?'Dojazd potwierdzony':'Przewidywany dojazd'}</span><strong>${nextArrival.time}</strong></div><small>${nextArrival.date}<br>${nextOrder.reference}</small></div>
+        <button class="home-operation-action" data-action="home-order" data-id="${nextOrder.id}"><span>Otwórz transport</span>${icon('arrow')}</button>
+      </article>
+    </section>
+
+    <section class="home-summary" aria-label="Podsumowanie konta">
+      <button class="home-metric" data-view="orders"><span class="home-metric-icon">${icon('truck')}</span><span><small>Transporty w realizacji</small><strong>${activeOrders.length}</strong><em>Sprawdź trasy i ETA</em></span>${icon('arrow')}</button>
+      <button class="home-metric" data-view="invoices"><span class="home-metric-icon warm">${icon('invoice')}</span><span><small>Faktury do opłacenia</small><strong>${unpaid.length}</strong><em>Wartość i terminy płatności</em></span>${icon('arrow')}</button>
+      <button class="home-metric" data-view="rewards"><span class="home-metric-icon dark">${icon('spark')}</span><span><small>Dostępne punkty</small><strong>${number(demoSource.balance.available)} <b>pkt</b></strong><em>Zobacz katalog nagród</em></span>${icon('arrow')}</button>
+    </section>
+
+    <section class="home-panels">
+      <article class="card home-invoice-panel">
+        <div class="home-panel-heading"><div><span>Rozliczenia</span><h2>Ostatnia faktura do opłacenia</h2></div><span class="status amber">Do opłacenia</span></div>
+        <div class="home-invoice-line"><div><small>Faktura demonstracyjna</small><strong>${unpaid[0].id}</strong></div><div><small>Termin</small><strong>${unpaid[0].due}</strong></div><div><small>Kwota netto</small><strong>${money(unpaid[0].amount)}</strong></div></div>
+        <div class="home-panel-footer"><span>${icon('bolt')} Zapłać do ${unpaid[0].fastUntil}, aby w przykładzie zyskać bonus.</span><button class="text-action" data-view="invoices">Wszystkie faktury ${icon('arrow')}</button></div>
+      </article>
+      <article class="home-goal-panel">
+        <div class="home-goal-top"><span class="miles-symbol">${icon('gift')}</span><div><span>Twój cel Miles</span><h2>${esc(reward.name)}</h2></div></div>
+        <div class="home-goal-progress"><div style="--progress:${progress}%"><span></span></div><strong>${progress}%</strong></div>
+        <p>${missingPoints?`Brakuje ${number(missingPoints)} pkt do celu.`:'Ta nagroda jest już w Twoim zasięgu.'}</p>
+        <button class="home-operation-action light" data-view="rewards"><span>Przejdź do nagród</span>${icon('arrow')}</button>
+      </article>
+    </section>
+  </section>`;
 }
 
 function ordersView() {
@@ -341,7 +392,7 @@ function rulesView() {
 }
 
 function renderView() {
-  return ({orders:ordersView,tracking:trackingView,invoices:invoicesView,rewards:rewardsView,history:historyView,claims:claimsView,rules:rulesView}[state.view]||ordersView)();
+  return ({home:homeView,orders:ordersView,tracking:trackingView,invoices:invoicesView,rewards:rewardsView,history:historyView,claims:claimsView,rules:rulesView}[state.view]||homeView)();
 }
 
 function navigate(view,focus=true) {
@@ -442,6 +493,7 @@ document.addEventListener('click',event=>{
   }
   if(action==='map-expand')expandedMap();
   if(action==='open-rewards')navigate('rewards');
+  if(action==='home-order'){state.orderStatus='active';navigate('orders',false);selectOrder(id,'gps');}
   if(action==='order-detail'||action==='order-select')selectOrder(id,target.dataset.orderEntry||'gps');
   if(action==='order-close')closeOrder();
   if(action==='order-tools'){state.orderToolsOpen=!state.orderToolsOpen;updateOrderTools();}
@@ -510,7 +562,7 @@ function applyRoute() {
   state.expandedOrder=null;
   state.orderToolsOpen=false;
   const [view,id]=window.location.hash.slice(1).split('/');
-  state.view=view==='overview'||view==='tracking'?'orders':VIEWS[view]?view:'orders';
+  state.view=view==='tracking'?'orders':view==='overview'||!view?'home':VIEWS[view]?view:'home';
   if(view==='tracking'){
     const order=demoSource.orders.find(o=>o.id===id);
     if(order){
