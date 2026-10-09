@@ -4,7 +4,7 @@ Jasny, klikalny projekt AMG Miles: od publicznego ekranu wejściowego i aktywacj
 
 **[Otwórz aktualny podgląd](https://zuzanna-amg-trans.github.io/amg-miles-design-preview/)**
 
-Przed wejściem do panelu publiczny ekran wyjaśnia program, jego trzy główne obszary i zasady korzyści w tej samej grafitowo-pomarańczowej identyfikacji. „Mam kod aktywacyjny” otwiera dostępne okno do wpisania 6 cyfr: akceptuje wklejenie, usuwa znaki inne niż cyfry, pokazuje postęp i aktywuje przycisk dopiero po uzupełnieniu kodu. To wyłącznie demonstracja interfejsu — kod nie jest wysyłany ani sprawdzany w systemie, a poprawne 6 cyfr otwiera fikcyjne konto podglądowe.
+Przed wejściem do panelu publiczny ekran wyjaśnia program, jego trzy główne obszary i zasady korzyści w tej samej grafitowo-pomarańczowej identyfikacji. „Logowanie” otwiera dostępne okno do wpisania 6 cyfr: akceptuje wklejenie, usuwa znaki inne niż cyfry, pokazuje postęp i aktywuje przycisk dopiero po uzupełnieniu kodu. To wyłącznie demonstracja interfejsu — kod nie jest wysyłany ani sprawdzany w systemie, a poprawne 6 cyfr otwiera fikcyjne konto podglądowe. Karty podglądowe mają proste, równoległe krawędzie bez stałych obrotów i perspektywy.
 
 Po aktywacji główne zakładki to **Start, Zlecenia, Faktury i Nagrody**. Nowy ekran startowy zastępuje dawną ciężką, żółto-grafitową prezentację programu pulpitem klienta w aktualnej identyfikacji: pokazuje najbliższą operację transportową, liczbę aktywnych zleceń, faktury do opłacenia, saldo punktów, ostatnią fakturę do opłacenia i postęp do wybranej nagrody. Każdy blok prowadzi bezpośrednio do właściwej części panelu.
 

@@ -65,6 +65,8 @@
   "public_entry": {
     "entry_view": true,
     "private_navigation_visible": false,
+    "login_label": "Logowanie",
+    "preview_cards_aligned_without_rotation": true,
     "sections": [
       "program_hero",
       "transport_invoice_reward_steps",

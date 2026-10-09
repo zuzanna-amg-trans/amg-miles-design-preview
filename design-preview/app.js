@@ -102,7 +102,7 @@ function publicShell() {
     <header class="public-topbar"><div class="public-header-inner">
       <button class="brand public-brand" data-action="public-scroll" data-id="public-start" aria-label="AMG Miles — początek strony"><img src="assets/amg-logo-white.webp" alt="AMG European Transport"><span class="brand-word">miles<em>.</em></span></button>
       <nav class="public-nav" aria-label="Nawigacja strony programu"><button data-action="public-scroll" data-id="public-how">Jak działa</button><button data-action="public-scroll" data-id="public-benefits">Korzyści</button><button data-action="public-scroll" data-id="public-preview">Panel klienta</button></nav>
-      <button class="public-login" data-action="open-activation" aria-label="Wpisz kod aktywacyjny">${icon('shield')}<span>Mam kod aktywacyjny</span></button>
+      <button class="public-login" data-action="open-activation" aria-label="Logowanie">${icon('shield')}<span>Logowanie</span></button>
     </div></header>
     <main id="main-content" class="public-main" tabindex="-1">
       <section class="public-hero" id="public-start" aria-labelledby="public-title">

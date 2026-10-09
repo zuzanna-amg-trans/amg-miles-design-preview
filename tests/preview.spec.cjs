@@ -95,12 +95,14 @@ test('the public entry explains Miles and fits every supported screen', async ({
     await page.setViewportSize(size);
     await page.goto('./');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twój transport.Twoje korzyści.');
+    await expect(page.getByRole('button', { name: 'Logowanie', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Wpisz kod aktywacyjny', exact: true }).first()).toBeVisible();
     await expect(page.locator('.public-steps article')).toHaveCount(3);
     await expect(page.locator('.public-benefit-list>div')).toHaveCount(3);
     await expect(page.locator('.primary-nav')).toHaveCount(0);
     await page.evaluate(() => document.fonts.ready);
     expect(await page.evaluate(() => document.documentElement.scrollWidth), 'public entry has no horizontal scrolling').toBeLessThanOrEqual(size.width);
+    expect(await page.locator('.public-product-card,.public-mini-dashboard').evaluateAll(items => items.map(item => getComputedStyle(item).transform))).toEqual(['none', 'none']);
     await expect.poll(() => page.locator('.public-brand img').first().evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
   }
 });
