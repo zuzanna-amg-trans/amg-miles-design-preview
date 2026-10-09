@@ -1,7 +1,7 @@
 {
   "revision_date": "2026-10-09",
   "scope": "Independent visual prototype; all sample records fictional",
-  "visual_direction": "Lighter AMG client dashboard with a graphite and warm-orange home hero, nearest-operation card, account summary and consistent operational order, invoice and reward views",
+  "visual_direction": "Unified AMG public entry, activation and client dashboard with graphite, warm orange, light surfaces and consistent operational order, invoice and reward views",
   "main_navigation": [
     "Start",
     "Zlecenia",
@@ -44,7 +44,7 @@
   "browser_verification": {
     "executor": "GitHub Actions only",
     "workflow": ".github/workflows/preview.yml",
-    "tests_per_run": 94,
+    "tests_per_run": 98,
     "viewports": [
       "desktop: 1280 x 900",
       "mobile: 390 x 844",
@@ -62,8 +62,28 @@
   "new_screenshots_published": false,
   "existing_documentary_images_preserved": true,
   "existing_documentary_images_describe_current_revision": false,
-  "home_dashboard": {
+  "public_entry": {
     "entry_view": true,
+    "private_navigation_visible": false,
+    "sections": [
+      "program_hero",
+      "transport_invoice_reward_steps",
+      "program_benefits",
+      "client_panel_preview"
+    ],
+    "activation_dialog": {
+      "input": "six numeric characters with one-time-code autocomplete",
+      "submit_disabled_until_complete": true,
+      "keyboard_focus_restored_on_close": true,
+      "help_explains_real_code_source": true,
+      "backend_connected": false,
+      "code_stored_or_transmitted": false,
+      "success_destination": "fictional demo home only"
+    }
+  },
+  "home_dashboard": {
+    "entry_view": false,
+    "entry_after_demo_activation": true,
     "sections": [
       "nearest_transport_operation",
       "active_transport_count",

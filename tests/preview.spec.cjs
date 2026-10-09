@@ -71,8 +71,8 @@ for (const [view, heading, primaryView] of views) {
   });
 }
 
-test('the refreshed home is the entry view and leads to the nearest operation', async ({ page }) => {
-  await page.goto('./');
+test('the refreshed client home leads to the nearest operation', async ({ page }) => {
+  await page.goto('./#home');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dzień dobry, Firma przykładowa.');
   await expect(page.locator('.primary-nav [data-view="home"]')).toHaveAttribute('aria-current', 'page');
   await expect(page.locator('.home-summary .home-metric')).toHaveCount(3);
@@ -87,6 +87,51 @@ test('the refreshed home is the entry view and leads to the nearest operation', 
   await page.locator('.brand').click();
   await expect(page).toHaveURL(/#home$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dzień dobry, Firma przykładowa.');
+});
+
+test('the public entry explains Miles and fits every supported screen', async ({ page, isMobile }) => {
+  const sizes = isMobile ? [{ width: 319, height: 568 }, { width: 390, height: 844 }, { width: 844, height: 390 }] : [page.viewportSize()];
+  for (const size of sizes) {
+    await page.setViewportSize(size);
+    await page.goto('./');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twój transport.Twoje korzyści.');
+    await expect(page.getByRole('button', { name: 'Wpisz kod aktywacyjny', exact: true }).first()).toBeVisible();
+    await expect(page.locator('.public-steps article')).toHaveCount(3);
+    await expect(page.locator('.public-benefit-list>div')).toHaveCount(3);
+    await expect(page.locator('.primary-nav')).toHaveCount(0);
+    await page.evaluate(() => document.fonts.ready);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), 'public entry has no horizontal scrolling').toBeLessThanOrEqual(size.width);
+    await expect.poll(() => page.locator('.public-brand img').first().evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
+  }
+});
+
+test('activation popup validates a six-digit demo code and restores focus', async ({ page }) => {
+  await page.goto('./');
+  const trigger = page.getByRole('button', { name: 'Wpisz kod aktywacyjny', exact: true }).first();
+  await trigger.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('heading', { name: 'Wpisz kod aktywacyjny.', exact: true })).toBeVisible();
+  const code = dialog.getByRole('textbox', { name: '6-cyfrowy kod', exact: true });
+  const submit = dialog.getByRole('button', { name: 'Aktywuj dostęp demo', exact: true });
+  await expect(code).toBeFocused();
+  await code.fill('12a34');
+  await expect(code).toHaveValue('1234');
+  await expect(dialog.locator('#activation-count')).toHaveText('4 / 6');
+  await expect(submit).toBeDisabled();
+  await dialog.getByRole('button', { name: 'Nie masz kodu?', exact: true }).click();
+  await expect(dialog.locator('#activation-help-copy')).toContainText('nie wysyła e-maili ani SMS-ów');
+  await page.keyboard.press('Escape');
+  await expect(dialog).not.toBeVisible();
+  await expect(trigger).toBeFocused();
+  await trigger.click();
+  await dialog.getByRole('textbox', { name: '6-cyfrowy kod', exact: true }).fill('654321');
+  await expect(dialog.locator('#activation-count')).toHaveText('6 / 6');
+  await expect(submit).toBeEnabled();
+  await submit.click();
+  await expect(dialog).not.toBeVisible();
+  await expect(page).toHaveURL(/#home$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dzień dobry, Firma przykładowa.');
+  await expect(page.getByRole('status')).toContainText('otwarto konto demonstracyjne');
 });
 
 test('order filters and search keep their combined scope', async ({ page }) => {
@@ -588,7 +633,7 @@ test('reward categories, detail and temporary goal selection', async ({ page }) 
 });
 
 test('the four primary tabs remain available and rewards have their own subnavigation', async ({ page }) => {
-  await page.goto('./');
+  await page.goto('./#home');
   for (const view of ['home', 'orders', 'invoices', 'rewards']) {
     const tab = page.locator(`.primary-nav [data-view="${view}"]`);
     await expect(tab).toBeVisible();

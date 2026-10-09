@@ -74,8 +74,8 @@ const demoSource = {
   ],
 };
 
-const VIEWS = {home:'Strona główna',orders:'Zlecenia',tracking:'Podgląd zlecenia',invoices:'Faktury',rewards:'Nagrody',history:'Historia punktów',claims:'Moje nagrody',rules:'Zasady programu'};
-let state = {view:'home',orderStatus:'active',orderSearch:'',orderToolsOpen:false,selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones',mapZoom:1,expandedOrder:null};
+const VIEWS = {welcome:'AMG Miles',home:'Strona główna',orders:'Zlecenia',tracking:'Podgląd zlecenia',invoices:'Faktury',rewards:'Nagrody',history:'Historia punktów',claims:'Moje nagrody',rules:'Zasady programu'};
+let state = {view:'welcome',orderStatus:'active',orderSearch:'',orderToolsOpen:false,selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones',mapZoom:1,expandedOrder:null};
 let toastTimer;
 let modalTrigger;
 let orderReturnEntry='gps';
@@ -97,8 +97,59 @@ function button(label, action, style='primary', extras='') {
   return `<button class="button button-${style}" data-action="${action}" ${extras}><span>${label}</span><span class="button-circle">${icon('arrow')}</span></button>`;
 }
 
+function publicShell() {
+  document.getElementById('app').innerHTML=`<div class="public-shell">
+    <header class="public-topbar"><div class="public-header-inner">
+      <button class="brand public-brand" data-action="public-scroll" data-id="public-start" aria-label="AMG Miles — początek strony"><img src="assets/amg-logo-white.webp" alt="AMG European Transport"><span class="brand-word">miles<em>.</em></span></button>
+      <nav class="public-nav" aria-label="Nawigacja strony programu"><button data-action="public-scroll" data-id="public-how">Jak działa</button><button data-action="public-scroll" data-id="public-benefits">Korzyści</button><button data-action="public-scroll" data-id="public-preview">Panel klienta</button></nav>
+      <button class="public-login" data-action="open-activation" aria-label="Wpisz kod aktywacyjny">${icon('shield')}<span>Mam kod aktywacyjny</span></button>
+    </div></header>
+    <main id="main-content" class="public-main" tabindex="-1">
+      <section class="public-hero" id="public-start" aria-labelledby="public-title">
+        <div class="public-hero-copy">
+          <div class="public-kicker"><span></span>Program dla klientów AMG Trans</div>
+          <h1 id="public-title">Twój transport.<br><em>Twoje korzyści.</em></h1>
+          <p>AMG Miles łączy informacje o realizowanych transportach, rozliczeniach i nagrodach w jednym, przejrzystym panelu.</p>
+          <div class="public-hero-actions">${button('Wpisz kod aktywacyjny','open-activation','primary')}<button class="public-text-link" data-action="public-scroll" data-id="public-how">Zobacz, jak działa ${icon('down')}</button></div>
+          <p class="public-demo-note">${icon('info')} Podgląd projektu — bez prawdziwego logowania i danych klientów.</p>
+        </div>
+        <div class="public-product-card" aria-label="Przykładowe podsumowanie programu AMG Miles">
+          <div class="public-card-head"><span>AMG Miles</span><span class="public-live-dot">Panel klienta</span></div>
+          <div class="public-points-label">Dostępne punkty · demo</div>
+          <strong class="public-points">24 850 <small>pkt</small></strong>
+          <div class="public-card-progress"><span style="--progress:83%"></span></div>
+          <div class="public-card-goal"><span>${icon('gift')} Cel nagrody</span><strong>83%</strong></div>
+          <div class="public-transport"><span class="public-transport-icon">${icon('truck')}</span><span><small>Transport w realizacji</small><strong>NL 3011 AA <i>${icon('right')}</i> PL 50-001</strong><em>Najbliższa operacja · 10:00</em></span></div>
+        </div>
+      </section>
+
+      <section class="public-section" id="public-how" aria-labelledby="public-how-title">
+        <div class="public-section-head"><span>Prosto i przejrzyście</span><h2 id="public-how-title">Współpraca z AMG<br><em>w jednym miejscu.</em></h2><p>Od trasy i ETA, przez faktury, aż po punkty i nagrody — najważniejsze informacje są zawsze pod ręką.</p></div>
+        <div class="public-steps">
+          <article><span class="public-step-number">01</span><span class="public-step-icon">${icon('truck')}</span><h3>Śledź transport</h3><p>Sprawdzaj status, trasę, najbliższą operację i dokumenty przypisane do zlecenia.</p></article>
+          <article><span class="public-step-number">02</span><span class="public-step-icon warm">${icon('invoice')}</span><h3>Kontroluj rozliczenia</h3><p>Widzisz faktury, terminy i przykładowe punkty naliczane za opłaconą współpracę.</p></article>
+          <article><span class="public-step-number">03</span><span class="public-step-icon dark">${icon('gift')}</span><h3>Korzystaj z nagród</h3><p>Obserwuj saldo, wybierz cel i przeglądaj katalog korzyści programu AMG Miles.</p></article>
+        </div>
+      </section>
+
+      <section class="public-benefits" id="public-benefits" aria-labelledby="public-benefits-title">
+        <div><span class="public-kicker dark"><span></span>Korzyści programu</span><h2 id="public-benefits-title">Dobra współpraca<br><em>jedzie dalej.</em></h2><p>Każda opłacona faktura przybliża Cię do kolejnej nagrody, a szybsza płatność może oznaczać więcej punktów.</p><button class="public-text-link dark" data-action="open-activation">Aktywuj dostęp ${icon('arrow')}</button></div>
+        <div class="public-benefit-list"><div><strong>5 pkt</strong><span>za każde 1 EUR netto opłaconej faktury</span></div><div><strong>+100%</strong><span>przykładowego bonusu za szybką płatność</span></div><div><strong>12 mies.</strong><span>ważności przyznanych punktów</span></div></div>
+      </section>
+
+      <section class="public-panel-preview" id="public-preview" aria-labelledby="public-preview-title">
+        <div class="public-preview-copy"><span>Panel klienta</span><h2 id="public-preview-title">Najważniejsze informacje<br><em>bez szukania.</em></h2><p>Nowy ekran startowy prowadzi od razu do transportu, faktur i nagród. Układ pozostaje czytelny także na telefonie.</p><button class="button button-dark" data-action="open-activation"><span>Przejdź do aktywacji</span><span class="button-circle">${icon('arrow')}</span></button></div>
+        <div class="public-mini-dashboard" aria-hidden="true"><div class="public-mini-bar"><span></span><span></span><span></span></div><div class="public-mini-hero"><div><small>Panel klienta</small><strong>Wszystko na trasie.</strong><span></span><span></span></div><aside><small>Najbliższa operacja</small><strong>10:00</strong><span>NL → PL</span></aside></div><div class="public-mini-metrics"><span></span><span></span><span></span></div></div>
+      </section>
+    </main>
+    <footer class="public-footer"><div><button class="brand public-brand" data-action="public-scroll" data-id="public-start" aria-label="AMG Miles — początek strony"><img src="assets/amg-logo-white.webp" alt=""><span class="brand-word">miles<em>.</em></span></button><p>Program korzyści i panel klienta AMG Trans.</p></div><div><span>© 2026 AMG Trans</span><button data-action="about-preview">O podglądzie</button></div></footer>
+  </div>`;
+  document.title='AMG Miles · aktywacja i panel klienta — podgląd';
+}
+
 
 function shell() {
+  if(state.view==='welcome'){publicShell();return;}
   const active=['orders','tracking'].includes(state.view)?'orders':state.view==='invoices'?'invoices':['rewards','history','claims','rules'].includes(state.view)?'rewards':'home';
   const navItem=(view,name,ic)=>`<button class="nav-item ${active===view?'active':''}" data-view="${view}" ${active===view?'aria-current="page"':''}>${icon(ic)}<span>${name}</span></button>`;
   document.getElementById('app').innerHTML=`<div class="shell ${state.view==='orders'&&state.expandedOrder?'has-tracking':''}">
@@ -453,10 +504,40 @@ function closeOrder() {
 
 function openDialog(eyebrow,title,body,actions='') {
   const dialog=document.getElementById('detail-dialog');
-  dialog.classList.remove('map-dialog');
+  dialog.classList.remove('map-dialog','activation-dialog');
   modalTrigger=document.activeElement;
   dialog.innerHTML=`<div class="dialog-heading"><div><div class="eyebrow">${eyebrow}</div><h2 id="dialog-title">${title}</h2></div><button class="icon-button" data-action="close-dialog" aria-label="Zamknij okno">${icon('close')}</button></div>${body}${actions?`<div class="dialog-actions">${actions}</div>`:''}`;
   if(!dialog.open) dialog.showModal();
+}
+
+function openActivationDialog() {
+  const dialog=document.getElementById('detail-dialog');
+  dialog.classList.remove('map-dialog');
+  dialog.classList.add('activation-dialog');
+  modalTrigger=document.activeElement;
+  dialog.innerHTML=`<div class="activation-mark">${icon('shield')}</div>
+    <button class="activation-close icon-button" data-action="close-dialog" aria-label="Zamknij okno">${icon('close')}</button>
+    <div class="activation-heading"><div class="eyebrow"><span class="little-dot"></span>Aktywacja AMG Miles</div><h2 id="dialog-title">Wpisz kod aktywacyjny.</h2><p>Kod otrzymasz od AMG Trans po uruchomieniu dostępu do programu.</p></div>
+    <form id="activation-form" novalidate>
+      <label class="activation-label" for="activation-code"><span>6-cyfrowy kod</span><small id="activation-count">0 / 6</small></label>
+      <div class="activation-field"><input id="activation-code" name="activation-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" aria-label="6-cyfrowy kod" aria-describedby="activation-hint activation-error" aria-invalid="false" placeholder="••••••"><span>${icon('shield')}</span></div>
+      <p id="activation-hint" class="activation-hint">To interaktywny prototyp. Kod nie jest wysyłany ani sprawdzany w prawdziwym systemie.</p>
+      <p id="activation-error" class="activation-error" role="alert" hidden>Wpisz wszystkie 6 cyfr kodu.</p>
+      <div class="activation-actions"><button type="button" class="activation-help" data-action="activation-help">Nie masz kodu?</button><button type="submit" class="button button-primary" disabled><span>Aktywuj dostęp demo</span><span class="button-circle">${icon('arrow')}</span></button></div>
+      <div class="activation-help-copy" id="activation-help-copy" tabindex="-1" hidden>${icon('info')}<span>W docelowym serwisie kod przekazuje opiekun AMG Trans. Ten podgląd nie wysyła e-maili ani SMS-ów.</span></div>
+    </form>`;
+  if(!dialog.open)dialog.showModal();
+  requestAnimationFrame(()=>dialog.querySelector('#activation-code')?.focus());
+}
+
+function updateActivationCode(input) {
+  input.value=input.value.replace(/\D/g,'').slice(0,6);
+  const complete=input.value.length===6;
+  const form=input.form;
+  form.querySelector('[type="submit"]').disabled=!complete;
+  form.querySelector('#activation-count').textContent=`${input.value.length} / 6`;
+  input.setAttribute('aria-invalid','false');
+  form.querySelector('#activation-error').hidden=true;
 }
 
 function closeDialog() {
@@ -485,6 +566,12 @@ document.addEventListener('click',event=>{
   const target=event.target.closest('[data-action],[data-view]'); if(!target)return;
   if(target.dataset.view) {closeDialog(); navigate(target.dataset.view); return;}
   const {action,id}=target.dataset;
+  if(action==='open-activation')openActivationDialog();
+  if(action==='public-scroll')document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+  if(action==='activation-help'){
+    const help=document.getElementById('activation-help-copy');
+    if(help){help.hidden=false;help.focus({preventScroll:true});}
+  }
   if(['map-zoom-in','map-zoom-out','map-reset'].includes(action)){
     state.mapZoom=action==='map-reset'?1:Math.max(1,Math.min(2.4,Math.round((state.mapZoom+(action==='map-zoom-in' ? 0.35 : -0.35))*100)/100));
     document.querySelectorAll('.route-map').forEach(map=>map.setAttribute('viewBox',mapViewBox()));
@@ -518,7 +605,23 @@ document.addEventListener('click',event=>{
   if(action==='open-balance')openDialog('Twoje punkty · dane demo','Twoje punkty AMG Miles.',`<div class="dialog-stats"><div class="dialog-stat"><span>Dostępne punkty</span><strong>${number(demoSource.balance.available)} pkt</strong></div><div class="dialog-stat"><span>Przyznane w październiku</span><strong>+${number(demoSource.balance.earnedThisMonth)} pkt</strong></div><div class="dialog-stat"><span>Wygasają 31.10.2026</span><strong>${number(demoSource.balance.expiring)} pkt</strong></div></div><p class="dialog-copy">To przykładowe saldo służące do oceny wyglądu panelu.</p>`,button('Historia punktów','open-history','secondary'));
   if(action==='open-history'){closeDialog();navigate('history');}
   if(action==='contact')openDialog('AMG Trans · kontakt','Jesteśmy po drodze.',`<p class="dialog-copy">Porozmawiajmy o Twojej współpracy z AMG.</p><div class="dialog-stats"><div class="dialog-stat"><span>E-mail</span><strong>hello@amg-trans.eu</strong></div><div class="dialog-stat"><span>Telefon</span><strong>+48 508 24 5555</strong></div></div><p class="dialog-copy">Dane kontaktowe z aktualnej strony AMG Trans. Ten podgląd nie wysyła wiadomości.</p>`,button('Zamknij','close-dialog','secondary'));
-  if(action==='about-preview')openDialog('AMG Miles · projekt wizualny','Nowy kierunek.<br>Ten sam charakter.',`<p class="dialog-copy">Jasny panel oparty na identyfikacji AMG: Onest, grafit, ciepły pomarańcz i przyciski ze strzałką w osobnym kółku.</p><p class="dialog-copy">To niezależny podgląd wyglądu. Zlecenia, trasy, pozycje pojazdów, czasy dostawy, faktury, saldo i nagrody są demonstracyjne. Podłączenie właściwego backendu i przeniesienie do repozytorium dev są osobnym etapem.</p>`,button('Wróć do panelu','close-dialog','secondary'));
+  if(action==='about-preview')openDialog('AMG Miles · projekt wizualny','Nowy kierunek.<br>Ten sam charakter.',`<p class="dialog-copy">Publiczny ekran, aktywacja i panel korzystają ze wspólnej identyfikacji AMG: Onest, grafit, ciepły pomarańcz i przyciski ze strzałką w osobnym kółku.</p><p class="dialog-copy">To niezależny podgląd wyglądu. Kod aktywacyjny nie jest wysyłany ani weryfikowany, a zlecenia, trasy, faktury, saldo i nagrody są demonstracyjne. Podłączenie właściwego backendu i przeniesienie do repozytorium dev są osobnym etapem.</p>`,button('Zamknij','close-dialog','secondary'));
+});
+
+document.addEventListener('submit',event=>{
+  if(event.target.id!=='activation-form')return;
+  event.preventDefault();
+  const input=event.target.querySelector('#activation-code');
+  updateActivationCode(input);
+  if(input.value.length!==6){
+    input.setAttribute('aria-invalid','true');
+    event.target.querySelector('#activation-error').hidden=false;
+    input.focus();
+    return;
+  }
+  closeDialog();
+  navigate('home');
+  showToast('Kod przyjęty w podglądzie — otwarto konto demonstracyjne.');
 });
 
 document.addEventListener('keydown',event=>{
@@ -530,6 +633,9 @@ document.addEventListener('keydown',event=>{
 });
 
 document.addEventListener('input',event=>{
+  if(event.target.id==='activation-code'){
+    updateActivationCode(event.target);return;
+  }
   if(event.target.id==='order-search'){
     state.orderSearch=event.target.value;
     if(state.expandedOrder&&!matchingOrders().some(o=>o.id===state.expandedOrder)){
@@ -562,7 +668,7 @@ function applyRoute() {
   state.expandedOrder=null;
   state.orderToolsOpen=false;
   const [view,id]=window.location.hash.slice(1).split('/');
-  state.view=view==='tracking'?'orders':view==='overview'||!view?'home':VIEWS[view]?view:'home';
+  state.view=view==='tracking'?'orders':view==='overview'?'home':!view?'welcome':VIEWS[view]?view:'welcome';
   if(view==='tracking'){
     const order=demoSource.orders.find(o=>o.id===id);
     if(order){
