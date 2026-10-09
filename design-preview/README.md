@@ -1,6 +1,6 @@
 # AMG Miles — podgląd panelu klienta
 
-Klikalny projekt wizualny panelu. Najważniejszy przepływ: **pulpit startowy → najbliższa operacja → wybór zlecenia → lista po lewej i mapa po prawej → szybkie przełączanie transportów**. Punktów i nagród można szukać w zakładce Nagrody, a historii punktów i zasad — w jej podrzędnej nawigacji.
+Klikalny projekt wizualny AMG Miles. Najważniejszy przepływ: **publiczny ekran programu → kod aktywacyjny → pulpit startowy → najbliższa operacja → wybór zlecenia → lista po lewej i mapa po prawej → szybkie przełączanie transportów**. Punktów i nagród można szukać w zakładce Nagrody, a historii punktów i zasad — w jej podrzędnej nawigacji.
 
 ## Uruchomienie
 
@@ -16,6 +16,8 @@ Pełne testy przeglądarkowe wykonuje GitHub Actions przez pull request. Po inte
 
 ## Widoki i interakcje
 
+- Publiczny ekran przed zalogowaniem w tej samej identyfikacji co panel: grafitowy hero, podsumowanie transportu i punktów, trzy kroki programu, korzyści oraz zapowiedź pulpitu. Nie pokazuje prywatnej nawigacji, danych konta ani panelu klienta przed demonstracyjną aktywacją.
+- „Mam kod aktywacyjny” i pozostałe przyciski aktywacji otwierają modal z jednym polem `autocomplete="one-time-code"`. Pole przyjmuje wyłącznie 6 cyfr, obsługuje wklejanie, na bieżąco pokazuje liczbę znaków i odblokowuje przejście dopiero po kompletnym kodzie. Escape i przycisk zamknięcia przywracają fokus. Pomoc wyjaśnia, że docelowy kod przekazuje AMG Trans. W tym statycznym podglądzie kod nie jest nigdzie wysyłany ani weryfikowany; dowolne 6 cyfr prowadzi wyłącznie do fikcyjnego konta demonstracyjnego.
 - Nowa strona główna w aktualnej identyfikacji AMG Miles: grafitowy hero z ciepłym pomarańczem, najbliższa operacja transportowa, liczba aktywnych zleceń, faktury do opłacenia, dostępne punkty, ostatnia faktura do opłacenia i postęp do celu nagrody. Pulpit korzysta wyłącznie z tych samych fikcyjnych danych demonstracyjnych co pozostałe widoki. Dawny adres `#overview` otwiera nowy pulpit.
 - Powitanie „Dzień dobry!” i nazwa firmy w środkowej części nagłówka na komputerze. Dane firmy w prototypie są fikcyjne.
 - Pełna lista aktywnych zleceń po wejściu. Transport oczekujący na załadunek jest sortowany po planowanym dojeździe na załadunek; po potwierdzeniu załadunku — po dojeździe na rozładunek. Zakończone zlecenia są uporządkowane od ostatnio rozładowanych. W „Wszystkich” aktywne są przed zakończonymi.
@@ -33,11 +35,11 @@ Pełne testy przeglądarkowe wykonuje GitHub Actions przez pull request. Po inte
 - Katalog nagród, demonstracyjny wybór celu, historia punktów, moje nagrody i zasady programu. Na telefonie nagrody mają szerokie karty z ilustracją i danymi obok; przyciski do dotyku mają co najmniej 44 px, a wyszukiwarki tekst 16 px.
 - Kontakt, okna szczegółów i obsługa klawiaturą. Na komputerze cztery zakładki są w górnym pasku, na telefonie — w stałej nawigacji dolnej. Na telefonie najpierw widać dane bieżącej i następnej/poprzedniej operacji, potem mapę. Lista zleceń pozostaje dostępna podczas przewijania szczegółów.
 
-Wszystkie rekordy w `demoSource` są fikcyjne. Publiczny kod, ilustracje i zrzuty ekranu nie zawierają danych z zalogowanego konta Miles. Prototyp nie uwierzytelnia użytkowników, nie pobiera GPS, nie przelicza rzeczywistych rozliczeń, nie wysyła wiadomości ani nie zamawia nagród. Zapis celu pozostaje w pamięci bieżącej karty i znika po przeładowaniu.
+Wszystkie rekordy w `demoSource` są fikcyjne. Publiczny kod, ilustracje i zrzuty ekranu nie zawierają danych z zalogowanego konta Miles. Prototyp nie uwierzytelnia użytkowników, nie zapisuje ani nie przesyła kodów aktywacyjnych, nie pobiera GPS, nie przelicza rzeczywistych rozliczeń, nie wysyła wiadomości ani nie zamawia nagród. Zapis celu pozostaje w pamięci bieżącej karty i znika po przeładowaniu.
 
 ## Identyfikacja
 
-Onest, grafit, ciepły pomarańcz `#ff8145`, jasne powierzchnie oraz zaokrąglone przyciski z osobnym kółkiem na ikonę. Strona główna rozwija ten system jako operacyjny pulpit, bez starego żółtego panelu i dominującego logo. Logo i font pozyskano z oficjalnej strony AMG Trans 6 października 2026.
+Onest, grafit, ciepły pomarańcz `#ff8145`, jasne powierzchnie oraz zaokrąglone przyciski z osobnym kółkiem na ikonę. Publiczny ekran, aktywacja i strona główna tworzą jeden system bez starego żółtego panelu i dominującego logo. Logo i font pozyskano z oficjalnej strony AMG Trans 6 października 2026.
 
 Układ inspirowano rzeczywistymi widokami aktywnego i archiwalnego zlecenia po zalogowaniu 7 października 2026. W aktywnym zleceniu obejrzano mapę, szacunkowy postęp i dostawę, historię statusów, pojazd, punkty trasy oraz dokumenty dostępne jeszcze podczas transportu. Publiczny projekt odtwarza tę hierarchię na samodzielnie przygotowanych fikcyjnych rekordach. Ilustracja mapy, model danych i komponenty są propozycją interfejsu; nie stanowią potwierdzonego kontraktu API.
 
