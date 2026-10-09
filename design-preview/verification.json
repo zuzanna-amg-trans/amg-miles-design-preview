@@ -1,8 +1,9 @@
 {
-  "revision_date": "2026-10-08",
+  "revision_date": "2026-10-09",
   "scope": "Independent visual prototype; all sample records fictional",
-  "visual_direction": "Phone-specific order cards with side-by-side route points, full-width cargo and an ETA strip below; compact persistent order switching, expandable tools, readable invoice and reward cards",
+  "visual_direction": "Lighter AMG client dashboard with a graphite and warm-orange home hero, nearest-operation card, account summary and consistent operational order, invoice and reward views",
   "main_navigation": [
+    "Start",
     "Zlecenia",
     "Faktury",
     "Nagrody"
@@ -43,7 +44,7 @@
   "browser_verification": {
     "executor": "GitHub Actions only",
     "workflow": ".github/workflows/preview.yml",
-    "tests_per_run": 82,
+    "tests_per_run": 92,
     "viewports": [
       "desktop: 1280 x 900",
       "mobile: 390 x 844",
@@ -61,6 +62,20 @@
   "new_screenshots_published": false,
   "existing_documentary_images_preserved": true,
   "existing_documentary_images_describe_current_revision": false,
+  "home_dashboard": {
+    "entry_view": true,
+    "sections": [
+      "nearest_transport_operation",
+      "active_transport_count",
+      "unpaid_invoice_count",
+      "available_points",
+      "latest_unpaid_invoice",
+      "reward_goal_progress"
+    ],
+    "desktop_presentation": "Graphite AMG hero with an adjacent light operation card, followed by account summary and invoice and reward panels",
+    "mobile_presentation": "Single-column hero and operation card with four-item persistent bottom navigation",
+    "overview_alias": "Legacy #overview routes to the new home dashboard"
+  },
   "order_list": {
     "entry": "Full active order list, sorted by next unfinished operation",
     "status_groups": [
