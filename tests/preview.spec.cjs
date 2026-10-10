@@ -665,6 +665,8 @@ test('the five primary tabs remain available and rewards have their own subnavig
 
 test('the client centre combines the whole project and completes the missing service pages', async ({ page }) => {
   await page.goto('./#more');
+  await expect(page.locator('.service-nav')).toHaveCount(0);
+  await expect(page.locator('.service-trail')).toHaveCount(0);
   await expect(page.locator('.hub-flow-card')).toHaveCount(4);
   await expect(page.locator('.hub-service-card')).toHaveCount(4);
   await expect(page.locator('.hub-architecture')).toContainText('Program i aktywacja');
@@ -672,6 +674,9 @@ test('the client centre combines the whole project and completes the missing ser
 
   await page.locator('.hub-service-card[data-view="documents"]').click();
   await expect(page).toHaveURL(/#documents$/);
+  const serviceTrail = page.getByRole('navigation', { name: 'Ścieżka Centrum klienta', exact: true });
+  await expect(serviceTrail).toContainText('Więcej/Dokumenty');
+  await expect(page.locator('.service-nav')).toHaveCount(0);
   await expect(page.locator('.library-item')).toHaveCount(14);
   await page.locator('[data-action="document-filter"][data-id="transport"]').click();
   await expect(page.locator('.library-item')).toHaveCount(8);
@@ -685,21 +690,26 @@ test('the client centre combines the whole project and completes the missing ser
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.getByRole('button', { name: 'Zamknij okno', exact: true }).click();
 
-  await page.getByRole('navigation', { name: 'Centrum klienta', exact: true }).getByRole('button', { name: 'Powiadomienia', exact: true }).click();
+  await serviceTrail.getByRole('button', { name: 'Wróć do Centrum klienta', exact: true }).click();
+  await page.locator('.hub-service-card[data-view="notifications"]').click();
   await expect(page).toHaveURL(/#notifications$/);
+  await expect(page.getByRole('navigation', { name: 'Ścieżka Centrum klienta', exact: true })).toContainText('Więcej/Powiadomienia');
   await expect(page.locator('.notification-item')).toHaveCount(4);
   await expect(page.locator('.notification-item.unread')).toHaveCount(2);
   await page.getByRole('button', { name: 'Oznacz jako przeczytane', exact: true }).click();
   await expect(page.locator('.notification-item.unread')).toHaveCount(0);
 
   await navigate(page, 'more');
-  await page.getByRole('navigation', { name: 'Centrum klienta', exact: true }).getByRole('button', { name: 'Konto i firma', exact: true }).click();
+  await page.locator('.hub-service-card[data-view="account"]').click();
+  await expect(page.getByRole('navigation', { name: 'Ścieżka Centrum klienta', exact: true })).toContainText('Więcej/Konto i firma');
   const rewardSwitch = page.getByRole('switch', { name: /Punkty i nagrody/ });
   await expect(rewardSwitch).toHaveAttribute('aria-checked', 'false');
   await rewardSwitch.click();
   await expect(rewardSwitch).toHaveAttribute('aria-checked', 'true');
 
-  await page.getByRole('navigation', { name: 'Centrum klienta', exact: true }).getByRole('button', { name: 'Pomoc', exact: true }).click();
+  await page.getByRole('navigation', { name: 'Ścieżka Centrum klienta', exact: true }).getByRole('button', { name: 'Wróć do Centrum klienta', exact: true }).click();
+  await page.locator('.hub-service-card[data-view="help"]').click();
+  await expect(page.getByRole('navigation', { name: 'Ścieżka Centrum klienta', exact: true })).toContainText('Więcej/Pomoc');
   const faq = page.locator('.help-faq details').filter({ hasText: 'Gdzie znajdę CMR lub zdjęcie załadunku?' });
   await faq.locator('summary').click();
   await expect(faq).toHaveJSProperty('open', true);
