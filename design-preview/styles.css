@@ -455,6 +455,11 @@ dialog::backdrop { background:#13141677; backdrop-filter:blur(5px); }
   .step-dot { width:30px; height:30px; }
   .journey li:not(:last-child)::after { top:14px; left:31px; width:calc(100% - 35px); }
 }
+@media (max-width:1160px) and (min-width:761px) {
+  .header-inner { gap:18px; }
+  .header-points { display:none; }
+  .contact-button span { display:none; }
+}
 @media (max-width:1050px) and (min-width:761px) {
   .header-inner,.content { padding-left:25px; padding-right:25px; }
   .header-points { display:none; }
@@ -1848,6 +1853,7 @@ body { font-size:15px; }
   .account-entry { min-width:30px; }
   .service-nav { width:calc(100vw - 40px); margin-bottom:22px; padding:4px; border-radius:15px; }
   .service-nav button { min-height:44px; padding:8px 11px; border-radius:11px; font-size:10px; }
+  .page-head>.notification-read-all { width:100%; display:inline-flex; margin-top:7px; }
   .hub-page { gap:30px; }
   .hub-hero { display:block; min-height:0; padding:29px 19px 19px; border-radius:23px; }
   .hub-hero::before { background-size:36px 36px; }
