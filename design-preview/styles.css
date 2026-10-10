@@ -442,7 +442,7 @@ dialog::backdrop { background:#13141677; backdrop-filter:blur(5px); }
   .content { padding-top:27px; }
   .map-area { height:330px; }
 }
-@media (max-width:1250px) and (min-width:761px) {
+@media (max-width:1360px) and (min-width:761px) {
   .header-inner { gap:24px; }
   .header-actions { gap:14px; }
   .account-label { display:none; }
