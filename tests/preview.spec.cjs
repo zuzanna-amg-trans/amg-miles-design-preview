@@ -50,6 +50,11 @@ const views = [
   ['history', 'Historia punktów.', 'rewards'],
   ['claims', 'Moje nagrody.', 'rewards'],
   ['rules', 'Zasady programu.', 'rewards'],
+  ['more', 'Cały panel.Jeden widok.', 'more'],
+  ['documents', 'Dokumenty w jednym miejscu.', 'more'],
+  ['notifications', 'Powiadomienia.Bez chaosu.', 'more'],
+  ['account', 'Konto i firma.', 'more'],
+  ['help', 'Pomoc zawszepod ręką.', 'more'],
 ];
 
 for (const [view, heading, primaryView] of views) {
@@ -57,7 +62,7 @@ for (const [view, heading, primaryView] of views) {
     await page.goto(`./#${view}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(heading);
     await expect(page.locator('.preview-note')).toHaveText('Podgląd projektu · wszystkie dane są przykładowe');
-    await expect(page.locator('.primary-nav button')).toHaveCount(4);
+    await expect(page.locator('.primary-nav button')).toHaveCount(5);
     await expect(page.locator(`.primary-nav [data-view="${primaryView}"]`)).toHaveAttribute('aria-current', 'page');
     await page.evaluate(() => document.fonts.ready);
     await expect.poll(() => page.locator('.brand img').evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
@@ -71,8 +76,8 @@ for (const [view, heading, primaryView] of views) {
   });
 }
 
-test('the refreshed home is the entry view and leads to the nearest operation', async ({ page }) => {
-  await page.goto('./');
+test('the refreshed client home leads to the nearest operation', async ({ page }) => {
+  await page.goto('./#home');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dzień dobry, Firma przykładowa.');
   await expect(page.locator('.primary-nav [data-view="home"]')).toHaveAttribute('aria-current', 'page');
   await expect(page.locator('.home-summary .home-metric')).toHaveCount(3);
@@ -87,6 +92,53 @@ test('the refreshed home is the entry view and leads to the nearest operation', 
   await page.locator('.brand').click();
   await expect(page).toHaveURL(/#home$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dzień dobry, Firma przykładowa.');
+});
+
+test('the public entry explains Miles and fits every supported screen', async ({ page, isMobile }) => {
+  const sizes = isMobile ? [{ width: 319, height: 568 }, { width: 390, height: 844 }, { width: 844, height: 390 }] : [page.viewportSize()];
+  for (const size of sizes) {
+    await page.setViewportSize(size);
+    await page.goto('./');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twój transport.Twoje korzyści.');
+    await expect(page.getByRole('button', { name: 'Logowanie', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Wpisz kod aktywacyjny', exact: true }).first()).toBeVisible();
+    await expect(page.locator('.public-steps article')).toHaveCount(3);
+    await expect(page.locator('.public-benefit-list>div')).toHaveCount(3);
+    await expect(page.locator('.primary-nav')).toHaveCount(0);
+    await page.evaluate(() => document.fonts.ready);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), 'public entry has no horizontal scrolling').toBeLessThanOrEqual(size.width);
+    expect(await page.locator('.public-product-card,.public-mini-dashboard').evaluateAll(items => items.map(item => getComputedStyle(item).transform))).toEqual(['none', 'none']);
+    await expect.poll(() => page.locator('.public-brand img').first().evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
+  }
+});
+
+test('activation popup validates a six-digit demo code and restores focus', async ({ page }) => {
+  await page.goto('./');
+  const trigger = page.getByRole('button', { name: 'Wpisz kod aktywacyjny', exact: true }).first();
+  await trigger.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('heading', { name: 'Wpisz kod aktywacyjny.', exact: true })).toBeVisible();
+  const code = dialog.getByRole('textbox', { name: '6-cyfrowy kod', exact: true });
+  const submit = dialog.getByRole('button', { name: 'Aktywuj dostęp demo', exact: true });
+  await expect(code).toBeFocused();
+  await code.fill('12a34');
+  await expect(code).toHaveValue('1234');
+  await expect(dialog.locator('#activation-count')).toHaveText('4 / 6');
+  await expect(submit).toBeDisabled();
+  await dialog.getByRole('button', { name: 'Nie masz kodu?', exact: true }).click();
+  await expect(dialog.locator('#activation-help-copy')).toContainText('nie wysyła e-maili ani SMS-ów');
+  await page.keyboard.press('Escape');
+  await expect(dialog).not.toBeVisible();
+  await expect(trigger).toBeFocused();
+  await trigger.click();
+  await dialog.getByRole('textbox', { name: '6-cyfrowy kod', exact: true }).fill('654321');
+  await expect(dialog.locator('#activation-count')).toHaveText('6 / 6');
+  await expect(submit).toBeEnabled();
+  await submit.click();
+  await expect(dialog).not.toBeVisible();
+  await expect(page).toHaveURL(/#home$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dzień dobry, Firma przykładowa.');
+  await expect(page.getByRole('status')).toContainText('otwarto konto demonstracyjne');
 });
 
 test('order filters and search keep their combined scope', async ({ page }) => {
@@ -587,9 +639,9 @@ test('reward categories, detail and temporary goal selection', async ({ page }) 
   await expect(cards.filter({ hasText: 'Słuchawki bezprzewodowe' }).locator('.goal-label')).toHaveText('Twój cel');
 });
 
-test('the four primary tabs remain available and rewards have their own subnavigation', async ({ page }) => {
-  await page.goto('./');
-  for (const view of ['home', 'orders', 'invoices', 'rewards']) {
+test('the five primary tabs remain available and rewards have their own subnavigation', async ({ page }) => {
+  await page.goto('./#home');
+  for (const view of ['home', 'orders', 'invoices', 'rewards', 'more']) {
     const tab = page.locator(`.primary-nav [data-view="${view}"]`);
     await expect(tab).toBeVisible();
     await navigate(page, view);
@@ -609,6 +661,49 @@ test('the four primary tabs remain available and rewards have their own subnavig
   await page.getByRole('button', { name: 'Przejdź do katalogu', exact: true }).click();
   await expect(page.locator('.reward-card')).toHaveCount(6);
   await expect(page.locator('.primary-nav [data-view="rewards"]')).toHaveAttribute('aria-current', 'page');
+});
+
+test('the client centre combines the whole project and completes the missing service pages', async ({ page }) => {
+  await page.goto('./#more');
+  await expect(page.locator('.hub-flow-card')).toHaveCount(4);
+  await expect(page.locator('.hub-service-card')).toHaveCount(4);
+  await expect(page.locator('.hub-architecture')).toContainText('Program i aktywacja');
+  await expect(page.locator('.hub-architecture')).toContainText('Dokumenty · Konto · Pomoc');
+
+  await page.locator('.hub-service-card[data-view="documents"]').click();
+  await expect(page).toHaveURL(/#documents$/);
+  await expect(page.locator('.library-item')).toHaveCount(14);
+  await page.locator('[data-action="document-filter"][data-id="transport"]').click();
+  await expect(page.locator('.library-item')).toHaveCount(8);
+  const search = page.getByRole('searchbox', { name: 'Szukaj dokumentu', exact: true });
+  await search.fill('AMG-DEMO-01');
+  await expect(page.locator('.library-item')).toHaveCount(2);
+  await search.fill('');
+  await page.locator('[data-action="document-filter"][data-id="invoice"]').click();
+  await expect(page.locator('.library-item')).toHaveCount(6);
+  await page.locator('.library-item').first().getByRole('button').click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.getByRole('button', { name: 'Zamknij okno', exact: true }).click();
+
+  await page.getByRole('navigation', { name: 'Centrum klienta', exact: true }).getByRole('button', { name: 'Powiadomienia', exact: true }).click();
+  await expect(page).toHaveURL(/#notifications$/);
+  await expect(page.locator('.notification-item')).toHaveCount(4);
+  await expect(page.locator('.notification-item.unread')).toHaveCount(2);
+  await page.getByRole('button', { name: 'Oznacz jako przeczytane', exact: true }).click();
+  await expect(page.locator('.notification-item.unread')).toHaveCount(0);
+
+  await navigate(page, 'more');
+  await page.getByRole('navigation', { name: 'Centrum klienta', exact: true }).getByRole('button', { name: 'Konto i firma', exact: true }).click();
+  const rewardSwitch = page.getByRole('switch', { name: /Punkty i nagrody/ });
+  await expect(rewardSwitch).toHaveAttribute('aria-checked', 'false');
+  await rewardSwitch.click();
+  await expect(rewardSwitch).toHaveAttribute('aria-checked', 'true');
+
+  await page.getByRole('navigation', { name: 'Centrum klienta', exact: true }).getByRole('button', { name: 'Pomoc', exact: true }).click();
+  const faq = page.locator('.help-faq details').filter({ hasText: 'Gdzie znajdę CMR lub zdjęcie załadunku?' });
+  await faq.locator('summary').click();
+  await expect(faq).toHaveJSProperty('open', true);
+  await expect(faq).toContainText('bibliotece Dokumenty');
 });
 
 test('the keyboard skip link focuses content without changing the route', async ({ page }) => {
