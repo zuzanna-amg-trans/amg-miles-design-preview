@@ -33,7 +33,11 @@ Pełne testy przeglądarkowe wykonuje GitHub Actions przez pull request. Po inte
 - Rozwijane szczegóły auta, ładunku i punktów trasy, w tym demonstracyjny punkt pośredni.
 - Faktury z filtrowaniem, wyszukiwaniem i szczegółami. Na telefonie każdy wiersz jest czytelnym blokiem z podpisami, bez przewijania tabeli w poziomie.
 - Katalog nagród, demonstracyjny wybór celu, historia punktów, moje nagrody i zasady programu. Na telefonie nagrody mają szerokie karty z ilustracją i danymi obok; przyciski do dotyku mają co najmniej 44 px, a wyszukiwarki tekst 16 px.
-- Kontakt, okna szczegółów i obsługa klawiaturą. Na komputerze cztery zakładki są w górnym pasku, na telefonie — w stałej nawigacji dolnej. Na telefonie najpierw widać dane bieżącej i następnej/poprzedniej operacji, potem mapę. Lista zleceń pozostaje dostępna podczas przewijania szczegółów.
+- „Więcej” jako wspólny, interaktywny widok całego projektu: cztery główne obszary panelu, skróty do nowych stron zaplecza i liniowa mapa przepływu od programu i aktywacji po obsługę konta.
+- Biblioteka Dokumenty łączy demonstracyjne CMR, zdjęcia załadunku i faktury. Ma filtry Transport/Faktury, wyszukiwanie po nazwie i numerze oraz te same podglądy szczegółów co zlecenia i rozliczenia.
+- Centrum Powiadomienia pokazuje fikcyjne zmiany ETA, nowe dokumenty, terminy faktur i przyznane punkty. Filtry i stan odczytania działają tylko do przeładowania karty; podgląd niczego nie wysyła.
+- Konto i firma zawiera fikcyjny profil organizacji, projekt preferencji informacji oraz jawny stan demonstracyjny. Pomoc i kontakt łączy skróty tematyczne, FAQ oraz istniejący podgląd kontaktu z AMG bez formularza wysyłającego dane.
+- Kontakt, okna szczegółów i obsługa klawiaturą. Na komputerze pięć zakładek jest w górnym pasku, na telefonie — w stałej nawigacji dolnej. Na telefonie najpierw widać dane bieżącej i następnej/poprzedniej operacji, potem mapę. Lista zleceń pozostaje dostępna podczas przewijania szczegółów.
 
 Wszystkie rekordy w `demoSource` są fikcyjne. Publiczny kod, ilustracje i zrzuty ekranu nie zawierają danych z zalogowanego konta Miles. Prototyp nie uwierzytelnia użytkowników, nie zapisuje ani nie przesyła kodów aktywacyjnych, nie pobiera GPS, nie przelicza rzeczywistych rozliczeń, nie wysyła wiadomości ani nie zamawia nagród. Zapis celu pozostaje w pamięci bieżącej karty i znika po przeładowaniu.
 

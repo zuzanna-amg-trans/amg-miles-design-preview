@@ -6,7 +6,8 @@
     "Start",
     "Zlecenia",
     "Faktury",
-    "Nagrody"
+    "Nagrody",
+    "Więcej"
   ],
   "production_reference": {
     "active_order_ui_viewed": true,
@@ -44,7 +45,7 @@
   "browser_verification": {
     "executor": "GitHub Actions only",
     "workflow": ".github/workflows/preview.yml",
-    "tests_per_run": 98,
+    "tests_per_run": 110,
     "viewports": [
       "desktop: 1280 x 900",
       "mobile: 390 x 844",
@@ -95,8 +96,24 @@
       "reward_goal_progress"
     ],
     "desktop_presentation": "Graphite AMG hero with an adjacent light operation card, followed by account summary and invoice and reward panels",
-    "mobile_presentation": "Single-column hero and operation card with four-item persistent bottom navigation",
+    "mobile_presentation": "Single-column hero and operation card with five-item persistent bottom navigation",
     "overview_alias": "Legacy #overview routes to the new home dashboard"
+  },
+  "client_center": {
+    "overview": "One interactive map of the full client panel, linking every existing core flow and the completed account-service pages",
+    "service_navigation": [
+      "Centrum",
+      "Dokumenty",
+      "Powiadomienia",
+      "Konto i firma",
+      "Pomoc"
+    ],
+    "document_library": "Combined fictional CMR, loading photos and invoice records with filtering and search",
+    "notification_center": "Fictional transport, document, invoice and reward notices with local read state",
+    "account_page": "Fictional company profile, local-only information preferences and demo exit",
+    "help_page": "Topic shortcuts, FAQ and existing AMG contact preview without message sending",
+    "backend_connected": false,
+    "local_state_persisted": false
   },
   "order_list": {
     "entry": "Full active order list, sorted by next unfinished operation",
