@@ -33,7 +33,7 @@ Pełne testy przeglądarkowe wykonuje GitHub Actions przez pull request. Po inte
 - Rozwijane szczegóły auta, ładunku i punktów trasy, w tym demonstracyjny punkt pośredni.
 - Faktury z filtrowaniem, wyszukiwaniem i szczegółami. Na telefonie każdy wiersz jest czytelnym blokiem z podpisami, bez przewijania tabeli w poziomie.
 - Katalog nagród, demonstracyjny wybór celu, historia punktów, moje nagrody i zasady programu. Na telefonie nagrody mają szerokie karty z ilustracją i danymi obok; przyciski do dotyku mają co najmniej 44 px, a wyszukiwarki tekst 16 px.
-- Główna nawigacja ma cztery docelowe pozycje: Start, Zlecenia, Faktury i Nagrody. Zakładka „Więcej”, mapa projektu i dodatkowy breadcrumb zostały usunięte. Powiadomienia otwiera dzwonek, Konto i firma — profil organizacji, a Pomoc — przycisk w nagłówku.
+- Główna nawigacja ma cztery docelowe pozycje: Start, Zlecenia, Faktury i Nagrody. Zakładka „Więcej”, mapa projektu i dodatkowy breadcrumb zostały usunięte. Powiadomienia otwiera dzwonek, Konto i firma — profil organizacji, a Pomoc — odnośnik w stopce; przycisk w nagłówku zachowuje szybki kontakt z AMG.
 - Biblioteka Dokumenty łączy demonstracyjne CMR, zdjęcia załadunku i faktury. Ma filtry Transport/Faktury, wyszukiwanie po nazwie i numerze oraz te same podglądy szczegółów co zlecenia i rozliczenia.
 - Centrum Powiadomienia pokazuje fikcyjne zmiany ETA, nowe dokumenty, terminy faktur i przyznane punkty. Filtry i stan odczytania działają tylko do przeładowania karty; podgląd niczego nie wysyła.
 - Konto i firma zawiera fikcyjny profil organizacji, projekt preferencji informacji oraz jawny stan demonstracyjny. Pomoc i kontakt łączy skróty tematyczne, FAQ oraz istniejący podgląd kontaktu z AMG bez formularza wysyłającego dane.

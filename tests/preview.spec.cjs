@@ -709,7 +709,7 @@ test('account services remain reachable without a duplicated more menu', async (
   await rewardSwitch.click();
   await expect(rewardSwitch).toHaveAttribute('aria-checked', 'true');
 
-  await page.locator('.contact-button').click();
+  await page.locator('.page-footer').getByRole('button', { name: 'Pomoc', exact: true }).click();
   await expect(page).toHaveURL(/#help$/);
   await expect(page.locator('.service-trail')).toHaveCount(0);
   const faq = page.locator('.help-faq details').filter({ hasText: 'Gdzie znajdę CMR lub zdjęcie załadunku?' });
@@ -1106,7 +1106,8 @@ test('all views fit small portrait and landscape phones, with readable invoice a
       await page.goto('./#' + view);
       await page.evaluate(() => document.fonts.ready);
       expect(await page.evaluate(() => document.documentElement.scrollWidth), view + ': no horizontal page scrolling').toBeLessThanOrEqual(size.width);
-      await expect(page.locator('.primary-nav [aria-current="page"]')).toBeVisible();
+      if (['documents', 'notifications', 'account', 'help'].includes(view)) await expect(page.locator('.primary-nav [aria-current="page"]')).toHaveCount(0);
+      else await expect(page.locator('.primary-nav [aria-current="page"]')).toBeVisible();
       if (isMobile) expect((await page.locator('.contact-button').boundingBox()).height).toBeGreaterThanOrEqual(44);
       if (view === 'orders' && size.width <= 760) {
         const promo = page.locator('.miles-strip');

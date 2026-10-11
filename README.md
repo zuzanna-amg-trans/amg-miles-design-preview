@@ -8,7 +8,7 @@ Przed wejściem do panelu publiczny ekran wyjaśnia program, ale nie pokazuje na
 
 Po wejściu główne zakładki to **Start, Zlecenia, Faktury i Nagrody**. Zbędna zakładka „Więcej” oraz mapa całego projektu zostały usunięte. Nowy ekran startowy pokazuje najbliższą operację transportową, liczbę aktywnych zleceń, faktury do opłacenia, saldo punktów, ostatnią fakturę do opłacenia i postęp do wybranej nagrody. Każdy blok prowadzi bezpośrednio do właściwej części panelu.
 
-Biblioteka dokumentów, powiadomienia, Konto i firma oraz Pomoc pozostają chronionymi podstronami uruchamianymi z właściwego kontekstu panelu: zlecenia, dzwonka, profilu firmy i przycisku Pomoc. Filtry, wyszukiwanie, odczytywanie powiadomień i przełączniki preferencji działają lokalnie w karcie przeglądarki; nic nie jest zapisywane ani wysyłane.
+Biblioteka dokumentów, powiadomienia, Konto i firma oraz Pomoc pozostają chronionymi podstronami uruchamianymi z właściwego kontekstu panelu: zlecenia, dzwonka, profilu firmy i stopki. Filtry, wyszukiwanie, odczytywanie powiadomień i przełączniki preferencji działają lokalnie w karcie przeglądarki; nic nie jest zapisywane ani wysyłane.
 
 Widok Zlecenia pokazuje „Dzień dobry!” i nazwę firmy oraz pełną listę aktywnych transportów, uporządkowaną według najbliższej niewykonanej operacji: załadunku albo rozładunku. Filtry „W realizacji”, „Zakończone” i „Wszystkie” oraz wyszukiwanie pozostają nad listą.
 
