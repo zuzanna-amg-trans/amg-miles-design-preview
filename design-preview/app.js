@@ -1,6 +1,7 @@
 /* Independent visual prototype. All records below are fictional.
  * Replace demoSource with the dev project's actual data layer once its API is known.
- * This prototype does not authenticate, settle invoices, send mail, or order rewards.
+ * The access screen gates demo UI only; it does not provide real authentication.
+ * This prototype does not settle invoices, send mail, or order rewards.
  */
 'use strict';
 
@@ -83,8 +84,11 @@ const demoSource = {
   ],
 };
 
-const VIEWS = {welcome:'AMG Miles',home:'Strona główna',orders:'Zlecenia',tracking:'Podgląd zlecenia',invoices:'Faktury',rewards:'Nagrody',history:'Historia punktów',claims:'Moje nagrody',rules:'Zasady programu',more:'Centrum klienta',documents:'Dokumenty',notifications:'Powiadomienia',account:'Konto i firma',help:'Pomoc i kontakt'};
-let state = {view:'welcome',orderStatus:'active',orderSearch:'',orderToolsOpen:false,selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones',mapZoom:1,expandedOrder:null,documentType:'all',documentSearch:'',notificationCategory:'all',readNotifications:new Set(),notificationPreferences:{transport:true,documents:true,invoices:true,rewards:false}};
+const ACCESS_SESSION_KEY='amg-miles-demo-access';
+const DEMO_ACCESS={email:'demo@przyklad.pl',code:'248506'};
+const VIEWS = {welcome:'AMG Miles',access:'Dostęp do panelu',home:'Strona główna',orders:'Zlecenia',tracking:'Podgląd zlecenia',invoices:'Faktury',rewards:'Nagrody',history:'Historia punktów',claims:'Moje nagrody',rules:'Zasady programu',documents:'Dokumenty',notifications:'Powiadomienia',account:'Konto i firma',help:'Pomoc i kontakt'};
+const PUBLIC_VIEWS=new Set(['welcome','access']);
+let state = {view:'welcome',authenticated:sessionStorage.getItem(ACCESS_SESSION_KEY)==='active',pendingRoute:'home',orderStatus:'active',orderSearch:'',orderToolsOpen:false,selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones',mapZoom:1,expandedOrder:null,documentType:'all',documentSearch:'',notificationCategory:'all',readNotifications:new Set(),notificationPreferences:{transport:true,documents:true,invoices:true,rewards:false}};
 let toastTimer;
 let modalTrigger;
 let orderReturnEntry='gps';
@@ -110,8 +114,8 @@ function publicShell() {
   document.getElementById('app').innerHTML=`<div class="public-shell">
     <header class="public-topbar"><div class="public-header-inner">
       <button class="brand public-brand" data-action="public-scroll" data-id="public-start" aria-label="AMG Miles — początek strony"><img src="assets/amg-logo-white.webp" alt="AMG European Transport"><span class="brand-word">miles<em>.</em></span></button>
-      <nav class="public-nav" aria-label="Nawigacja strony programu"><button data-action="public-scroll" data-id="public-how">Jak działa</button><button data-action="public-scroll" data-id="public-benefits">Korzyści</button><button data-action="public-scroll" data-id="public-preview">Panel klienta</button></nav>
-      <button class="public-login" data-action="open-activation" aria-label="Logowanie">${icon('shield')}<span>Logowanie</span></button>
+      <nav class="public-nav" aria-label="Nawigacja strony programu"><button data-action="public-scroll" data-id="public-how">Jak działa</button><button data-action="public-scroll" data-id="public-benefits">Korzyści</button><button data-action="public-scroll" data-id="public-access">Dostęp</button></nav>
+      <button class="public-login" data-view="access" aria-label="Logowanie">${icon('shield')}<span>Logowanie</span></button>
     </div></header>
     <main id="main-content" class="public-main" tabindex="-1">
       <section class="public-hero" id="public-start" aria-labelledby="public-title">
@@ -119,16 +123,13 @@ function publicShell() {
           <div class="public-kicker"><span></span>Program dla klientów AMG Trans</div>
           <h1 id="public-title">Twój transport.<br><em>Twoje korzyści.</em></h1>
           <p>AMG Miles łączy informacje o realizowanych transportach, rozliczeniach i nagrodach w jednym, przejrzystym panelu.</p>
-          <div class="public-hero-actions">${button('Wpisz kod aktywacyjny','open-activation','primary')}<button class="public-text-link" data-action="public-scroll" data-id="public-how">Zobacz, jak działa ${icon('down')}</button></div>
-          <p class="public-demo-note">${icon('info')} Podgląd projektu — bez prawdziwego logowania i danych klientów.</p>
+          <div class="public-hero-actions"><button class="button button-primary" data-view="access"><span>Przejdź do logowania</span><span class="button-circle">${icon('arrow')}</span></button><button class="public-text-link" data-action="public-scroll" data-id="public-how">Zobacz, jak działa ${icon('down')}</button></div>
+          <p class="public-demo-note">${icon('info')} Panel i dane przykładowej firmy są dostępne dopiero po wejściu do demonstracyjnej sesji.</p>
         </div>
-        <div class="public-product-card" aria-label="Przykładowe podsumowanie programu AMG Miles">
-          <div class="public-card-head"><span>AMG Miles</span><span class="public-live-dot">Panel klienta</span></div>
-          <div class="public-points-label">Dostępne punkty · demo</div>
-          <strong class="public-points">24 850 <small>pkt</small></strong>
-          <div class="public-card-progress"><span style="--progress:83%"></span></div>
-          <div class="public-card-goal"><span>${icon('gift')} Cel nagrody</span><strong>83%</strong></div>
-          <div class="public-transport"><span class="public-transport-icon">${icon('truck')}</span><span><small>Transport w realizacji</small><strong>NL 3011 AA <i>${icon('right')}</i> PL 50-001</strong><em>Najbliższa operacja · 10:00</em></span></div>
+        <div class="public-access-card" aria-label="Bezpieczny dostęp do panelu AMG Miles">
+          <span class="public-access-lock">${icon('shield')}</span>
+          <div><small>Dostęp do panelu</small><h2>Najpierw logowanie.<br><em>Potem dane firmy.</em></h2><p>Strona publiczna nie pokazuje nazwy firmy, zleceń, faktur, dokumentów ani salda punktów.</p></div>
+          <ul><li>${icon('check')} Weryfikacja dostępu</li><li>${icon('check')} Sesja przypisana do użytkownika</li><li>${icon('check')} Dane tylko właściwej firmy</li></ul>
         </div>
       </section>
 
@@ -142,30 +143,54 @@ function publicShell() {
       </section>
 
       <section class="public-benefits" id="public-benefits" aria-labelledby="public-benefits-title">
-        <div><span class="public-kicker dark"><span></span>Korzyści programu</span><h2 id="public-benefits-title">Dobra współpraca<br><em>jedzie dalej.</em></h2><p>Każda opłacona faktura przybliża Cię do kolejnej nagrody, a szybsza płatność może oznaczać więcej punktów.</p><button class="public-text-link dark" data-action="open-activation">Aktywuj dostęp ${icon('arrow')}</button></div>
+        <div><span class="public-kicker dark"><span></span>Korzyści programu</span><h2 id="public-benefits-title">Dobra współpraca<br><em>jedzie dalej.</em></h2><p>Każda opłacona faktura przybliża Cię do kolejnej nagrody, a szybsza płatność może oznaczać więcej punktów.</p><button class="public-text-link dark" data-view="access">Zaloguj się ${icon('arrow')}</button></div>
         <div class="public-benefit-list"><div><strong>5 pkt</strong><span>za każde 1 EUR netto opłaconej faktury</span></div><div><strong>+100%</strong><span>przykładowego bonusu za szybką płatność</span></div><div><strong>12 mies.</strong><span>ważności przyznanych punktów</span></div></div>
       </section>
 
-      <section class="public-panel-preview" id="public-preview" aria-labelledby="public-preview-title">
-        <div class="public-preview-copy"><span>Panel klienta</span><h2 id="public-preview-title">Najważniejsze informacje<br><em>bez szukania.</em></h2><p>Nowy ekran startowy prowadzi od razu do transportu, faktur i nagród. Układ pozostaje czytelny także na telefonie.</p><button class="button button-dark" data-action="open-activation"><span>Przejdź do aktywacji</span><span class="button-circle">${icon('arrow')}</span></button></div>
-        <div class="public-mini-dashboard" aria-hidden="true"><div class="public-mini-bar"><span></span><span></span><span></span></div><div class="public-mini-hero"><div><small>Panel klienta</small><strong>Wszystko na trasie.</strong><span></span><span></span></div><aside><small>Najbliższa operacja</small><strong>10:00</strong><span>NL → PL</span></aside></div><div class="public-mini-metrics"><span></span><span></span><span></span></div></div>
+      <section class="public-access-preview" id="public-access" aria-labelledby="public-access-title">
+        <div><span class="public-kicker dark"><span></span>Dostęp do AMG Miles</span><h2 id="public-access-title">Panel zaczyna się<br><em>po zalogowaniu.</em></h2><p>Po potwierdzeniu tożsamości system może pobrać wyłącznie dane przypisane do firmy i uprawnień użytkownika. Ten publiczny prototyp nie łączy się z prawdziwym backendem.</p></div>
+        <div class="public-access-steps"><article><strong>01</strong><span>Zaloguj się lub użyj kodu jednorazowego.</span></article><article><strong>02</strong><span>Backend sprawdza konto, firmę i zakres uprawnień.</span></article><article><strong>03</strong><span>Dopiero wtedy otwiera się prywatny panel klienta.</span></article><button class="button button-dark" data-view="access"><span>Otwórz dostęp demo</span><span class="button-circle">${icon('arrow')}</span></button></div>
       </section>
     </main>
     <footer class="public-footer"><div><button class="brand public-brand" data-action="public-scroll" data-id="public-start" aria-label="AMG Miles — początek strony"><img src="assets/amg-logo-white.webp" alt=""><span class="brand-word">miles<em>.</em></span></button><p>Program korzyści i panel klienta AMG Trans.</p></div><div><span>© 2026 AMG Trans</span><button data-action="about-preview">O podglądzie</button></div></footer>
   </div>`;
-  document.title='AMG Miles · aktywacja i panel klienta — podgląd';
+  document.title='AMG Miles · program i dostęp do panelu — podgląd';
+}
+
+function accessShell() {
+  document.getElementById('app').innerHTML=`<div class="access-shell">
+    <header class="access-topbar"><div class="access-header-inner"><button class="brand public-brand" data-view="welcome" aria-label="AMG Miles — wróć do strony publicznej"><img src="assets/amg-logo-white.webp" alt="AMG European Transport"><span class="brand-word">miles<em>.</em></span></button><button class="access-back" data-view="welcome">${icon('left')}<span>Wróć do strony programu</span></button></div></header>
+    <main id="main-content" class="access-main" tabindex="-1">
+      <section class="access-intro" aria-labelledby="access-title"><div class="public-kicker"><span></span>Dostęp klienta AMG Trans</div><h1 id="access-title">Zaloguj się<br><em>do AMG Miles.</em></h1><p>Po potwierdzeniu dostępu otworzymy panel firmy. Zlecenia, dokumenty, faktury i punkty nie są pokazywane na stronie publicznej.</p><div class="access-assurances"><span>${icon('shield')} Dane po stronie chronionego backendu</span><span>${icon('user')} Uprawnienia przypisane do firmy</span><span>${icon('clock')} Sesja wygasa po zakończeniu pracy</span></div></section>
+      <section class="access-form-card" aria-labelledby="access-form-title">
+        <div class="access-form-heading"><span class="access-form-icon">${icon('shield')}</span><div><small>Podgląd dostępu</small><h2 id="access-form-title">Wejdź do konta demo</h2><p>Użyj wyłącznie poniższych danych demonstracyjnych.</p></div></div>
+        <form id="access-form" novalidate>
+          <label class="access-field" for="access-email"><span>E-mail demonstracyjny</span><input id="access-email" name="access-email" type="email" autocomplete="username" spellcheck="false" aria-label="E-mail demonstracyjny" aria-describedby="access-demo-data access-error" placeholder="demo@przyklad.pl"></label>
+          <label class="access-field" for="access-code"><span>6-cyfrowy kod dostępu</span><span class="access-code-wrap"><input id="access-code" name="access-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" aria-label="6-cyfrowy kod dostępu" aria-describedby="access-demo-data access-error" placeholder="••••••"><small id="access-count">0 / 6</small></span></label>
+          <div id="access-demo-data" class="access-demo-data"><span>${icon('info')}</span><p><strong>Dane do podglądu</strong><button type="button" data-action="fill-demo-access">demo@przyklad.pl · 248506</button></p></div>
+          <p id="access-error" class="activation-error" role="alert" hidden>Dane nie pasują do konta demonstracyjnego.</p>
+          <button type="submit" class="button button-primary access-submit" disabled><span>Otwórz panel demonstracyjny</span><span class="button-circle">${icon('arrow')}</span></button>
+        </form>
+        <p class="access-technical-note">To bramka interfejsu, nie produkcyjne uwierzytelnianie. Dane nie są wysyłane ani porównywane z Super Spedytorem.</p>
+      </section>
+    </main>
+    <footer class="access-footer"><span>© 2026 AMG Trans</span><span>Podgląd projektu · bez prawdziwych danych klientów</span></footer>
+  </div>`;
+  document.title='Logowanie · AMG Miles — podgląd';
+  requestAnimationFrame(()=>document.getElementById('access-email')?.focus());
 }
 
 
 function shell() {
   if(state.view==='welcome'){publicShell();return;}
-  const active=['orders','tracking'].includes(state.view)?'orders':state.view==='invoices'?'invoices':['rewards','history','claims','rules'].includes(state.view)?'rewards':['more','documents','notifications','account','help'].includes(state.view)?'more':'home';
+  if(state.view==='access'){accessShell();return;}
+  const active=['orders','tracking'].includes(state.view)?'orders':state.view==='invoices'?'invoices':['rewards','history','claims','rules'].includes(state.view)?'rewards':state.view==='home'?'home':'';
   const navItem=(view,name,ic)=>`<button class="nav-item ${active===view?'active':''}" data-view="${view}" ${active===view?'aria-current="page"':''}>${icon(ic)}<span>${name}</span></button>`;
   document.getElementById('app').innerHTML=`<div class="shell ${state.view==='orders'&&state.expandedOrder?'has-tracking':''}">
     <header class="topbar"><div class="header-inner">
       <button class="brand" data-view="home" aria-label="AMG Miles — strona główna"><img src="assets/amg-logo-white.webp" alt="AMG European Transport"><span class="brand-word">miles<em>.</em></span></button>
-      <nav class="primary-nav" aria-label="Nawigacja panelu">${navItem('home','Start','grid')}${navItem('orders','Zlecenia','truck')}${navItem('invoices','Faktury','invoice')}${navItem('rewards','Nagrody','gift')}${navItem('more','Więcej','menu')}</nav>
-      <div class="header-actions"><button class="header-points" data-action="open-balance" aria-label="Twoje punkty demonstracyjne: ${number(demoSource.balance.available)}">${icon('spark')}<strong>${number(demoSource.balance.available)}</strong><span>pkt</span></button><button class="contact-button" data-action="contact" aria-label="Kontakt z AMG">${icon('support')}<span>Kontakt z AMG</span></button><span class="header-separator"></span><button class="account-entry" data-view="account" aria-label="Konto i firma — ${esc(demoSource.customer.companyName)}"><span class="account-label"><strong>${esc(demoSource.customer.companyName)}</strong><span>Konto demonstracyjne</span></span><span class="avatar" aria-hidden="true">FP</span></button></div>
+      <nav class="primary-nav" aria-label="Nawigacja panelu">${navItem('home','Start','grid')}${navItem('orders','Zlecenia','truck')}${navItem('invoices','Faktury','invoice')}${navItem('rewards','Nagrody','gift')}</nav>
+      <div class="header-actions"><button class="header-notifications" data-view="notifications" aria-label="Powiadomienia">${icon('bell')}</button><button class="header-points" data-action="open-balance" aria-label="Twoje punkty demonstracyjne: ${number(demoSource.balance.available)}">${icon('spark')}<strong>${number(demoSource.balance.available)}</strong><span>pkt</span></button><button class="contact-button" data-view="help" aria-label="Pomoc i kontakt">${icon('support')}<span>Pomoc</span></button><span class="header-separator"></span><button class="account-entry" data-view="account" aria-label="Konto i firma — ${esc(demoSource.customer.companyName)}"><span class="account-label"><strong>${esc(demoSource.customer.companyName)}</strong><span>Konto demonstracyjne</span></span><span class="avatar" aria-hidden="true">FP</span></button></div>
     </div></header>
     <main class="content ${state.view==='orders'?'orders-content':state.view==='home'?'home-content':''}" id="main-content" tabindex="-1"><div class="preview-note">Podgląd projektu <span>·</span> wszystkie dane są przykładowe</div><div class="view">${renderView()}</div><footer class="page-footer"><span>© 2026 AMG Trans</span><div><button data-view="rules">Zasady AMG Miles</button><button data-action="about-preview">O podglądzie ${icon('arrow')}</button></div></footer></main>
   </div>`;
@@ -451,10 +476,6 @@ function rulesView() {
   <div class="rule-layout"><div><section class="card rule-detail"><h2>${icon('invoice')} Punkty za współpracę</h2><p>Za każde 1 euro netto z opłaconej faktury otrzymujesz 5 punktów AMG Miles.</p><div class="formula"><b>1 <span>EUR</span></b><span>=</span><b>5 <span>PKT</span></b></div></section><section class="card rule-detail"><h2>${icon('bolt')} Szybsza płatność, większy bonus</h2><p>Zasady wyświetlane na aktualnej stronie programu:</p><div class="bonus-row"><span>Płatność do 10 dni od wystawienia</span><strong>+100%</strong></div><div class="bonus-row"><span>Płatność do połowy terminu</span><strong>+30%</strong></div><div class="bonus-row"><span>Punkty bazowe za płatność</span><strong>5 pkt / EUR</strong></div></section><section class="card rule-detail"><h2>${icon('calendar')} Czas na Twoje korzyści</h2><p>Punkty są ważne przez 12 miesięcy od daty przyznania. Datę wygaśnięcia zobaczysz w swoim panelu.</p></section></div><section class="card faq"><h2>Wszystko jasne?</h2><details open><summary>Kiedy pojawią się moje punkty?</summary><p>Po zarejestrowaniu płatności za fakturę w systemie. Punkty są przyznawane automatycznie.</p></details><details><summary>Jak wymienić punkty na nagrody?</summary><p>Zaloguj się, otwórz katalog nagród i wybierz nagrodę. Ten podgląd pozwala obejrzeć interfejs i ustawić przykładowy cel.</p></details><details><summary>Ile trwa realizacja nagrody?</summary><p>Aktualna strona programu podaje zwykle do 14 dni. Docelowy status realizacji będzie pochodził z backendu.</p></details><details><summary>Co oznaczają dane demo?</summary><p>Kwoty, faktury, saldo i katalog w tym projekcie służą wyłącznie do oceny wyglądu. Nie są rzeczywistymi danymi Twojej firmy.</p></details><div style="margin-top:20px">${button('Porozmawiajmy','contact','secondary')}</div></section></div>`;
 }
 
-function serviceTrail(current) {
-  return `<nav class="service-trail" aria-label="Ścieżka Centrum klienta"><button data-view="more" aria-label="Wróć do Centrum klienta">${icon('left')}<span>Więcej</span></button><span class="service-trail-separator" aria-hidden="true">/</span><strong aria-current="page">${current}</strong></nav>`;
-}
-
 function documentRecords() {
   const orderDocuments=demoSource.orders.flatMap(order=>order.documents.map((document,index)=>({
     id:`${order.id}-${index}`,
@@ -479,30 +500,6 @@ function documentRecords() {
   return [...orderDocuments,...invoices];
 }
 
-function moreView() {
-  const documents=documentRecords();
-  const unread=demoSource.notifications.filter(item=>item.unread&&!state.readNotifications.has(item.id)).length;
-  return `<section class="hub-page" aria-labelledby="hub-title">
-    <section class="hub-hero">
-      <div class="hub-hero-copy"><div class="home-kicker"><span class="home-kicker-dot"></span>Pełny panel klienta</div><h1 id="hub-title">Cały panel.<br><em>Jeden widok.</em></h1><p>Transporty, rozliczenia, korzyści i obsługa konta tworzą jeden spójny przepływ. Poniżej masz mapę wszystkich przygotowanych ekranów.</p><div class="hub-hero-actions"><button class="button button-primary" data-view="orders"><span>Przejdź do zleceń</span><span class="button-circle">${icon('arrow')}</span></button><button class="hub-text-link" data-view="help">Potrzebuję pomocy ${icon('arrow')}</button></div></div>
-      <div class="hub-pulse" aria-label="Podsumowanie konta demonstracyjnego"><span class="hub-pulse-kicker">Dzisiaj w AMG Miles</span><div><strong>${demoSource.orders.filter(order=>order.active).length}</strong><span>aktywne<br>transporty</span></div><div><strong>${demoSource.invoices.filter(invoice=>invoice.status==='unpaid').length}</strong><span>faktury<br>do opłacenia</span></div><div><strong>${unread}</strong><span>nowe<br>powiadomienia</span></div></div>
-    </section>
-    <section class="hub-current" aria-labelledby="hub-current-title"><div class="section-heading"><div><span>Gotowe obszary</span><h2 id="hub-current-title">Główna ścieżka klienta</h2></div><p>Każdy kafel prowadzi do działającego widoku prototypu.</p></div><div class="hub-current-grid">
-      <button class="hub-flow-card" data-view="home"><span class="hub-card-number">01</span><span class="hub-card-icon">${icon('grid')}</span><strong>Start</strong><small>Najbliższa operacja i skrót całego konta</small>${icon('arrow')}</button>
-      <button class="hub-flow-card" data-view="orders"><span class="hub-card-number">02</span><span class="hub-card-icon">${icon('truck')}</span><strong>Zlecenia</strong><small>Lista, ETA, GPS, trasa i szczegóły transportu</small>${icon('arrow')}</button>
-      <button class="hub-flow-card" data-view="invoices"><span class="hub-card-number">03</span><span class="hub-card-icon warm">${icon('invoice')}</span><strong>Faktury</strong><small>Statusy, terminy, kwoty i punkty</small>${icon('arrow')}</button>
-      <button class="hub-flow-card" data-view="rewards"><span class="hub-card-number">04</span><span class="hub-card-icon dark">${icon('gift')}</span><strong>Nagrody</strong><small>Katalog, historia punktów i zasady programu</small>${icon('arrow')}</button>
-    </div></section>
-    <section class="hub-services" aria-labelledby="hub-services-title"><div class="section-heading"><div><span>Uzupełnione podstrony</span><h2 id="hub-services-title">Zaplecze klienta</h2></div><p>Brakujące miejsca są teraz częścią tej samej nawigacji i identyfikacji.</p></div><div class="hub-service-grid">
-      <button class="hub-service-card" data-view="documents"><span class="hub-service-icon">${icon('folder')}</span><span><small>${documents.length} plików demo</small><strong>Dokumenty</strong><em>CMR, zdjęcia i faktury w jednej bibliotece.</em></span>${icon('arrow')}</button>
-      <button class="hub-service-card" data-view="notifications"><span class="hub-service-icon warm">${icon('bell')}</span><span><small>${unread} nieprzeczytane</small><strong>Powiadomienia</strong><em>Zmiany ETA, dokumenty, faktury i punkty.</em></span>${icon('arrow')}</button>
-      <button class="hub-service-card" data-view="account"><span class="hub-service-icon dark">${icon('user')}</span><span><small>Konto demonstracyjne</small><strong>Konto i firma</strong><em>Dane organizacji oraz preferencje informacji.</em></span>${icon('arrow')}</button>
-      <button class="hub-service-card" data-view="help"><span class="hub-service-icon blue">${icon('support')}</span><span><small>Pomoc i kontakt</small><strong>Centrum pomocy</strong><em>Najczęstsze pytania i szybki kontakt z AMG.</em></span>${icon('arrow')}</button>
-    </div></section>
-    <section class="hub-architecture card" aria-label="Struktura projektu"><div><span>Wejście</span><strong>Program i aktywacja</strong></div>${icon('right')}<div><span>Praca</span><strong>Start · Zlecenia · Faktury</strong></div>${icon('right')}<div><span>Korzyści</span><strong>Nagrody i punkty</strong></div>${icon('right')}<div><span>Obsługa</span><strong>Dokumenty · Konto · Pomoc</strong></div></section>
-  </section>`;
-}
-
 function filteredDocumentRecords() {
   const query=state.documentSearch.trim().toLocaleLowerCase('pl');
   return documentRecords().filter(record=>(state.documentType==='all'||record.type===state.documentType)&&`${record.name} ${record.reference} ${record.source}`.toLocaleLowerCase('pl').includes(query));
@@ -514,7 +511,7 @@ function documentLibraryMarkup(records) {
 
 function documentsView() {
   const records=filteredDocumentRecords();
-  return `${serviceTrail('Dokumenty')}${pageHead('Centrum klienta','Dokumenty <em>w jednym miejscu.</em>','CMR, zdjęcia załadunku i faktury zebrane w jednej bibliotece demonstracyjnej.')}
+  return `${pageHead('Centrum klienta','Dokumenty <em>w jednym miejscu.</em>','CMR, zdjęcia załadunku i faktury zebrane w jednej bibliotece demonstracyjnej.')}
   <div class="filter-bar"><div class="filters" aria-label="Filtruj dokumenty">${[['all','Wszystkie'],['transport','Transport'],['invoice','Faktury']].map(([key,label])=>`<button class="filter ${state.documentType===key?'active':''}" data-action="document-filter" data-id="${key}" aria-pressed="${state.documentType===key}">${label}</button>`).join('')}</div><label class="search-field">${icon('search')}<input id="document-search" type="search" placeholder="Numer lub nazwa dokumentu" aria-label="Szukaj dokumentu" value="${esc(state.documentSearch)}"></label></div>
   <section class="document-library" id="document-library" aria-live="polite">${documentLibraryMarkup(records)}</section><div class="library-footer">${records.length} z ${documentRecords().length} dokumentów · wyłącznie dane demonstracyjne</div>`;
 }
@@ -522,7 +519,7 @@ function documentsView() {
 function notificationsView() {
   const items=demoSource.notifications.filter(item=>state.notificationCategory==='all'||item.category===state.notificationCategory);
   const unread=demoSource.notifications.filter(item=>item.unread&&!state.readNotifications.has(item.id)).length;
-  return `${serviceTrail('Powiadomienia')}${pageHead('Centrum klienta','Powiadomienia.<br><em>Bez chaosu.</em>','Najważniejsze zmiany dotyczące transportu, dokumentów, rozliczeń i punktów.',unread?`<button class="button button-secondary notification-read-all" data-action="mark-notices-read"><span>Oznacz jako przeczytane</span><span class="button-circle">${icon('check')}</span></button>`:'')}
+  return `${pageHead('Centrum klienta','Powiadomienia.<br><em>Bez chaosu.</em>','Najważniejsze zmiany dotyczące transportu, dokumentów, rozliczeń i punktów.',unread?`<button class="button button-secondary notification-read-all" data-action="mark-notices-read"><span>Oznacz jako przeczytane</span><span class="button-circle">${icon('check')}</span></button>`:'')}
   <div class="filter-bar notification-filter"><div class="filters" aria-label="Filtruj powiadomienia">${[['all','Wszystkie'],['transport','Transport'],['documents','Dokumenty'],['invoices','Faktury'],['rewards','Punkty']].map(([key,label])=>`<button class="filter ${state.notificationCategory===key?'active':''}" data-action="notification-filter" data-id="${key}" aria-pressed="${state.notificationCategory===key}">${label}</button>`).join('')}</div><span class="notification-count">${unread} nieprzeczytane</span></div>
   <section class="card notification-list" aria-label="Lista powiadomień">${items.map(item=>{const unreadItem=item.unread&&!state.readNotifications.has(item.id);return `<button class="notification-item ${unreadItem?'unread':''}" data-action="notification-open" data-id="${item.id}"><span class="notification-icon">${icon(item.icon)}</span><span><small>${esc(item.time)}</small><strong>${esc(item.title)}</strong><em>${esc(item.text)}</em></span><span class="notification-state">${unreadItem?'<i>Nowe</i>':''}${icon('arrow')}</span></button>`;}).join('')}</section>
   <p class="demo-disclaimer">To projekt centrum powiadomień. Wersja demo nie wysyła e-maili, SMS-ów ani powiadomień push.</p>`;
@@ -531,25 +528,35 @@ function notificationsView() {
 function accountView() {
   const c=demoSource.customer;
   const preferences=[['transport','Zmiany statusu i ETA','Transport'],['documents','Nowe dokumenty','Dokumenty'],['invoices','Terminy i status faktur','Faktury'],['rewards','Punkty i nagrody','AMG Miles']];
-  return `${serviceTrail('Konto i firma')}${pageHead('Centrum klienta','Konto <em>i firma.</em>','Dane organizacji, dostęp do programu i preferencje informacji.')}
+  return `${pageHead('Centrum klienta','Konto <em>i firma.</em>','Dane organizacji, dostęp do programu i preferencje informacji.')}
   <div class="account-layout"><section class="card account-profile"><div class="account-profile-head"><span class="account-avatar">FP</span><div><small>Konto demonstracyjne</small><h2>${esc(c.companyName)}</h2><span>${esc(c.customerId)}</span></div></div><dl class="account-facts"><div><dt>NIP demonstracyjny</dt><dd>${esc(c.taxId)}</dd></div><div><dt>Adres</dt><dd>${esc(c.address)}</dd></div><div><dt>E-mail</dt><dd>${esc(c.email)}</dd></div><div><dt>Telefon</dt><dd>${esc(c.phone)}</dd></div></dl><button class="text-action" data-action="account-edit">Zaprojektuj zmianę danych ${icon('arrow')}</button></section>
   <section class="card preference-card"><div class="card-heading"><div><h2>Preferencje informacji</h2><p>Przełączniki działają tylko w tej karcie przeglądarki.</p></div>${icon('sliders')}</div><div class="preference-list">${preferences.map(([key,title,description])=>`<button class="preference-row" data-action="preference-toggle" data-id="${key}" role="switch" aria-checked="${state.notificationPreferences[key]}"><span><strong>${title}</strong><small>${description}</small></span><span class="switch-track"><i></i></span></button>`).join('')}</div></section></div>
-  <section class="card access-card"><div><span class="access-icon">${icon('shield')}</span><div><small>Dostęp do AMG Miles</small><h2>Aktywacja i bezpieczeństwo</h2><p>Projekt przewiduje zarządzanie kodem aktywacyjnym, sesjami i osobami uprawnionymi. W tym prototypie nie ma prawdziwego uwierzytelniania.</p></div></div><button class="button button-secondary" data-action="demo-exit"><span>Wyjdź z konta demo</span><span class="button-circle">${icon('left')}</span></button></section>`;
+  <section class="card access-card"><div><span class="access-icon">${icon('shield')}</span><div><small>Dostęp do AMG Miles</small><h2>Sesja demonstracyjna</h2><p>Panel jest dostępny dopiero po przejściu ekranu wejścia. Ta sesja działa tylko w bieżącej karcie i nie jest prawdziwym uwierzytelnianiem.</p></div></div><button class="button button-secondary" data-action="demo-exit"><span>Wyloguj z konta demo</span><span class="button-circle">${icon('left')}</span></button></section>`;
 }
 
 function helpView() {
-  return `${serviceTrail('Pomoc')}${pageHead('Centrum klienta','Pomoc zawsze<br><em>pod ręką.</em>','Szybka odpowiedź, właściwy kontakt i jasne informacje o działaniu panelu.')}
+  return `${pageHead('Centrum klienta','Pomoc zawsze<br><em>pod ręką.</em>','Szybka odpowiedź, właściwy kontakt i jasne informacje o działaniu panelu.')}
   <section class="help-hero"><div><span class="help-kicker">AMG Trans · obsługa klienta</span><h2>W czym możemy pomóc?</h2><p>Wybierz temat. Prototyp pokaże właściwą ścieżkę, bez wysyłania wiadomości.</p></div><button class="button button-primary" data-action="contact"><span>Kontakt z AMG</span><span class="button-circle">${icon('support')}</span></button></section>
   <div class="help-grid"><button class="card help-card" data-view="orders"><span>${icon('truck')}</span><strong>Transport i ETA</strong><small>Statusy, pozycja pojazdu i dokumenty zlecenia.</small>${icon('arrow')}</button><button class="card help-card" data-view="invoices"><span>${icon('invoice')}</span><strong>Faktury i punkty</strong><small>Terminy, płatności oraz naliczanie punktów.</small>${icon('arrow')}</button><button class="card help-card" data-view="rules"><span>${icon('book')}</span><strong>Zasady programu</strong><small>Bonusy, ważność punktów i realizacja nagród.</small>${icon('arrow')}</button></div>
   <section class="card help-faq"><div class="section-heading"><div><span>Najczęstsze pytania</span><h2>O panelu AMG Miles</h2></div></div><details open><summary>Czy dane w tym widoku są prawdziwe?${icon('down')}</summary><p>Nie. Zlecenia, pojazdy, kwoty, dokumenty, punkty i dane konta są fikcyjne i służą wyłącznie do oceny projektu interfejsu.</p></details><details><summary>Gdzie znajdę CMR lub zdjęcie załadunku?${icon('down')}</summary><p>Przy konkretnym zleceniu oraz w nowej, wspólnej bibliotece Dokumenty. Wersja produkcyjna pokaże tylko pliki dostępne dla zalogowanego klienta.</p></details><details><summary>Jak zmienić dane firmy?${icon('down')}</summary><p>Projekt przewiduje bezpieczny wniosek o zmianę danych. W tym statycznym prototypie formularz nie zapisuje ani nie wysyła informacji.</p></details><details><summary>Jak działają powiadomienia?${icon('down')}</summary><p>Centrum powiadomień zbiera zmiany ETA, dokumenty, faktury oraz punkty. Kanały e-mail, SMS i push wymagają osobnego podłączenia w prawdziwej aplikacji.</p></details></section>`;
 }
 
 function renderView() {
-  return ({home:homeView,orders:ordersView,tracking:trackingView,invoices:invoicesView,rewards:rewardsView,history:historyView,claims:claimsView,rules:rulesView,more:moreView,documents:documentsView,notifications:notificationsView,account:accountView,help:helpView}[state.view]||homeView)();
+  return ({home:homeView,orders:ordersView,tracking:trackingView,invoices:invoicesView,rewards:rewardsView,history:historyView,claims:claimsView,rules:rulesView,documents:documentsView,notifications:notificationsView,account:accountView,help:helpView}[state.view]||homeView)();
 }
 
 function navigate(view,focus=true) {
   if (!VIEWS[view]) return;
+  if(view==='access'&&state.view==='welcome')state.pendingRoute='home';
+  if(!state.authenticated&&!PUBLIC_VIEWS.has(view)){
+    state.pendingRoute=view;
+    state.view='access';
+    if(window.location.hash!=='#access')window.history.pushState(null,'','#access');
+    shell();
+    window.scrollTo({top:0,behavior:'instant'});
+    if(focus)document.getElementById('main-content').focus({preventScroll:true});
+    return;
+  }
   state.view=view==='tracking'?'orders':view;
   state.search='';
   state.mapZoom=1;
@@ -612,34 +619,17 @@ function openDialog(eyebrow,title,body,actions='') {
   if(!dialog.open) dialog.showModal();
 }
 
-function openActivationDialog() {
-  const dialog=document.getElementById('detail-dialog');
-  dialog.classList.remove('map-dialog');
-  dialog.classList.add('activation-dialog');
-  modalTrigger=document.activeElement;
-  dialog.innerHTML=`<div class="activation-mark">${icon('shield')}</div>
-    <button class="activation-close icon-button" data-action="close-dialog" aria-label="Zamknij okno">${icon('close')}</button>
-    <div class="activation-heading"><div class="eyebrow"><span class="little-dot"></span>Aktywacja AMG Miles</div><h2 id="dialog-title">Wpisz kod aktywacyjny.</h2><p>Kod otrzymasz od AMG Trans po uruchomieniu dostępu do programu.</p></div>
-    <form id="activation-form" novalidate>
-      <label class="activation-label" for="activation-code"><span>6-cyfrowy kod</span><small id="activation-count">0 / 6</small></label>
-      <div class="activation-field"><input id="activation-code" name="activation-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" aria-label="6-cyfrowy kod" aria-describedby="activation-hint activation-error" aria-invalid="false" placeholder="••••••"><span>${icon('shield')}</span></div>
-      <p id="activation-hint" class="activation-hint">To interaktywny prototyp. Kod nie jest wysyłany ani sprawdzany w prawdziwym systemie.</p>
-      <p id="activation-error" class="activation-error" role="alert" hidden>Wpisz wszystkie 6 cyfr kodu.</p>
-      <div class="activation-actions"><button type="button" class="activation-help" data-action="activation-help">Nie masz kodu?</button><button type="submit" class="button button-primary" disabled><span>Aktywuj dostęp demo</span><span class="button-circle">${icon('arrow')}</span></button></div>
-      <div class="activation-help-copy" id="activation-help-copy" tabindex="-1" hidden>${icon('info')}<span>W docelowym serwisie kod przekazuje opiekun AMG Trans. Ten podgląd nie wysyła e-maili ani SMS-ów.</span></div>
-    </form>`;
-  if(!dialog.open)dialog.showModal();
-  requestAnimationFrame(()=>dialog.querySelector('#activation-code')?.focus());
-}
-
-function updateActivationCode(input) {
-  input.value=input.value.replace(/\D/g,'').slice(0,6);
-  const complete=input.value.length===6;
-  const form=input.form;
-  form.querySelector('[type="submit"]').disabled=!complete;
-  form.querySelector('#activation-count').textContent=`${input.value.length} / 6`;
-  input.setAttribute('aria-invalid','false');
-  form.querySelector('#activation-error').hidden=true;
+function updateAccessForm() {
+  const form=document.getElementById('access-form');
+  if(!form)return;
+  const email=form.querySelector('#access-email');
+  const code=form.querySelector('#access-code');
+  code.value=code.value.replace(/\D/g,'').slice(0,6);
+  form.querySelector('#access-count').textContent=`${code.value.length} / 6`;
+  form.querySelector('[type="submit"]').disabled=!email.value.trim()||code.value.length!==6;
+  email.setAttribute('aria-invalid','false');
+  code.setAttribute('aria-invalid','false');
+  form.querySelector('#access-error').hidden=true;
 }
 
 function closeDialog() {
@@ -668,11 +658,10 @@ document.addEventListener('click',event=>{
   const target=event.target.closest('[data-action],[data-view]'); if(!target)return;
   if(target.dataset.view) {closeDialog(); navigate(target.dataset.view); return;}
   const {action,id}=target.dataset;
-  if(action==='open-activation')openActivationDialog();
   if(action==='public-scroll')document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
-  if(action==='activation-help'){
-    const help=document.getElementById('activation-help-copy');
-    if(help){help.hidden=false;help.focus({preventScroll:true});}
+  if(action==='fill-demo-access'){
+    const email=document.getElementById('access-email'),code=document.getElementById('access-code');
+    if(email&&code){email.value=DEMO_ACCESS.email;code.value=DEMO_ACCESS.code;updateAccessForm();code.focus();}
   }
   if(['map-zoom-in','map-zoom-out','map-reset'].includes(action)){
     state.mapZoom=action==='map-reset'?1:Math.max(1,Math.min(2.4,Math.round((state.mapZoom+(action==='map-zoom-in' ? 0.35 : -0.35))*100)/100));
@@ -708,7 +697,7 @@ document.addEventListener('click',event=>{
   }
   if(action==='preference-toggle'){state.notificationPreferences[id]=!state.notificationPreferences[id];shell();document.querySelector(`[data-action="preference-toggle"][data-id="${id}"]`)?.focus();showToast('Preferencja zmieniona tylko w tej wersji demo.');}
   if(action==='account-edit')openDialog('Konto i firma · projekt','Zmiana danych firmy.',`<p class="dialog-copy">Docelowo w tym miejscu klient wyśle bezpieczny wniosek o zmianę danych, a panel pokaże status weryfikacji.</p><div class="notice">${icon('shield')}<span>Statyczny podgląd nie zapisuje ani nie wysyła danych firmy.</span></div>`,button('Rozumiem','close-dialog','secondary'));
-  if(action==='demo-exit'){state.view='welcome';window.history.pushState(null,'',window.location.pathname);shell();window.scrollTo({top:0,behavior:'instant'});showToast('Zamknięto konto demonstracyjne.');}
+  if(action==='demo-exit'){sessionStorage.removeItem(ACCESS_SESSION_KEY);state.authenticated=false;state.pendingRoute='home';state.view='welcome';window.history.pushState(null,'',window.location.pathname);shell();window.scrollTo({top:0,behavior:'instant'});showToast('Wylogowano z konta demonstracyjnego.');}
   if(action==='reward-filter'){state.rewardCategory=id; shell(); document.querySelector(`[data-action="reward-filter"][data-id="${id}"]`).focus();}
   if(action==='invoice-filter'){state.invoiceStatus=id; shell(); document.querySelector(`[data-action="invoice-filter"][data-id="${id}"]`).focus();}
   if(action==='unpaid-invoices'){state.invoiceStatus='unpaid'; navigate('invoices');}
@@ -719,23 +708,32 @@ document.addEventListener('click',event=>{
   if(action==='open-balance')openDialog('Twoje punkty · dane demo','Twoje punkty AMG Miles.',`<div class="dialog-stats"><div class="dialog-stat"><span>Dostępne punkty</span><strong>${number(demoSource.balance.available)} pkt</strong></div><div class="dialog-stat"><span>Przyznane w październiku</span><strong>+${number(demoSource.balance.earnedThisMonth)} pkt</strong></div><div class="dialog-stat"><span>Wygasają 31.10.2026</span><strong>${number(demoSource.balance.expiring)} pkt</strong></div></div><p class="dialog-copy">To przykładowe saldo służące do oceny wyglądu panelu.</p>`,button('Historia punktów','open-history','secondary'));
   if(action==='open-history'){closeDialog();navigate('history');}
   if(action==='contact')openDialog('AMG Trans · kontakt','Jesteśmy po drodze.',`<p class="dialog-copy">Porozmawiajmy o Twojej współpracy z AMG.</p><div class="dialog-stats"><div class="dialog-stat"><span>E-mail</span><strong>hello@amg-trans.eu</strong></div><div class="dialog-stat"><span>Telefon</span><strong>+48 508 24 5555</strong></div></div><p class="dialog-copy">Dane kontaktowe z aktualnej strony AMG Trans. Ten podgląd nie wysyła wiadomości.</p>`,button('Zamknij','close-dialog','secondary'));
-  if(action==='about-preview')openDialog('AMG Miles · projekt wizualny','Nowy kierunek.<br>Ten sam charakter.',`<p class="dialog-copy">Publiczny ekran, aktywacja i panel korzystają ze wspólnej identyfikacji AMG: Onest, grafit, ciepły pomarańcz i przyciski ze strzałką w osobnym kółku.</p><p class="dialog-copy">To niezależny podgląd wyglądu. Kod aktywacyjny nie jest wysyłany ani weryfikowany, a zlecenia, trasy, faktury, saldo i nagrody są demonstracyjne. Podłączenie właściwego backendu i przeniesienie do repozytorium dev są osobnym etapem.</p>`,button('Zamknij','close-dialog','secondary'));
+  if(action==='about-preview')openDialog('AMG Miles · projekt wizualny','Nowy kierunek.<br>Ten sam charakter.',`<p class="dialog-copy">Publiczny ekran, dostęp i panel korzystają ze wspólnej identyfikacji AMG: Onest, grafit, ciepły pomarańcz i przyciski ze strzałką w osobnym kółku.</p><p class="dialog-copy">To niezależny podgląd wyglądu. Dane wejściowe nie są wysyłane ani weryfikowane w prawdziwym systemie, a zlecenia, trasy, faktury, saldo i nagrody są demonstracyjne. Podłączenie właściwego backendu i przeniesienie do repozytorium dev są osobnym etapem.</p>`,button('Zamknij','close-dialog','secondary'));
 });
 
 document.addEventListener('submit',event=>{
-  if(event.target.id!=='activation-form')return;
-  event.preventDefault();
-  const input=event.target.querySelector('#activation-code');
-  updateActivationCode(input);
-  if(input.value.length!==6){
-    input.setAttribute('aria-invalid','true');
-    event.target.querySelector('#activation-error').hidden=false;
-    input.focus();
+  if(event.target.id==='access-form'){
+    event.preventDefault();
+    updateAccessForm();
+    const email=event.target.querySelector('#access-email');
+    const code=event.target.querySelector('#access-code');
+    const valid=email.value.trim().toLocaleLowerCase('pl')===DEMO_ACCESS.email&&code.value===DEMO_ACCESS.code;
+    if(!valid){
+      email.setAttribute('aria-invalid','true');
+      code.setAttribute('aria-invalid','true');
+      event.target.querySelector('#access-error').hidden=false;
+      (email.value.trim().toLocaleLowerCase('pl')!==DEMO_ACCESS.email?email:code).focus();
+      return;
+    }
+    sessionStorage.setItem(ACCESS_SESSION_KEY,'active');
+    state.authenticated=true;
+    const destination=state.pendingRoute||'home';
+    state.pendingRoute='home';
+    window.history.replaceState(null,'',`#${destination}`);
+    applyRoute();
+    showToast('Dostęp demo potwierdzony — otwarto panel przykładowej firmy.');
     return;
   }
-  closeDialog();
-  navigate('home');
-  showToast('Kod przyjęty w podglądzie — otwarto konto demonstracyjne.');
 });
 
 document.addEventListener('keydown',event=>{
@@ -747,8 +745,8 @@ document.addEventListener('keydown',event=>{
 });
 
 document.addEventListener('input',event=>{
-  if(event.target.id==='activation-code'){
-    updateActivationCode(event.target);return;
+  if(event.target.id==='access-email'||event.target.id==='access-code'){
+    updateAccessForm();return;
   }
   if(event.target.id==='order-search'){
     state.orderSearch=event.target.value;
@@ -788,8 +786,18 @@ function applyRoute() {
   state.mapZoom=1;
   state.expandedOrder=null;
   state.orderToolsOpen=false;
-  const [view,id]=window.location.hash.slice(1).split('/');
-  state.view=view==='tracking'?'orders':view==='overview'?'home':!view?'welcome':VIEWS[view]?view:'welcome';
+  const [requestedView,id]=window.location.hash.slice(1).split('/');
+  const view=requestedView==='overview'||requestedView==='more'?'home':requestedView;
+  const route=view==='tracking'?`tracking/${id||''}`:view||'home';
+  const target=view==='tracking'?'orders':!view?(state.authenticated?'home':'welcome'):VIEWS[view]?view:'welcome';
+  if(!state.authenticated&&!PUBLIC_VIEWS.has(target)){
+    state.pendingRoute=route;
+    state.view='access';
+    if(window.location.hash!=='#access')window.history.replaceState(null,'','#access');
+    shell();
+    return;
+  }
+  state.view=target;
   if(view==='tracking'){
     const order=demoSource.orders.find(o=>o.id===id);
     if(order){
