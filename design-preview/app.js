@@ -85,10 +85,11 @@ const demoSource = {
 };
 
 const ACCESS_SESSION_KEY='amg-miles-demo-access';
+const ACCESS_EMAIL_KEY='amg-miles-demo-email';
 const DEMO_ACCESS={email:'demo@przyklad.pl',code:'248506'};
 const VIEWS = {welcome:'AMG Miles',access:'Dostęp do panelu',home:'Strona główna',orders:'Zlecenia',tracking:'Podgląd zlecenia',invoices:'Faktury',rewards:'Nagrody',history:'Historia punktów',claims:'Moje nagrody',rules:'Zasady programu',documents:'Dokumenty',notifications:'Powiadomienia',account:'Konto i firma',help:'Pomoc i kontakt'};
 const PUBLIC_VIEWS=new Set(['welcome','access']);
-let state = {view:'welcome',authenticated:sessionStorage.getItem(ACCESS_SESSION_KEY)==='active',pendingRoute:'home',orderStatus:'active',orderSearch:'',orderToolsOpen:false,selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones',mapZoom:1,expandedOrder:null,documentType:'all',documentSearch:'',notificationCategory:'all',readNotifications:new Set(),notificationPreferences:{transport:true,documents:true,invoices:true,rewards:false}};
+let state = {view:'welcome',authenticated:sessionStorage.getItem(ACCESS_SESSION_KEY)==='active',accessStep:'email',accessEmail:sessionStorage.getItem(ACCESS_EMAIL_KEY)||'',pendingRoute:'home',orderStatus:'active',orderSearch:'',orderToolsOpen:false,selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones',mapZoom:1,expandedOrder:null,documentType:'all',documentSearch:'',notificationCategory:'all',readNotifications:new Set(),notificationPreferences:{transport:true,documents:true,invoices:true,rewards:false}};
 let toastTimer;
 let modalTrigger;
 let orderReturnEntry='gps';
@@ -149,7 +150,7 @@ function publicShell() {
 
       <section class="public-access-preview" id="public-access" aria-labelledby="public-access-title">
         <div><span class="public-kicker dark"><span></span>Dostęp do AMG Miles</span><h2 id="public-access-title">Panel zaczyna się<br><em>po zalogowaniu.</em></h2><p>Po potwierdzeniu tożsamości system może pobrać wyłącznie dane przypisane do firmy i uprawnień użytkownika. Ten publiczny prototyp nie łączy się z prawdziwym backendem.</p></div>
-        <div class="public-access-steps"><article><strong>01</strong><span>Zaloguj się lub użyj kodu jednorazowego.</span></article><article><strong>02</strong><span>Backend sprawdza konto, firmę i zakres uprawnień.</span></article><article><strong>03</strong><span>Dopiero wtedy otwiera się prywatny panel klienta.</span></article><button class="button button-dark" data-view="access"><span>Otwórz dostęp demo</span><span class="button-circle">${icon('arrow')}</span></button></div>
+        <div class="public-access-steps"><article><strong>01</strong><span>Podaj e-mail przypisany do konta AMG Miles.</span></article><article><strong>02</strong><span>Otwórz link aktywacyjny otrzymany w wiadomości.</span></article><article><strong>03</strong><span>Wróć do panelu, wpisz kod z maila i przejdź do konta firmy.</span></article><button class="button button-dark" data-view="access"><span>Otwórz dostęp demo</span><span class="button-circle">${icon('arrow')}</span></button></div>
       </section>
     </main>
     <footer class="public-footer"><div><button class="brand public-brand" data-action="public-scroll" data-id="public-start" aria-label="AMG Miles — początek strony"><img src="assets/amg-logo-white.webp" alt=""><span class="brand-word">miles<em>.</em></span></button><p>Program korzyści i panel klienta AMG Trans.</p></div><div><span>© 2026 AMG Trans</span><button data-action="about-preview">O podglądzie</button></div></footer>
@@ -158,26 +159,42 @@ function publicShell() {
 }
 
 function accessShell() {
+  const email=esc(state.accessEmail||DEMO_ACCESS.email);
+  const stepNumber=state.accessStep==='email'?'01':state.accessStep==='sent'?'02':'03';
+  const formContent=state.accessStep==='email'?`
+        <div class="access-form-heading"><span class="access-form-icon">${icon('mail')}</span><div><small>Krok ${stepNumber} z 3</small><h2 id="access-form-title">Podaj swój e-mail</h2><p>Wyślemy link aktywacyjny i jednorazowy kod dostępu.</p></div></div>
+        <form id="access-email-form" novalidate>
+          <label class="access-field" for="access-email"><span>Adres e-mail</span><input id="access-email" name="access-email" type="email" autocomplete="username" spellcheck="false" aria-label="Adres e-mail" aria-describedby="access-demo-data access-email-error" placeholder="nazwa@firma.pl" value="${esc(state.accessEmail)}"></label>
+          <div id="access-demo-data" class="access-demo-data"><span>${icon('info')}</span><p><strong>E-mail do podglądu</strong><button type="button" data-action="fill-demo-email">${DEMO_ACCESS.email}</button></p></div>
+          <p id="access-email-error" class="activation-error" role="alert" hidden>Podaj e-mail konta demonstracyjnego.</p>
+          <button type="submit" class="button button-primary access-submit" ${state.accessEmail?'':'disabled'}><span>Wyślij link i kod</span><span class="button-circle">${icon('arrow')}</span></button>
+        </form>`:state.accessStep==='sent'?`
+        <div class="access-form-heading"><span class="access-form-icon">${icon('mail')}</span><div><small>Krok ${stepNumber} z 3</small><h2 id="access-form-title">Sprawdź swoją pocztę</h2><p>Wiadomość zawiera link aktywacyjny oraz kod.</p></div></div>
+        <div class="access-email-summary"><span>${icon('user')}</span><div><small>E-mail logowania</small><strong>${email}</strong></div></div>
+        <div class="access-message-preview"><span>${icon('check')}</span><div><strong>Wiadomość demonstracyjna jest gotowa</strong><p>W prawdziwej aplikacji link i kod zostaną wysłane na powyższy adres. Tutaj kliknij przycisk, aby zasymulować powrót z maila.</p></div></div>
+        <div class="access-state-actions"><button class="button button-primary access-submit" data-action="activate-demo-link"><span>Otwórz link aktywacyjny</span><span class="button-circle">${icon('arrow')}</span></button><button class="access-text-action" data-action="change-access-email">Zmień adres e-mail</button></div>`:`
+        <div class="access-form-heading"><span class="access-form-icon">${icon('shield')}</span><div><small>Krok ${stepNumber} z 3</small><h2 id="access-form-title">Wpisz kod z maila</h2><p>Link został potwierdzony. Dokończ logowanie kodem.</p></div></div>
+        <div class="access-email-summary"><span>${icon('user')}</span><div><small>E-mail logowania</small><strong>${email}</strong></div><button type="button" data-action="change-access-email">Zmień</button></div>
+        <form id="access-code-form" novalidate>
+          <label class="access-field" for="access-code"><span>6-cyfrowy kod z wiadomości</span><span class="access-code-wrap"><input id="access-code" name="access-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" aria-label="6-cyfrowy kod z wiadomości" aria-describedby="access-demo-data access-code-error" placeholder="••••••"><small id="access-count">0 / 6</small></span></label>
+          <div id="access-demo-data" class="access-demo-data"><span>${icon('info')}</span><p><strong>Kod do podglądu</strong><button type="button" data-action="fill-demo-code">${DEMO_ACCESS.code}</button></p></div>
+          <p id="access-code-error" class="activation-error" role="alert" hidden>Wpisany kod jest nieprawidłowy.</p>
+          <button type="submit" class="button button-primary access-submit" disabled><span>Zaloguj się</span><span class="button-circle">${icon('arrow')}</span></button>
+        </form>
+        <button class="access-text-action access-resend" data-action="resend-demo-code">Wyślij kod ponownie</button>`;
   document.getElementById('app').innerHTML=`<div class="access-shell">
     <header class="access-topbar"><div class="access-header-inner"><button class="brand public-brand" data-view="welcome" aria-label="AMG Miles — wróć do strony publicznej"><img src="assets/amg-logo-white.webp" alt="AMG European Transport"><span class="brand-word">miles<em>.</em></span></button><button class="access-back" data-view="welcome">${icon('left')}<span>Wróć do strony programu</span></button></div></header>
     <main id="main-content" class="access-main" tabindex="-1">
       <section class="access-intro" aria-labelledby="access-title"><div class="public-kicker"><span></span>Dostęp klienta AMG Trans</div><h1 id="access-title">Zaloguj się<br><em>do AMG Miles.</em></h1><p>Po potwierdzeniu dostępu otworzymy panel firmy. Zlecenia, dokumenty, faktury i punkty nie są pokazywane na stronie publicznej.</p><div class="access-assurances"><span>${icon('shield')} Dane po stronie chronionego backendu</span><span>${icon('user')} Uprawnienia przypisane do firmy</span><span>${icon('clock')} Sesja wygasa po zakończeniu pracy</span></div></section>
       <section class="access-form-card" aria-labelledby="access-form-title">
-        <div class="access-form-heading"><span class="access-form-icon">${icon('shield')}</span><div><small>Podgląd dostępu</small><h2 id="access-form-title">Wejdź do konta demo</h2><p>Użyj wyłącznie poniższych danych demonstracyjnych.</p></div></div>
-        <form id="access-form" novalidate>
-          <label class="access-field" for="access-email"><span>E-mail demonstracyjny</span><input id="access-email" name="access-email" type="email" autocomplete="username" spellcheck="false" aria-label="E-mail demonstracyjny" aria-describedby="access-demo-data access-error" placeholder="demo@przyklad.pl"></label>
-          <label class="access-field" for="access-code"><span>6-cyfrowy kod dostępu</span><span class="access-code-wrap"><input id="access-code" name="access-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" aria-label="6-cyfrowy kod dostępu" aria-describedby="access-demo-data access-error" placeholder="••••••"><small id="access-count">0 / 6</small></span></label>
-          <div id="access-demo-data" class="access-demo-data"><span>${icon('info')}</span><p><strong>Dane do podglądu</strong><button type="button" data-action="fill-demo-access">demo@przyklad.pl · 248506</button></p></div>
-          <p id="access-error" class="activation-error" role="alert" hidden>Dane nie pasują do konta demonstracyjnego.</p>
-          <button type="submit" class="button button-primary access-submit" disabled><span>Otwórz panel demonstracyjny</span><span class="button-circle">${icon('arrow')}</span></button>
-        </form>
-        <p class="access-technical-note">To bramka interfejsu, nie produkcyjne uwierzytelnianie. Dane nie są wysyłane ani porównywane z Super Spedytorem.</p>
+        ${formContent}
+        <p class="access-technical-note">To demonstracja dwuetapowego logowania. Podgląd nie wysyła wiadomości ani nie łączy się z Super Spedytorem.</p>
       </section>
     </main>
     <footer class="access-footer"><span>© 2026 AMG Trans</span><span>Podgląd projektu · bez prawdziwych danych klientów</span></footer>
   </div>`;
   document.title='Logowanie · AMG Miles — podgląd';
-  requestAnimationFrame(()=>document.getElementById('access-email')?.focus());
+  requestAnimationFrame(()=>document.getElementById(state.accessStep==='code'?'access-code':'access-email')?.focus());
 }
 
 
@@ -547,7 +564,10 @@ function renderView() {
 
 function navigate(view,focus=true) {
   if (!VIEWS[view]) return;
-  if(view==='access'&&state.view==='welcome')state.pendingRoute='home';
+  if(view==='access'){
+    if(state.view==='welcome')state.pendingRoute='home';
+    state.accessStep='email';
+  }
   if(!state.authenticated&&!PUBLIC_VIEWS.has(view)){
     state.pendingRoute=view;
     state.view='access';
@@ -619,17 +639,25 @@ function openDialog(eyebrow,title,body,actions='') {
   if(!dialog.open) dialog.showModal();
 }
 
-function updateAccessForm() {
-  const form=document.getElementById('access-form');
+function updateEmailAccessForm() {
+  const form=document.getElementById('access-email-form');
   if(!form)return;
   const email=form.querySelector('#access-email');
+  state.accessEmail=email.value.trim();
+  form.querySelector('[type="submit"]').disabled=!email.value.trim()||!email.validity.valid;
+  email.setAttribute('aria-invalid','false');
+  form.querySelector('#access-email-error').hidden=true;
+}
+
+function updateCodeAccessForm() {
+  const form=document.getElementById('access-code-form');
+  if(!form)return;
   const code=form.querySelector('#access-code');
   code.value=code.value.replace(/\D/g,'').slice(0,6);
   form.querySelector('#access-count').textContent=`${code.value.length} / 6`;
-  form.querySelector('[type="submit"]').disabled=!email.value.trim()||code.value.length!==6;
-  email.setAttribute('aria-invalid','false');
+  form.querySelector('[type="submit"]').disabled=code.value.length!==6;
   code.setAttribute('aria-invalid','false');
-  form.querySelector('#access-error').hidden=true;
+  form.querySelector('#access-code-error').hidden=true;
 }
 
 function closeDialog() {
@@ -659,10 +687,26 @@ document.addEventListener('click',event=>{
   if(target.dataset.view) {closeDialog(); navigate(target.dataset.view); return;}
   const {action,id}=target.dataset;
   if(action==='public-scroll')document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
-  if(action==='fill-demo-access'){
-    const email=document.getElementById('access-email'),code=document.getElementById('access-code');
-    if(email&&code){email.value=DEMO_ACCESS.email;code.value=DEMO_ACCESS.code;updateAccessForm();code.focus();}
+  if(action==='fill-demo-email'){
+    const email=document.getElementById('access-email');
+    if(email){email.value=DEMO_ACCESS.email;updateEmailAccessForm();email.focus();}
   }
+  if(action==='fill-demo-code'){
+    const code=document.getElementById('access-code');
+    if(code){code.value=DEMO_ACCESS.code;updateCodeAccessForm();code.focus();}
+  }
+  if(action==='activate-demo-link'){
+    state.accessStep='code';
+    window.history.pushState(null,'','#access/code');
+    shell();
+  }
+  if(action==='change-access-email'){
+    sessionStorage.removeItem(ACCESS_EMAIL_KEY);
+    state.accessEmail='';state.accessStep='email';
+    window.history.pushState(null,'','#access');
+    shell();
+  }
+  if(action==='resend-demo-code')showToast(`Nowy kod demonstracyjny został przygotowany dla ${state.accessEmail}.`);
   if(['map-zoom-in','map-zoom-out','map-reset'].includes(action)){
     state.mapZoom=action==='map-reset'?1:Math.max(1,Math.min(2.4,Math.round((state.mapZoom+(action==='map-zoom-in' ? 0.35 : -0.35))*100)/100));
     document.querySelectorAll('.route-map').forEach(map=>map.setAttribute('viewBox',mapViewBox()));
@@ -697,7 +741,7 @@ document.addEventListener('click',event=>{
   }
   if(action==='preference-toggle'){state.notificationPreferences[id]=!state.notificationPreferences[id];shell();document.querySelector(`[data-action="preference-toggle"][data-id="${id}"]`)?.focus();showToast('Preferencja zmieniona tylko w tej wersji demo.');}
   if(action==='account-edit')openDialog('Konto i firma · projekt','Zmiana danych firmy.',`<p class="dialog-copy">Docelowo w tym miejscu klient wyśle bezpieczny wniosek o zmianę danych, a panel pokaże status weryfikacji.</p><div class="notice">${icon('shield')}<span>Statyczny podgląd nie zapisuje ani nie wysyła danych firmy.</span></div>`,button('Rozumiem','close-dialog','secondary'));
-  if(action==='demo-exit'){sessionStorage.removeItem(ACCESS_SESSION_KEY);state.authenticated=false;state.pendingRoute='home';state.view='welcome';window.history.pushState(null,'',window.location.pathname);shell();window.scrollTo({top:0,behavior:'instant'});showToast('Wylogowano z konta demonstracyjnego.');}
+  if(action==='demo-exit'){sessionStorage.removeItem(ACCESS_SESSION_KEY);sessionStorage.removeItem(ACCESS_EMAIL_KEY);state.authenticated=false;state.accessEmail='';state.accessStep='email';state.pendingRoute='home';state.view='welcome';window.history.pushState(null,'',window.location.pathname);shell();window.scrollTo({top:0,behavior:'instant'});showToast('Wylogowano z konta demonstracyjnego.');}
   if(action==='reward-filter'){state.rewardCategory=id; shell(); document.querySelector(`[data-action="reward-filter"][data-id="${id}"]`).focus();}
   if(action==='invoice-filter'){state.invoiceStatus=id; shell(); document.querySelector(`[data-action="invoice-filter"][data-id="${id}"]`).focus();}
   if(action==='unpaid-invoices'){state.invoiceStatus='unpaid'; navigate('invoices');}
@@ -712,21 +756,41 @@ document.addEventListener('click',event=>{
 });
 
 document.addEventListener('submit',event=>{
-  if(event.target.id==='access-form'){
+  if(event.target.id==='access-email-form'){
     event.preventDefault();
-    updateAccessForm();
+    updateEmailAccessForm();
     const email=event.target.querySelector('#access-email');
-    const code=event.target.querySelector('#access-code');
-    const valid=email.value.trim().toLocaleLowerCase('pl')===DEMO_ACCESS.email&&code.value===DEMO_ACCESS.code;
+    const normalizedEmail=email.value.trim().toLocaleLowerCase('pl');
+    const valid=email.validity.valid&&normalizedEmail===DEMO_ACCESS.email;
     if(!valid){
       email.setAttribute('aria-invalid','true');
+      event.target.querySelector('#access-email-error').hidden=false;
+      email.focus();
+      return;
+    }
+    state.accessEmail=normalizedEmail;
+    state.accessStep='sent';
+    sessionStorage.setItem(ACCESS_EMAIL_KEY,normalizedEmail);
+    window.history.pushState(null,'','#access/sent');
+    shell();
+    showToast(`Wiadomość demonstracyjna została przygotowana dla ${normalizedEmail}.`);
+    return;
+  }
+  if(event.target.id==='access-code-form'){
+    event.preventDefault();
+    updateCodeAccessForm();
+    const code=event.target.querySelector('#access-code');
+    const valid=state.accessEmail===DEMO_ACCESS.email&&code.value===DEMO_ACCESS.code;
+    if(!valid){
       code.setAttribute('aria-invalid','true');
-      event.target.querySelector('#access-error').hidden=false;
-      (email.value.trim().toLocaleLowerCase('pl')!==DEMO_ACCESS.email?email:code).focus();
+      event.target.querySelector('#access-code-error').hidden=false;
+      code.focus();
       return;
     }
     sessionStorage.setItem(ACCESS_SESSION_KEY,'active');
+    sessionStorage.removeItem(ACCESS_EMAIL_KEY);
     state.authenticated=true;
+    state.accessEmail='';state.accessStep='email';
     const destination=state.pendingRoute||'home';
     state.pendingRoute='home';
     window.history.replaceState(null,'',`#${destination}`);
@@ -745,9 +809,8 @@ document.addEventListener('keydown',event=>{
 });
 
 document.addEventListener('input',event=>{
-  if(event.target.id==='access-email'||event.target.id==='access-code'){
-    updateAccessForm();return;
-  }
+  if(event.target.id==='access-email'){updateEmailAccessForm();return;}
+  if(event.target.id==='access-code'){updateCodeAccessForm();return;}
   if(event.target.id==='order-search'){
     state.orderSearch=event.target.value;
     if(state.expandedOrder&&!matchingOrders().some(o=>o.id===state.expandedOrder)){
@@ -796,6 +859,11 @@ function applyRoute() {
     if(window.location.hash!=='#access')window.history.replaceState(null,'','#access');
     shell();
     return;
+  }
+  if(target==='access'){
+    const hasPendingEmail=Boolean(state.accessEmail);
+    state.accessStep=id==='code'&&hasPendingEmail?'code':id==='sent'&&hasPendingEmail?'sent':'email';
+    if(id&&state.accessStep==='email'&&window.location.hash!=='#access')window.history.replaceState(null,'','#access');
   }
   state.view=target;
   if(view==='tracking'){

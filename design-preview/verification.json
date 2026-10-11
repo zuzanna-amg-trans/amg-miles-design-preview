@@ -75,11 +75,12 @@
     ],
     "access_screen": {
       "route": "#access",
-      "inputs": "fictional demo email and six numeric characters with one-time-code autocomplete",
+      "flow": "demo email, simulated activation link return, retained email summary, six-digit mailed code",
+      "inputs": "fictional demo email followed by six numeric characters with one-time-code autocomplete",
       "submit_disabled_until_complete": true,
       "protected_routes_redirect_before_demo_access": true,
       "session_scope": "current browser tab only",
-      "logout_clears_demo_session": true,
+      "logout_clears_demo_session_and_pending_email": true,
       "backend_connected": false,
       "credentials_transmitted": false,
       "success_destination": "fictional demo home only"
