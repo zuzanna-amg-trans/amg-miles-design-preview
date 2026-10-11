@@ -1,6 +1,6 @@
 # AMG Miles — podgląd panelu klienta
 
-Klikalny projekt wizualny AMG Miles. Najważniejszy przepływ: **publiczny ekran programu → kod aktywacyjny → pulpit startowy → najbliższa operacja → wybór zlecenia → lista po lewej i mapa po prawej → szybkie przełączanie transportów**. Punktów i nagród można szukać w zakładce Nagrody, a historii punktów i zasad — w jej podrzędnej nawigacji.
+Klikalny projekt wizualny AMG Miles. Najważniejszy przepływ: **publiczny ekran programu → osobny ekran dostępu → prywatny pulpit firmy → najbliższa operacja → wybór zlecenia → lista po lewej i mapa po prawej → szybkie przełączanie transportów**. Punktów i nagród można szukać w zakładce Nagrody, a historii punktów i zasad — w jej podrzędnej nawigacji.
 
 ## Uruchomienie
 
@@ -16,8 +16,8 @@ Pełne testy przeglądarkowe wykonuje GitHub Actions przez pull request. Po inte
 
 ## Widoki i interakcje
 
-- Publiczny ekran przed zalogowaniem w tej samej identyfikacji co panel: grafitowy hero, podsumowanie transportu i punktów, trzy kroki programu, korzyści oraz zapowiedź pulpitu. Nie pokazuje prywatnej nawigacji, danych konta ani panelu klienta przed demonstracyjną aktywacją.
-- „Logowanie” i pozostałe przyciski aktywacji otwierają modal z jednym polem `autocomplete="one-time-code"`. Pole przyjmuje wyłącznie 6 cyfr, obsługuje wklejanie, na bieżąco pokazuje liczbę znaków i odblokowuje przejście dopiero po kompletnym kodzie. Escape i przycisk zamknięcia przywracają fokus. Pomoc wyjaśnia, że docelowy kod przekazuje AMG Trans. W tym statycznym podglądzie kod nie jest nigdzie wysyłany ani weryfikowany; dowolne 6 cyfr prowadzi wyłącznie do fikcyjnego konta demonstracyjnego. Górna karta punktów i dolny podgląd panelu pozostają ustawione prosto, bez stałego obrotu lub perspektywy.
+- Publiczny ekran przed zalogowaniem nie renderuje nazwy firmy, transportów, faktur, dokumentów, salda punktów ani prywatnej nawigacji. Zamiast miniatury pulpitu wyjaśnia granicę pomiędzy publicznym programem i chronionym panelem.
+- „Logowanie” i przyciski dostępu otwierają osobny pełnoekranowy widok. Formularz wymaga demonstracyjnego e-maila `demo@przyklad.pl` oraz kodu `248506`; kod przyjmuje wyłącznie 6 cyfr i pokazuje bieżącą długość. Po wejściu stan sesji jest zapisany tylko w `sessionStorage` bieżącej karty. Wylogowanie usuwa ten stan. Bezpośrednie wejście na `#home`, `#orders`, `#invoices`, `#rewards` lub inną prywatną trasę bez sesji przekierowuje do `#access`, a po poprawnym wejściu wraca do żądanego widoku. To demonstracyjna blokada interfejsu, nie mechanizm bezpieczeństwa ani prawdziwe uwierzytelnianie.
 - Nowa strona główna w aktualnej identyfikacji AMG Miles: grafitowy hero z ciepłym pomarańczem, najbliższa operacja transportowa, liczba aktywnych zleceń, faktury do opłacenia, dostępne punkty, ostatnia faktura do opłacenia i postęp do celu nagrody. Pulpit korzysta wyłącznie z tych samych fikcyjnych danych demonstracyjnych co pozostałe widoki. Dawny adres `#overview` otwiera nowy pulpit.
 - Powitanie „Dzień dobry!” i nazwa firmy w środkowej części nagłówka na komputerze. Dane firmy w prototypie są fikcyjne.
 - Pełna lista aktywnych zleceń po wejściu. Transport oczekujący na załadunek jest sortowany po planowanym dojeździe na załadunek; po potwierdzeniu załadunku — po dojeździe na rozładunek. Zakończone zlecenia są uporządkowane od ostatnio rozładowanych. W „Wszystkich” aktywne są przed zakończonymi.
@@ -33,13 +33,13 @@ Pełne testy przeglądarkowe wykonuje GitHub Actions przez pull request. Po inte
 - Rozwijane szczegóły auta, ładunku i punktów trasy, w tym demonstracyjny punkt pośredni.
 - Faktury z filtrowaniem, wyszukiwaniem i szczegółami. Na telefonie każdy wiersz jest czytelnym blokiem z podpisami, bez przewijania tabeli w poziomie.
 - Katalog nagród, demonstracyjny wybór celu, historia punktów, moje nagrody i zasady programu. Na telefonie nagrody mają szerokie karty z ilustracją i danymi obok; przyciski do dotyku mają co najmniej 44 px, a wyszukiwarki tekst 16 px.
-- „Więcej” jako wspólny, interaktywny widok całego projektu: cztery główne obszary panelu, skróty do nowych stron zaplecza i liniowa mapa przepływu od programu i aktywacji po obsługę konta.
+- Główna nawigacja ma cztery docelowe pozycje: Start, Zlecenia, Faktury i Nagrody. Zakładka „Więcej”, mapa projektu i dodatkowy breadcrumb zostały usunięte. Powiadomienia otwiera dzwonek, Konto i firma — profil organizacji, a Pomoc — odnośnik w stopce; przycisk w nagłówku zachowuje szybki kontakt z AMG.
 - Biblioteka Dokumenty łączy demonstracyjne CMR, zdjęcia załadunku i faktury. Ma filtry Transport/Faktury, wyszukiwanie po nazwie i numerze oraz te same podglądy szczegółów co zlecenia i rozliczenia.
 - Centrum Powiadomienia pokazuje fikcyjne zmiany ETA, nowe dokumenty, terminy faktur i przyznane punkty. Filtry i stan odczytania działają tylko do przeładowania karty; podgląd niczego nie wysyła.
 - Konto i firma zawiera fikcyjny profil organizacji, projekt preferencji informacji oraz jawny stan demonstracyjny. Pomoc i kontakt łączy skróty tematyczne, FAQ oraz istniejący podgląd kontaktu z AMG bez formularza wysyłającego dane.
-- Kontakt, okna szczegółów i obsługa klawiaturą. Na komputerze pięć zakładek jest w górnym pasku, na telefonie — w stałej nawigacji dolnej. Na telefonie najpierw widać dane bieżącej i następnej/poprzedniej operacji, potem mapę. Lista zleceń pozostaje dostępna podczas przewijania szczegółów.
+- Kontakt, okna szczegółów i obsługa klawiaturą. Na komputerze cztery zakładki są w górnym pasku, na telefonie — w stałej nawigacji dolnej. Na telefonie najpierw widać dane bieżącej i następnej/poprzedniej operacji, potem mapę. Lista zleceń pozostaje dostępna podczas przewijania szczegółów.
 
-Wszystkie rekordy w `demoSource` są fikcyjne. Publiczny kod, ilustracje i zrzuty ekranu nie zawierają danych z zalogowanego konta Miles. Prototyp nie uwierzytelnia użytkowników, nie zapisuje ani nie przesyła kodów aktywacyjnych, nie pobiera GPS, nie przelicza rzeczywistych rozliczeń, nie wysyła wiadomości ani nie zamawia nagród. Zapis celu pozostaje w pamięci bieżącej karty i znika po przeładowaniu.
+Wszystkie rekordy w `demoSource` są fikcyjne. Publiczny kod, ilustracje i zrzuty ekranu nie zawierają danych z zalogowanego konta Miles. Prototyp nie uwierzytelnia użytkowników; przechowuje jedynie znacznik demonstracyjnej sesji w bieżącej karcie. Nie przesyła e-maila ani kodu, nie pobiera GPS, nie przelicza rzeczywistych rozliczeń, nie wysyła wiadomości ani nie zamawia nagród. Zapis celu pozostaje w pamięci bieżącej karty i znika po przeładowaniu.
 
 ## Identyfikacja
 
@@ -54,11 +54,13 @@ Publiczna strona programu podaje 5 punktów za 1 EUR netto, bonus 100% przy pła
 Ten katalog nie jest kopią repozytorium dev AMG Miles. Do integracji potrzebny jest link i dostęp do właściwego repozytorium oraz potwierdzenie jego gałęzi.
 
 1. Sprawdzić framework, istniejące komponenty, uwierzytelnienie i rzeczywiste odpowiedzi API.
-2. Przenieść tokeny i komponenty do istniejącej architektury, zachowując aktualne uprawnienia. Nazwę firmy w nagłówku pobrać z właściwego, uprawnionego konta klienta.
+2. Przenieść komponenty do istniejącej architektury, zachowując aktualne uwierzytelnianie i uprawnienia. Nazwę firmy w nagłówku pobrać z właściwego, uprawnionego konta klienta. Sekrety, tokeny integracyjne i dane logowania przechowywać wyłącznie po stronie serwera.
 3. Pobierać listę zleceń i pełną historię statusów z backendu. Pięć etapów w projekcie rozróżnia jazdę na załadunek i na rozładunek; pełne oryginalne statusy i daty muszą być zachowane w historii. Numer klienta, numer AMG, towar, waga, opakowania, rejestracja oraz oba adresy z krajami i kodami muszą pochodzić z właściwych pól API. Sortowanie trzeba oprzeć na rzeczywistej kolejnej niewykonanej operacji i jej terminie w poprawnej strefie czasowej. Daty demo służą tylko porównaniu kolejności; nie opisują bieżących transportów.
 4. Potwierdzić dostawcę mapy, źródło GPS, częstotliwość aktualizacji oraz dostępność i znaczenie ETA. Potwierdzić osobne czasy dojazdu na załadunek i rozładunek, ich okna oraz faktyczny/planowany charakter. Pokazać wiek pozycji; dla brakującej pozycji lub ETA wyświetlić jawny stan braku danych.
 5. Udostępniać CMR, zdjęcia i faktury według faktycznej dostępności dokumentów i uprawnień, niezależnie od samego statusu transportu. Potwierdzenie weryfikacji dokumentu i opcje pobrania muszą pochodzić z backendu.
 6. Pobierać kwoty, waluty, statusy płatności, punkty i bonusy z właściwego systemu rozliczeń. Zachować rozróżnienie kwot netto/brutto i istniejące warunki naliczania.
 7. Obsłużyć ładowanie, brak aktywnych zleceń, błędy, brak danych GPS i brak uprawnień bez podstawiania danych demo.
+
+Super Spedytor może być źródłem danych dla tego interfejsu, ale wyłącznie pośrednio: **przeglądarka → uwierzytelniony backend AMG Miles → warstwa integracji → API Super Spedytora**. Backend musi najpierw powiązać użytkownika z firmą, ograniczyć rekordy do jej zakresu, przefiltrować pola i dopiero wtedy zwrócić bezpieczny kontrakt dla frontu. Statyczny GitHub Pages nie może przechowywać tokenu Super Spedytora ani wywoływać jego API z przeglądarki. Wymagane są też potwierdzone endpointy, mapowanie firmy i zamówień, autoryzacja dokumentów, limity wywołań, cache oraz jawne stany braku i opóźnienia danych.
 
 Kod celowo nie wymaga narzędzi buildowych, aby można było ocenić kierunek przed integracją z backendem.

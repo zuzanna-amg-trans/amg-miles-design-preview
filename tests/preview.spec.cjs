@@ -12,6 +12,12 @@ const test = base.extend({
         errors.push(`${response.status()} ${response.url()}`);
       }
     });
+    await page.addInitScript(() => {
+      const route = window.location.hash.slice(1).split('/')[0];
+      if (route && route !== 'access' && !window.location.search.includes('unauth=1')) {
+        window.sessionStorage.setItem('amg-miles-demo-access', 'active');
+      }
+    });
     await use(errors);
     if (errors.length) {
       await testInfo.attach('browser-errors', { body: JSON.stringify(errors), contentType: 'application/json' });
@@ -50,11 +56,10 @@ const views = [
   ['history', 'Historia punktów.', 'rewards'],
   ['claims', 'Moje nagrody.', 'rewards'],
   ['rules', 'Zasady programu.', 'rewards'],
-  ['more', 'Cały panel.Jeden widok.', 'more'],
-  ['documents', 'Dokumenty w jednym miejscu.', 'more'],
-  ['notifications', 'Powiadomienia.Bez chaosu.', 'more'],
-  ['account', 'Konto i firma.', 'more'],
-  ['help', 'Pomoc zawszepod ręką.', 'more'],
+  ['documents', 'Dokumenty w jednym miejscu.', null],
+  ['notifications', 'Powiadomienia.Bez chaosu.', null],
+  ['account', 'Konto i firma.', null],
+  ['help', 'Pomoc zawszepod ręką.', null],
 ];
 
 for (const [view, heading, primaryView] of views) {
@@ -62,8 +67,9 @@ for (const [view, heading, primaryView] of views) {
     await page.goto(`./#${view}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(heading);
     await expect(page.locator('.preview-note')).toHaveText('Podgląd projektu · wszystkie dane są przykładowe');
-    await expect(page.locator('.primary-nav button')).toHaveCount(5);
-    await expect(page.locator(`.primary-nav [data-view="${primaryView}"]`)).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('.primary-nav button')).toHaveCount(4);
+    if (primaryView) await expect(page.locator(`.primary-nav [data-view="${primaryView}"]`)).toHaveAttribute('aria-current', 'page');
+    else await expect(page.locator('.primary-nav [aria-current="page"]')).toHaveCount(0);
     await page.evaluate(() => document.fonts.ready);
     await expect.poll(() => page.locator('.brand img').evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
     const layout = await page.evaluate(() => ({
@@ -101,44 +107,49 @@ test('the public entry explains Miles and fits every supported screen', async ({
     await page.goto('./');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Twój transport.Twoje korzyści.');
     await expect(page.getByRole('button', { name: 'Logowanie', exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Wpisz kod aktywacyjny', exact: true }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Przejdź do logowania', exact: true }).first()).toBeVisible();
     await expect(page.locator('.public-steps article')).toHaveCount(3);
     await expect(page.locator('.public-benefit-list>div')).toHaveCount(3);
     await expect(page.locator('.primary-nav')).toHaveCount(0);
+    await expect(page.locator('.public-access-card')).toBeVisible();
+    await expect(page.locator('.public-product-card,.public-mini-dashboard')).toHaveCount(0);
+    await expect(page.locator('body')).not.toContainText('Firma przykładowa');
+    await expect(page.locator('body')).not.toContainText('24 850');
     await page.evaluate(() => document.fonts.ready);
     expect(await page.evaluate(() => document.documentElement.scrollWidth), 'public entry has no horizontal scrolling').toBeLessThanOrEqual(size.width);
-    expect(await page.locator('.public-product-card,.public-mini-dashboard').evaluateAll(items => items.map(item => getComputedStyle(item).transform))).toEqual(['none', 'none']);
     await expect.poll(() => page.locator('.public-brand img').first().evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
   }
 });
 
-test('activation popup validates a six-digit demo code and restores focus', async ({ page }) => {
-  await page.goto('./');
-  const trigger = page.getByRole('button', { name: 'Wpisz kod aktywacyjny', exact: true }).first();
-  await trigger.click();
-  const dialog = page.getByRole('dialog');
-  await expect(dialog.getByRole('heading', { name: 'Wpisz kod aktywacyjny.', exact: true })).toBeVisible();
-  const code = dialog.getByRole('textbox', { name: '6-cyfrowy kod', exact: true });
-  const submit = dialog.getByRole('button', { name: 'Aktywuj dostęp demo', exact: true });
-  await expect(code).toBeFocused();
+test('the full access screen validates demo credentials before opening the panel', async ({ page }) => {
+  await page.goto('./?unauth=1');
+  await page.getByRole('button', { name: 'Przejdź do logowania', exact: true }).first().click();
+  await expect(page).toHaveURL(/#access$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Zaloguj siędo AMG Miles.');
+  const email = page.getByRole('textbox', { name: 'E-mail demonstracyjny', exact: true });
+  const code = page.getByRole('textbox', { name: '6-cyfrowy kod dostępu', exact: true });
+  const submit = page.getByRole('button', { name: 'Otwórz panel demonstracyjny', exact: true });
+  await expect(email).toBeFocused();
+  await email.fill('niepoprawny@przyklad.pl');
   await code.fill('12a34');
   await expect(code).toHaveValue('1234');
-  await expect(dialog.locator('#activation-count')).toHaveText('4 / 6');
+  await expect(page.locator('#access-count')).toHaveText('4 / 6');
   await expect(submit).toBeDisabled();
-  await dialog.getByRole('button', { name: 'Nie masz kodu?', exact: true }).click();
-  await expect(dialog.locator('#activation-help-copy')).toContainText('nie wysyła e-maili ani SMS-ów');
-  await page.keyboard.press('Escape');
-  await expect(dialog).not.toBeVisible();
-  await expect(trigger).toBeFocused();
-  await trigger.click();
-  await dialog.getByRole('textbox', { name: '6-cyfrowy kod', exact: true }).fill('654321');
-  await expect(dialog.locator('#activation-count')).toHaveText('6 / 6');
+  await code.fill('111111');
+  await submit.click();
+  await expect(page.locator('#access-error')).toBeVisible();
+  await page.getByRole('button', { name: 'demo@przyklad.pl · 248506', exact: true }).click();
   await expect(submit).toBeEnabled();
   await submit.click();
-  await expect(dialog).not.toBeVisible();
   await expect(page).toHaveURL(/#home$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dzień dobry, Firma przykładowa.');
-  await expect(page.getByRole('status')).toContainText('otwarto konto demonstracyjne');
+  await expect(page.getByRole('status')).toContainText('otwarto panel przykładowej firmy');
+  await page.locator('.account-entry').click();
+  await page.getByRole('button', { name: 'Wyloguj z konta demo', exact: true }).click();
+  await expect(page).not.toHaveURL(/#home$/);
+  await page.goto('./?unauth=1#orders');
+  await expect(page).toHaveURL(/#access$/);
+  await expect(page.locator('.primary-nav')).toHaveCount(0);
 });
 
 test('order filters and search keep their combined scope', async ({ page }) => {
@@ -639,9 +650,9 @@ test('reward categories, detail and temporary goal selection', async ({ page }) 
   await expect(cards.filter({ hasText: 'Słuchawki bezprzewodowe' }).locator('.goal-label')).toHaveText('Twój cel');
 });
 
-test('the five primary tabs remain available and rewards have their own subnavigation', async ({ page }) => {
+test('the four primary tabs remain available and rewards have their own subnavigation', async ({ page }) => {
   await page.goto('./#home');
-  for (const view of ['home', 'orders', 'invoices', 'rewards', 'more']) {
+  for (const view of ['home', 'orders', 'invoices', 'rewards']) {
     const tab = page.locator(`.primary-nav [data-view="${view}"]`);
     await expect(tab).toBeVisible();
     await navigate(page, view);
@@ -663,20 +674,12 @@ test('the five primary tabs remain available and rewards have their own subnavig
   await expect(page.locator('.primary-nav [data-view="rewards"]')).toHaveAttribute('aria-current', 'page');
 });
 
-test('the client centre combines the whole project and completes the missing service pages', async ({ page }) => {
-  await page.goto('./#more');
-  await expect(page.locator('.service-nav')).toHaveCount(0);
+test('account services remain reachable without a duplicated more menu', async ({ page }) => {
+  await page.goto('./#documents');
+  await expect(page.locator('.primary-nav button')).toHaveCount(4);
+  await expect(page.locator('.primary-nav [data-view="more"]')).toHaveCount(0);
   await expect(page.locator('.service-trail')).toHaveCount(0);
-  await expect(page.locator('.hub-flow-card')).toHaveCount(4);
-  await expect(page.locator('.hub-service-card')).toHaveCount(4);
-  await expect(page.locator('.hub-architecture')).toContainText('Program i aktywacja');
-  await expect(page.locator('.hub-architecture')).toContainText('Dokumenty · Konto · Pomoc');
-
-  await page.locator('.hub-service-card[data-view="documents"]').click();
   await expect(page).toHaveURL(/#documents$/);
-  const serviceTrail = page.getByRole('navigation', { name: 'Ścieżka Centrum klienta', exact: true });
-  await expect(serviceTrail).toContainText('Więcej/Dokumenty');
-  await expect(page.locator('.service-nav')).toHaveCount(0);
   await expect(page.locator('.library-item')).toHaveCount(14);
   await page.locator('[data-action="document-filter"][data-id="transport"]').click();
   await expect(page.locator('.library-item')).toHaveCount(8);
@@ -690,30 +693,38 @@ test('the client centre combines the whole project and completes the missing ser
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.getByRole('button', { name: 'Zamknij okno', exact: true }).click();
 
-  await serviceTrail.getByRole('button', { name: 'Wróć do Centrum klienta', exact: true }).click();
-  await page.locator('.hub-service-card[data-view="notifications"]').click();
+  await page.locator('.header-notifications').click();
   await expect(page).toHaveURL(/#notifications$/);
-  await expect(page.getByRole('navigation', { name: 'Ścieżka Centrum klienta', exact: true })).toContainText('Więcej/Powiadomienia');
+  await expect(page.locator('.service-trail')).toHaveCount(0);
   await expect(page.locator('.notification-item')).toHaveCount(4);
   await expect(page.locator('.notification-item.unread')).toHaveCount(2);
   await page.getByRole('button', { name: 'Oznacz jako przeczytane', exact: true }).click();
   await expect(page.locator('.notification-item.unread')).toHaveCount(0);
 
-  await navigate(page, 'more');
-  await page.locator('.hub-service-card[data-view="account"]').click();
-  await expect(page.getByRole('navigation', { name: 'Ścieżka Centrum klienta', exact: true })).toContainText('Więcej/Konto i firma');
+  await page.locator('.account-entry').click();
+  await expect(page).toHaveURL(/#account$/);
+  await expect(page.locator('.service-trail')).toHaveCount(0);
   const rewardSwitch = page.getByRole('switch', { name: /Punkty i nagrody/ });
   await expect(rewardSwitch).toHaveAttribute('aria-checked', 'false');
   await rewardSwitch.click();
   await expect(rewardSwitch).toHaveAttribute('aria-checked', 'true');
 
-  await page.getByRole('navigation', { name: 'Ścieżka Centrum klienta', exact: true }).getByRole('button', { name: 'Wróć do Centrum klienta', exact: true }).click();
-  await page.locator('.hub-service-card[data-view="help"]').click();
-  await expect(page.getByRole('navigation', { name: 'Ścieżka Centrum klienta', exact: true })).toContainText('Więcej/Pomoc');
+  await page.locator('.page-footer').getByRole('button', { name: 'Pomoc', exact: true }).click();
+  await expect(page).toHaveURL(/#help$/);
+  await expect(page.locator('.service-trail')).toHaveCount(0);
   const faq = page.locator('.help-faq details').filter({ hasText: 'Gdzie znajdę CMR lub zdjęcie załadunku?' });
   await faq.locator('summary').click();
   await expect(faq).toHaveJSProperty('open', true);
   await expect(faq).toContainText('bibliotece Dokumenty');
+});
+
+test('the retired more route opens Start without restoring a fifth menu item', async ({ page }) => {
+  await page.goto('./#more');
+  await expect(page).toHaveURL(/#more$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dzień dobry, Firma przykładowa.');
+  await expect(page.locator('.primary-nav button')).toHaveCount(4);
+  await expect(page.locator('.primary-nav [data-view="more"],.hub-page')).toHaveCount(0);
+  await expect(page.locator('.primary-nav [data-view="home"]')).toHaveAttribute('aria-current', 'page');
 });
 
 test('the keyboard skip link focuses content without changing the route', async ({ page }) => {
@@ -1095,7 +1106,8 @@ test('all views fit small portrait and landscape phones, with readable invoice a
       await page.goto('./#' + view);
       await page.evaluate(() => document.fonts.ready);
       expect(await page.evaluate(() => document.documentElement.scrollWidth), view + ': no horizontal page scrolling').toBeLessThanOrEqual(size.width);
-      await expect(page.locator('.primary-nav [aria-current="page"]')).toBeVisible();
+      if (['documents', 'notifications', 'account', 'help'].includes(view)) await expect(page.locator('.primary-nav [aria-current="page"]')).toHaveCount(0);
+      else await expect(page.locator('.primary-nav [aria-current="page"]')).toBeVisible();
       if (isMobile) expect((await page.locator('.contact-button').boundingBox()).height).toBeGreaterThanOrEqual(44);
       if (view === 'orders' && size.width <= 760) {
         const promo = page.locator('.miles-strip');

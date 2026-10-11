@@ -1,13 +1,12 @@
 {
-  "revision_date": "2026-10-09",
+  "revision_date": "2026-10-11",
   "scope": "Independent visual prototype; all sample records fictional",
   "visual_direction": "Unified AMG public entry, activation and client dashboard with graphite, warm orange, light surfaces and consistent operational order, invoice and reward views",
   "main_navigation": [
     "Start",
     "Zlecenia",
     "Faktury",
-    "Nagrody",
-    "Więcej"
+    "Nagrody"
   ],
   "production_reference": {
     "active_order_ui_viewed": true,
@@ -67,20 +66,22 @@
     "entry_view": true,
     "private_navigation_visible": false,
     "login_label": "Logowanie",
-    "preview_cards_aligned_without_rotation": true,
+    "company_dashboard_preview_visible": false,
     "sections": [
       "program_hero",
       "transport_invoice_reward_steps",
       "program_benefits",
-      "client_panel_preview"
+      "access_boundary_explanation"
     ],
-    "activation_dialog": {
-      "input": "six numeric characters with one-time-code autocomplete",
+    "access_screen": {
+      "route": "#access",
+      "inputs": "fictional demo email and six numeric characters with one-time-code autocomplete",
       "submit_disabled_until_complete": true,
-      "keyboard_focus_restored_on_close": true,
-      "help_explains_real_code_source": true,
+      "protected_routes_redirect_before_demo_access": true,
+      "session_scope": "current browser tab only",
+      "logout_clears_demo_session": true,
       "backend_connected": false,
-      "code_stored_or_transmitted": false,
+      "credentials_transmitted": false,
       "success_destination": "fictional demo home only"
     }
   },
@@ -96,18 +97,18 @@
       "reward_goal_progress"
     ],
     "desktop_presentation": "Graphite AMG hero with an adjacent light operation card, followed by account summary and invoice and reward panels",
-    "mobile_presentation": "Single-column hero and operation card with five-item persistent bottom navigation",
+    "mobile_presentation": "Single-column hero and operation card with four-item persistent bottom navigation",
     "overview_alias": "Legacy #overview routes to the new home dashboard"
   },
   "client_center": {
-    "overview": "One interactive map of the full client panel, linking every existing core flow and the completed account-service pages",
-    "service_navigation": [
-      "Centrum",
-      "Dokumenty",
-      "Powiadomienia",
-      "Konto i firma",
-      "Pomoc"
+    "overview": "No separate More menu or project-map page; service pages open from contextual controls in the authenticated panel",
+    "primary_navigation": [
+      "Start",
+      "Zlecenia",
+      "Faktury",
+      "Nagrody"
     ],
+    "more_menu_present": false,
     "document_library": "Combined fictional CMR, loading photos and invoice records with filtering and search",
     "notification_center": "Fictional transport, document, invoice and reward notices with local read state",
     "account_page": "Fictional company profile, local-only information preferences and demo exit",
