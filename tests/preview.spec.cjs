@@ -121,26 +121,39 @@ test('the public entry explains Miles and fits every supported screen', async ({
   }
 });
 
-test('the full access screen validates demo credentials before opening the panel', async ({ page }) => {
+test('the access flow keeps the email after the activation link and validates the mailed code', async ({ page }) => {
   await page.goto('./?unauth=1');
   await page.getByRole('button', { name: 'Przejdź do logowania', exact: true }).first().click();
   await expect(page).toHaveURL(/#access$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Zaloguj siędo AMG Miles.');
-  const email = page.getByRole('textbox', { name: 'E-mail demonstracyjny', exact: true });
-  const code = page.getByRole('textbox', { name: '6-cyfrowy kod dostępu', exact: true });
-  const submit = page.getByRole('button', { name: 'Otwórz panel demonstracyjny', exact: true });
+  const email = page.getByRole('textbox', { name: 'Adres e-mail', exact: true });
+  const emailSubmit = page.getByRole('button', { name: 'Wyślij link i kod', exact: true });
   await expect(email).toBeFocused();
   await email.fill('niepoprawny@przyklad.pl');
+  await emailSubmit.click();
+  await expect(page.locator('#access-email-error')).toBeVisible();
+  await page.getByRole('button', { name: 'demo@przyklad.pl', exact: true }).click();
+  await expect(emailSubmit).toBeEnabled();
+  await emailSubmit.click();
+  await expect(page).toHaveURL(/#access\/sent$/);
+  await expect(page.getByText('demo@przyklad.pl', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 2 })).toHaveText('Sprawdź swoją pocztę');
+  await page.getByRole('button', { name: 'Otwórz link aktywacyjny', exact: true }).click();
+  await expect(page).toHaveURL(/#access\/code$/);
+  await expect(page.getByText('demo@przyklad.pl', { exact: true })).toBeVisible();
+  const code = page.getByRole('textbox', { name: '6-cyfrowy kod z wiadomości', exact: true });
+  const codeSubmit = page.getByRole('button', { name: 'Zaloguj się', exact: true });
+  await expect(code).toBeFocused();
   await code.fill('12a34');
   await expect(code).toHaveValue('1234');
   await expect(page.locator('#access-count')).toHaveText('4 / 6');
-  await expect(submit).toBeDisabled();
+  await expect(codeSubmit).toBeDisabled();
   await code.fill('111111');
-  await submit.click();
-  await expect(page.locator('#access-error')).toBeVisible();
-  await page.getByRole('button', { name: 'demo@przyklad.pl · 248506', exact: true }).click();
-  await expect(submit).toBeEnabled();
-  await submit.click();
+  await codeSubmit.click();
+  await expect(page.locator('#access-code-error')).toBeVisible();
+  await page.getByRole('button', { name: '248506', exact: true }).click();
+  await expect(codeSubmit).toBeEnabled();
+  await codeSubmit.click();
   await expect(page).toHaveURL(/#home$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dzień dobry, Firma przykładowa.');
   await expect(page.getByRole('status')).toContainText('otwarto panel przykładowej firmy');
