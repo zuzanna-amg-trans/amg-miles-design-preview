@@ -33,13 +33,17 @@ Pełne testy przeglądarkowe wykonuje GitHub Actions przez pull request. Po inte
 - Rozwijane szczegóły auta, ładunku i punktów trasy, w tym demonstracyjny punkt pośredni.
 - Faktury z filtrowaniem, wyszukiwaniem i szczegółami. Na telefonie każdy wiersz jest czytelnym blokiem z podpisami, bez przewijania tabeli w poziomie.
 - Katalog nagród, demonstracyjny wybór celu, historia punktów, moje nagrody i zasady programu. Na telefonie nagrody mają szerokie karty z ilustracją i danymi obok; przyciski do dotyku mają co najmniej 44 px, a wyszukiwarki tekst 16 px.
-- Główna nawigacja ma cztery docelowe pozycje: Start, Zlecenia, Faktury i Nagrody. Zakładka „Więcej”, mapa projektu i dodatkowy breadcrumb zostały usunięte. Powiadomienia otwiera dzwonek, Konto i firma — profil organizacji, a Pomoc — odnośnik w stopce; przycisk w nagłówku zachowuje szybki kontakt z AMG.
+- Główna nawigacja ma pięć docelowych pozycji: Start, Zlecenia, Faktury, Nagrody i Flota AMG Trans. Zakładka „Więcej”, mapa projektu i dodatkowy breadcrumb zostały usunięte. Powiadomienia otwiera dzwonek, Konto i firma — profil organizacji, a Pomoc — odnośnik w stopce; przycisk w nagłówku zachowuje szybki kontakt z AMG.
 - Biblioteka Dokumenty łączy demonstracyjne CMR, zdjęcia załadunku i faktury. Ma filtry Transport/Faktury, wyszukiwanie po nazwie i numerze oraz te same podglądy szczegółów co zlecenia i rozliczenia.
 - Centrum Powiadomienia pokazuje fikcyjne zmiany ETA, nowe dokumenty, terminy faktur i przyznane punkty. Filtry i stan odczytania działają tylko do przeładowania karty; podgląd niczego nie wysyła.
 - Konto i firma zawiera fikcyjny profil organizacji, projekt preferencji informacji oraz jawny stan demonstracyjny. Pomoc i kontakt łączy skróty tematyczne, FAQ oraz istniejący podgląd kontaktu z AMG bez formularza wysyłającego dane.
-- Kontakt, okna szczegółów i obsługa klawiaturą. Na komputerze cztery zakładki są w górnym pasku, na telefonie — w stałej nawigacji dolnej. Na telefonie najpierw widać dane bieżącej i następnej/poprzedniej operacji, potem mapę. Lista zleceń pozostaje dostępna podczas przewijania szczegółów.
+- Kontakt, okna szczegółów i obsługa klawiaturą. Na komputerze pięć zakładek są w górnym pasku, na telefonie — w stałej nawigacji dolnej. Na telefonie najpierw widać dane bieżącej i następnej/poprzedniej operacji, potem mapę. Lista zleceń pozostaje dostępna podczas przewijania szczegółów.
 
 Wszystkie rekordy w `demoSource` są fikcyjne. Publiczny kod, ilustracje i zrzuty ekranu nie zawierają danych z zalogowanego konta Miles. Prototyp nie uwierzytelnia użytkowników; przechowuje jedynie demonstracyjny e-mail oczekującego logowania i znacznik sesji w bieżącej karcie. Nie przesyła e-maila ani kodu, nie pobiera GPS, nie przelicza rzeczywistych rozliczeń, nie wysyła wiadomości ani nie zamawia nagród. Zapis celu pozostaje w pamięci bieżącej karty i znika po przeładowaniu.
+
+## Flota AMG Trans
+
+Publiczna trasa `#fleet` i zakładka w panelu pokazują sześć busów (AMG 007, 008, 009, 010, 014, 015). Dziesięć wybranych wizualizacji pochodzi z folderu Drive podanego przez użytkowniczkę; pominięto turkusowy pojazd i ujęcia grupowe, które go zawierają. Galeria ma pełne kadry, powiększanie, dodatkowe ujęcia i przywracanie fokusu po zamknięciu okna. Grafiki są lokalnymi zasobami WebP, a ich pochodzenie opisuje `assets/fleet/README.md`. Nie stanowią danych operacyjnych ani informacji o dostępności pojazdów.
 
 ## Identyfikacja
 

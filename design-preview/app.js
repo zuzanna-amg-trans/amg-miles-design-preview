@@ -1,4 +1,4 @@
-/* Independent visual prototype. All records below are fictional.
+/* Independent visual prototype. All customer records below are fictional.
  * Replace demoSource with the dev project's actual data layer once its API is known.
  * The access screen gates demo UI only; it does not provide real authentication.
  * This prototype does not settle invoices, send mail, or order rewards.
@@ -87,8 +87,18 @@ const demoSource = {
 const ACCESS_SESSION_KEY='amg-miles-demo-access';
 const ACCESS_EMAIL_KEY='amg-miles-demo-email';
 const DEMO_ACCESS={email:'demo@przyklad.pl',code:'248506'};
-const VIEWS = {welcome:'AMG Miles',access:'Dostęp do panelu',home:'Strona główna',orders:'Zlecenia',tracking:'Podgląd zlecenia',invoices:'Faktury',rewards:'Nagrody',history:'Historia punktów',claims:'Moje nagrody',rules:'Zasady programu',documents:'Dokumenty',notifications:'Powiadomienia',account:'Konto i firma',help:'Pomoc i kontakt'};
-const PUBLIC_VIEWS=new Set(['welcome','access']);
+const VIEWS = {welcome:'AMG Miles',access:'Dostęp do panelu',fleet:'Flota AMG Trans',home:'Strona główna',orders:'Zlecenia',tracking:'Podgląd zlecenia',invoices:'Faktury',rewards:'Nagrody',history:'Historia punktów',claims:'Moje nagrody',rules:'Zasady programu',documents:'Dokumenty',notifications:'Powiadomienia',account:'Konto i firma',help:'Pomoc i kontakt'};
+const PUBLIC_VIEWS=new Set(['welcome','access','fleet']);
+// User-selected fleet artwork, kept separate from fictional customer records.
+const FLEET = [
+  {id:'007',name:'AMG 007',theme:'Czerwień i grafit',description:'Czerwony Mercedes Sprinter z wyrazistym logo AMG.',photos:[['amg-007','Ujęcie studyjne'],['amg-007-scena','Na czerwonej scenie']]},
+  {id:'008',name:'AMG 008',theme:'Ognisty horyzont',description:'Grafitowy Mercedes Sprinter z pomarańczową grafiką na plandece.',photos:[['amg-008','Ujęcie studyjne'],['amg-008-scena','Na czerwonej scenie']]},
+  {id:'009',name:'AMG 009',theme:'Lodowy kanion',description:'Niebieski Mercedes Sprinter z motywem lodowego kanionu.',photos:[['amg-009','Ujęcie studyjne'],['amg-009-scena','Na czerwonej scenie']]},
+  {id:'010',name:'AMG 010',theme:'Dwie strony mostu',description:'Srebrny Mercedes Sprinter z mostem w burzowej i zachodzącej scenerii.',photos:[['amg-010','Burzowy most'],['amg-010-zachod','Most o zachodzie']]},
+  {id:'014',name:'AMG 014',theme:'Srebrny charakter',description:'Srebrny Mercedes Sprinter z dużym, czerwonym logo AMG.',photos:[['amg-014','Ujęcie studyjne']]},
+  {id:'015',name:'AMG 015',theme:'Granat i światło',description:'Granatowy Mercedes Sprinter z rozświetloną grafiką AMG.',photos:[['amg-015','Ujęcie studyjne']]},
+];
+let fleetSelection={id:'007',index:0};
 let state = {view:'welcome',authenticated:sessionStorage.getItem(ACCESS_SESSION_KEY)==='active',accessStep:'email',accessEmail:sessionStorage.getItem(ACCESS_EMAIL_KEY)||'',pendingRoute:'home',orderStatus:'active',orderSearch:'',orderToolsOpen:false,selectedOrder:'DEMO-261001',rewardCategory:'Wszystkie',invoiceStatus:'all',search:'',goal:'headphones',mapZoom:1,expandedOrder:null,documentType:'all',documentSearch:'',notificationCategory:'all',readNotifications:new Set(),notificationPreferences:{transport:true,documents:true,invoices:true,rewards:false}};
 let toastTimer;
 let modalTrigger;
@@ -111,13 +121,18 @@ function button(label, action, style='primary', extras='') {
   return `<button class="button button-${style}" data-action="${action}" ${extras}><span>${label}</span><span class="button-circle">${icon('arrow')}</span></button>`;
 }
 
-function publicShell() {
-  document.getElementById('app').innerHTML=`<div class="public-shell">
-    <header class="public-topbar"><div class="public-header-inner">
+function publicHeader() {
+  return `<header class="public-topbar"><div class="public-header-inner">
       <button class="brand public-brand" data-action="public-scroll" data-id="public-start" aria-label="AMG Miles — początek strony"><img src="assets/amg-logo-white.webp" alt="AMG European Transport"><span class="brand-word">miles<em>.</em></span></button>
       <nav class="public-nav" aria-label="Nawigacja strony programu"><button data-action="public-scroll" data-id="public-how">Jak działa</button><button data-action="public-scroll" data-id="public-benefits">Korzyści</button><button data-action="public-scroll" data-id="public-access">Dostęp</button></nav>
+      <button class="public-fleet-link" data-view="fleet" ${state.view==='fleet'?'aria-current="page"':''}>${icon('truck')}<span>Flota AMG Trans</span></button>
       <button class="public-login" data-view="access" aria-label="Logowanie">${icon('shield')}<span>Logowanie</span></button>
-    </div></header>
+    </div></header>`;
+}
+
+function publicShell() {
+  document.getElementById('app').innerHTML=`<div class="public-shell">
+    ${publicHeader()}
     <main id="main-content" class="public-main" tabindex="-1">
       <section class="public-hero" id="public-start" aria-labelledby="public-title">
         <div class="public-hero-copy">
@@ -201,15 +216,20 @@ function accessShell() {
 function shell() {
   if(state.view==='welcome'){publicShell();return;}
   if(state.view==='access'){accessShell();return;}
-  const active=['orders','tracking'].includes(state.view)?'orders':state.view==='invoices'?'invoices':['rewards','history','claims','rules'].includes(state.view)?'rewards':state.view==='home'?'home':'';
+  if(state.view==='fleet'&&!state.authenticated){
+    document.getElementById('app').innerHTML=`<div class="public-shell">${publicHeader()}<main class="content fleet-content" id="main-content" tabindex="-1">${fleetView()}<footer class="page-footer"><span>© 2026 AMG Trans</span><button data-view="welcome">Wróć do AMG Miles ${icon('left')}</button></footer></main></div>`;
+    document.title='Flota AMG Trans · AMG Miles';
+    return;
+  }
+  const active=['orders','tracking'].includes(state.view)?'orders':state.view==='invoices'?'invoices':['rewards','history','claims','rules'].includes(state.view)?'rewards':['home','fleet'].includes(state.view)?state.view:'';
   const navItem=(view,name,ic)=>`<button class="nav-item ${active===view?'active':''}" data-view="${view}" ${active===view?'aria-current="page"':''}>${icon(ic)}<span>${name}</span></button>`;
   document.getElementById('app').innerHTML=`<div class="shell ${state.view==='orders'&&state.expandedOrder?'has-tracking':''}">
     <header class="topbar"><div class="header-inner">
       <button class="brand" data-view="home" aria-label="AMG Miles — strona główna"><img src="assets/amg-logo-white.webp" alt="AMG European Transport"><span class="brand-word">miles<em>.</em></span></button>
-      <nav class="primary-nav" aria-label="Nawigacja panelu">${navItem('home','Start','grid')}${navItem('orders','Zlecenia','truck')}${navItem('invoices','Faktury','invoice')}${navItem('rewards','Nagrody','gift')}</nav>
+      <nav class="primary-nav" aria-label="Nawigacja panelu">${navItem('home','Start','grid')}${navItem('orders','Zlecenia','truck')}${navItem('invoices','Faktury','invoice')}${navItem('rewards','Nagrody','gift')}${navItem('fleet','Flota AMG Trans','truck')}</nav>
       <div class="header-actions"><button class="header-notifications" data-view="notifications" aria-label="Powiadomienia">${icon('bell')}</button><button class="header-points" data-action="open-balance" aria-label="Twoje punkty demonstracyjne: ${number(demoSource.balance.available)}">${icon('spark')}<strong>${number(demoSource.balance.available)}</strong><span>pkt</span></button><button class="contact-button" data-action="contact" aria-label="Kontakt z AMG">${icon('support')}<span>Kontakt z AMG</span></button><span class="header-separator"></span><button class="account-entry" data-view="account" aria-label="Konto i firma — ${esc(demoSource.customer.companyName)}"><span class="account-label"><strong>${esc(demoSource.customer.companyName)}</strong><span>Konto demonstracyjne</span></span><span class="avatar" aria-hidden="true">FP</span></button></div>
     </div></header>
-    <main class="content ${state.view==='orders'?'orders-content':state.view==='home'?'home-content':''}" id="main-content" tabindex="-1"><div class="preview-note">Podgląd projektu <span>·</span> wszystkie dane są przykładowe</div><div class="view">${renderView()}</div><footer class="page-footer"><span>© 2026 AMG Trans</span><div><button data-view="help">Pomoc</button><button data-view="rules">Zasady AMG Miles</button><button data-action="about-preview">O podglądzie ${icon('arrow')}</button></div></footer></main>
+    <main class="content ${state.view==='orders'?'orders-content':state.view==='home'?'home-content':''}" id="main-content" tabindex="-1"><div class="preview-note">Podgląd projektu <span>·</span> ${state.view==='fleet'?'galeria wizualizacji floty':'wszystkie dane są przykładowe'}</div><div class="view">${renderView()}</div><footer class="page-footer"><span>© 2026 AMG Trans</span><div><button data-view="help">Pomoc</button><button data-view="rules">Zasady AMG Miles</button><button data-action="about-preview">O podglądzie ${icon('arrow')}</button></div></footer></main>
   </div>`;
   document.title=`${VIEWS[state.view]} · AMG Miles — podgląd`;
 }
@@ -558,14 +578,36 @@ function helpView() {
   <section class="card help-faq"><div class="section-heading"><div><span>Najczęstsze pytania</span><h2>O panelu AMG Miles</h2></div></div><details open><summary>Czy dane w tym widoku są prawdziwe?${icon('down')}</summary><p>Nie. Zlecenia, pojazdy, kwoty, dokumenty, punkty i dane konta są fikcyjne i służą wyłącznie do oceny projektu interfejsu.</p></details><details><summary>Gdzie znajdę CMR lub zdjęcie załadunku?${icon('down')}</summary><p>Przy konkretnym zleceniu oraz w nowej, wspólnej bibliotece Dokumenty. Wersja produkcyjna pokaże tylko pliki dostępne dla zalogowanego klienta.</p></details><details><summary>Jak zmienić dane firmy?${icon('down')}</summary><p>Projekt przewiduje bezpieczny wniosek o zmianę danych. W tym statycznym prototypie formularz nie zapisuje ani nie wysyła informacji.</p></details><details><summary>Jak działają powiadomienia?${icon('down')}</summary><p>Centrum powiadomień zbiera zmiany ETA, dokumenty, faktury oraz punkty. Kanały e-mail, SMS i push wymagają osobnego podłączenia w prawdziwej aplikacji.</p></details></section>`;
 }
 
+function fleetView() {
+  return `<div class="fleet-page">
+    <section class="fleet-intro" aria-labelledby="fleet-title"><div><div class="eyebrow"><span class="little-dot"></span>Poznaj nasze busy</div><h1 id="fleet-title">Flota <em>AMG Trans</em></h1><p>Różne oblicza. Wspólny kierunek.<br>Obejrzyj charakterystyczne barwy i grafiki naszych Mercedesów Sprinterów.</p></div><span class="fleet-signature">${icon('truck')}<span>AMG European Transport<small>No distance too far.</small></span></span></section>
+    <section class="fleet-grid" aria-label="Busy AMG Trans">${FLEET.map((v,i)=>`<article class="fleet-card"><button class="fleet-photo" data-action="fleet-photo" data-id="${v.id}" aria-label="Obejrzyj ${v.name}"><img src="assets/fleet/${v.photos[0][0]}-thumb.webp" alt="${esc(v.description)}" width="720" height="405" loading="${i<2?'eager':'lazy'}" decoding="async"><span class="fleet-enlarge">${icon('expand')}<span>Powiększ</span></span></button><div class="fleet-card-copy"><div><span>Mercedes-Benz Sprinter</span><h2>${v.name}</h2></div><span class="fleet-photo-count">${icon('camera')} ${v.photos.length===1?'1 ujęcie':`${v.photos.length} ujęcia`}</span><p>${v.theme}</p></div></article>`).join('')}</section>
+    <p class="fleet-note">${icon('info')}<span>Galeria wizualizacji floty AMG Trans. Zapytaj nas o dobór pojazdu do Twojego transportu.</span></p>
+    <section class="fleet-contact"><div><span>Masz transport do zaplanowania?</span><h2>Porozmawiajmy o trasie.</h2></div><button class="button button-dark" data-action="contact"><span>Kontakt z AMG</span><span class="button-circle">${icon('arrow')}</span></button></section>
+  </div>`;
+}
+
+function openFleetPhoto(id,index=0) {
+  const vehicle=FLEET.find(v=>v.id===id);if(!vehicle)return;
+  const current=(index+vehicle.photos.length)%vehicle.photos.length;
+  const [asset,caption]=vehicle.photos[current];
+  const dialog=document.getElementById('detail-dialog');
+  const changing=dialog.open&&dialog.classList.contains('fleet-dialog');
+  const trigger=modalTrigger,focusedAction=document.activeElement?.dataset.action;
+  fleetSelection={id,index:current};
+  openDialog('Flota AMG Trans · Mercedes-Benz Sprinter',vehicle.name,`<figure class="fleet-expanded"><img src="assets/fleet/${asset}.webp" alt="${esc(vehicle.description)} ${esc(caption)}" width="1680" height="945"><figcaption><span>${caption}</span><span>${current+1} / ${vehicle.photos.length}</span></figcaption></figure>${vehicle.photos.length>1?`<div class="fleet-gallery-controls"><button class="button button-secondary" data-action="fleet-previous" aria-label="Poprzednie ujęcie">${icon('left')}<span>Poprzednie</span></button><button class="button button-secondary" data-action="fleet-next" aria-label="Następne ujęcie"><span>Następne</span>${icon('right')}</button></div>`:''}`);
+  dialog.classList.add('fleet-dialog');
+  if(changing){modalTrigger=trigger;dialog.querySelector(`[data-action="${focusedAction}"]`)?.focus({preventScroll:true});}
+}
+
 function renderView() {
-  return ({home:homeView,orders:ordersView,tracking:trackingView,invoices:invoicesView,rewards:rewardsView,history:historyView,claims:claimsView,rules:rulesView,documents:documentsView,notifications:notificationsView,account:accountView,help:helpView}[state.view]||homeView)();
+  return ({fleet:fleetView,home:homeView,orders:ordersView,tracking:trackingView,invoices:invoicesView,rewards:rewardsView,history:historyView,claims:claimsView,rules:rulesView,documents:documentsView,notifications:notificationsView,account:accountView,help:helpView}[state.view]||homeView)();
 }
 
 function navigate(view,focus=true) {
   if (!VIEWS[view]) return;
   if(view==='access'){
-    if(state.view==='welcome')state.pendingRoute='home';
+    if(PUBLIC_VIEWS.has(state.view))state.pendingRoute='home';
     state.accessStep='email';
   }
   if(!state.authenticated&&!PUBLIC_VIEWS.has(view)){
@@ -633,7 +675,7 @@ function closeOrder() {
 
 function openDialog(eyebrow,title,body,actions='') {
   const dialog=document.getElementById('detail-dialog');
-  dialog.classList.remove('map-dialog','activation-dialog');
+  dialog.classList.remove('map-dialog','activation-dialog','fleet-dialog');
   modalTrigger=document.activeElement;
   dialog.innerHTML=`<div class="dialog-heading"><div><div class="eyebrow">${eyebrow}</div><h2 id="dialog-title">${title}</h2></div><button class="icon-button" data-action="close-dialog" aria-label="Zamknij okno">${icon('close')}</button></div>${body}${actions?`<div class="dialog-actions">${actions}</div>`:''}`;
   if(!dialog.open) dialog.showModal();
@@ -686,7 +728,13 @@ document.addEventListener('click',event=>{
   const target=event.target.closest('[data-action],[data-view]'); if(!target)return;
   if(target.dataset.view) {closeDialog(); navigate(target.dataset.view); return;}
   const {action,id}=target.dataset;
-  if(action==='public-scroll')document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+  if(action==='public-scroll'){
+    if(state.view!=='welcome')navigate('welcome',false);
+    document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  if(action==='fleet-photo')openFleetPhoto(id);
+  if(action==='fleet-previous')openFleetPhoto(fleetSelection.id,fleetSelection.index-1);
+  if(action==='fleet-next')openFleetPhoto(fleetSelection.id,fleetSelection.index+1);
   if(action==='fill-demo-email'){
     const email=document.getElementById('access-email');
     if(email){email.value=DEMO_ACCESS.email;updateEmailAccessForm();email.focus();}

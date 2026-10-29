@@ -6,7 +6,7 @@ Jasny, klikalny projekt AMG Miles: od publicznego ekranu programu, przez pełny 
 
 Przed wejściem do panelu publiczny ekran wyjaśnia program, ale nie pokazuje nazwy przykładowej firmy, jej transportów, faktur, dokumentów ani salda punktów. „Logowanie” prowadzi do osobnego ekranu dostępu. Dopiero poprawny zestaw demonstracyjny `demo@przyklad.pl` i `248506` otwiera sesję fikcyjnej firmy w bieżącej karcie. Bezpośrednie adresy prywatnych widoków również zatrzymują się na ekranie dostępu. To bramka interfejsu, a nie produkcyjne uwierzytelnianie; dane nie są wysyłane ani sprawdzane w prawdziwym systemie.
 
-Po wejściu główne zakładki to **Start, Zlecenia, Faktury i Nagrody**. Zbędna zakładka „Więcej” oraz mapa całego projektu zostały usunięte. Nowy ekran startowy pokazuje najbliższą operację transportową, liczbę aktywnych zleceń, faktury do opłacenia, saldo punktów, ostatnią fakturę do opłacenia i postęp do wybranej nagrody. Każdy blok prowadzi bezpośrednio do właściwej części panelu.
+Po wejściu główne zakładki to **Start, Zlecenia, Faktury, Nagrody i Flota AMG Trans**. Zbędna zakładka „Więcej” oraz mapa całego projektu zostały usunięte. Nowy ekran startowy pokazuje najbliższą operację transportową, liczbę aktywnych zleceń, faktury do opłacenia, saldo punktów, ostatnią fakturę do opłacenia i postęp do wybranej nagrody. Każdy blok prowadzi bezpośrednio do właściwej części panelu.
 
 Biblioteka dokumentów, powiadomienia, Konto i firma oraz Pomoc pozostają chronionymi podstronami uruchamianymi z właściwego kontekstu panelu: zlecenia, dzwonka, profilu firmy i stopki. Filtry, wyszukiwanie, odczytywanie powiadomień i przełączniki preferencji działają lokalnie w karcie przeglądarki; nic nie jest zapisywane ani wysyłane.
 
@@ -20,9 +20,12 @@ Na telefonie załadunek i rozładunek są obok siebie, ładunek zajmuje pełną 
 
 Zlecenia, trasy, pozycje pojazdów, czasy dostawy, dokumenty, kwoty i punkty są fikcyjne i oznaczone jako dane demonstracyjne. To podgląd identyfikacji i interfejsu; mapa nie korzysta z GPS, a repozytorium nie zawiera backendu ani danych klientów.
 
+Zakładka **Flota AMG Trans** jest dostępna także przed logowaniem pod `#fleet`. Pokazuje sześć busów: AMG 007, 008, 009, 010, 014 i 015, w dziesięciu wybranych wizualizacjach z folderu Drive wskazanego przez użytkowniczkę. Pojazd z turkusową plandeką i zawierające go ujęcia grupowe są pominięte. Kliknięcie karty powiększa pełny kadr, a dodatkowe ujęcia można przełączać w oknie galerii. Grafiki WebP są częścią testowanego pakietu strony i nie wymagają logowania do Drive.
+
 ## Ekrany do obejrzenia
 
 - [Widok publiczny](https://zuzanna-amg-trans.github.io/amg-miles-design-preview/)
+- [Flota AMG Trans](https://zuzanna-amg-trans.github.io/amg-miles-design-preview/design-preview/#fleet)
 - [Ekran dostępu demo](https://zuzanna-amg-trans.github.io/amg-miles-design-preview/design-preview/#access)
 - [Strona główna](https://zuzanna-amg-trans.github.io/amg-miles-design-preview/design-preview/#home)
 - [Zlecenia](https://zuzanna-amg-trans.github.io/amg-miles-design-preview/design-preview/#orders)
@@ -37,7 +40,7 @@ Zlecenia, trasy, pozycje pojazdów, czasy dostawy, dokumenty, kwoty i punkty są
 
 ## Testy i publikacja na GitHubie
 
-Workflow [Test and publish preview](https://github.com/zuzanna-amg-trans/amg-miles-design-preview/actions/workflows/preview.yml) wykonuje pełne testy na maszynach GitHuba. Pull request uruchamia sprawdzenie składni i 110 testów przeglądarkowych w widoku komputerowym oraz mobilnym. Testowany jest gotowy pakiet strony: publiczne wejście bez danych firmy, osobny ekran dostępu, blokada prywatnych adresów, wylogowanie, cztery główne zakładki, pulpit klienta, lista i śledzenie zleceń, faktury, nagrody, historia punktów, zasady programu, dokumenty, powiadomienia, konto i pomoc. Aktualny wynik konkretnego wykonania znajduje się w GitHub Actions.
+Workflow [Test and publish preview](https://github.com/zuzanna-amg-trans/amg-miles-design-preview/actions/workflows/preview.yml) wykonuje pełne testy na maszynach GitHuba. Pull request uruchamia sprawdzenie składni i testy przeglądarkowe w widoku komputerowym oraz mobilnym. Testowany jest gotowy pakiet strony: publiczne wejście bez danych firmy, osobny ekran dostępu, blokada prywatnych adresów, wylogowanie, pięć głównych zakładek, pulpit klienta, lista i śledzenie zleceń, faktury, nagrody, historia punktów, zasady programu, dokumenty, powiadomienia, konto i pomoc. Aktualny wynik konkretnego wykonania znajduje się w GitHub Actions.
 
 Po zmianie `main` ten sam workflow publikuje przetestowany pakiet przez GitHub Pages, odczytuje publiczny identyfikator commita i sumy kontrolne zasobów oraz ponownie wykonuje testy na publicznej stronie. Nieudane testy przed publikacją blokują nowe wdrożenie. Źródłem Pages jest **GitHub Actions**.
 

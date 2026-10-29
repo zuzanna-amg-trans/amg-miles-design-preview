@@ -13,6 +13,11 @@ STATIC_FILES = (
     "design-preview/assets/OFL-Onest.txt", "design-preview/assets/amg-logo-white.webp",
     "design-preview/assets/favicon.svg", "design-preview/assets/onest-cyrillic.woff2",
     "design-preview/assets/onest-ext.woff2", "design-preview/assets/onest-latin.woff2",
+    *(f"design-preview/assets/fleet/{name}{variant}.webp"
+      for name in ("amg-007", "amg-007-scena", "amg-008", "amg-008-scena",
+                   "amg-009", "amg-009-scena", "amg-010", "amg-010-zachod",
+                   "amg-014", "amg-015")
+      for variant in ("", "-thumb")),
 )
 
 
