@@ -60,14 +60,15 @@ const views = [
   ['notifications', 'Powiadomienia.Bez chaosu.', null],
   ['account', 'Konto i firma.', null],
   ['help', 'Pomoc zawszepod ręką.', null],
+  ['fleet', 'Flota AMG Trans', 'fleet'],
 ];
 
 for (const [view, heading, primaryView] of views) {
   test(`${view}: content, assets and contained layout`, async ({ page }) => {
     await page.goto(`./#${view}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(heading);
-    await expect(page.locator('.preview-note')).toHaveText('Podgląd projektu · wszystkie dane są przykładowe');
-    await expect(page.locator('.primary-nav button')).toHaveCount(4);
+    await expect(page.locator('.preview-note')).toHaveText(view === 'fleet' ? 'Podgląd projektu · galeria wizualizacji floty' : 'Podgląd projektu · wszystkie dane są przykładowe');
+    await expect(page.locator('.primary-nav button')).toHaveCount(5);
     if (primaryView) await expect(page.locator(`.primary-nav [data-view="${primaryView}"]`)).toHaveAttribute('aria-current', 'page');
     else await expect(page.locator('.primary-nav [aria-current="page"]')).toHaveCount(0);
     await page.evaluate(() => document.fonts.ready);
@@ -81,6 +82,85 @@ for (const [view, heading, primaryView] of views) {
     expect(layout.fontLoaded, 'The bundled font loads').toBe(true);
   });
 }
+
+test('fleet is reachable from the public entry without a customer session', async ({ page, isMobile }) => {
+  const sizes = isMobile ? [{ width: 319, height: 568 }, { width: 390, height: 844 }, { width: 844, height: 390 }] : [page.viewportSize()];
+  for (const size of sizes) {
+    await page.setViewportSize(size);
+    await page.goto('./?unauth=1');
+    const fleetLink = page.getByRole('button', { name: 'Flota AMG Trans', exact: true });
+    await expect(fleetLink).toBeVisible();
+    await fleetLink.click();
+    await expect(page).toHaveURL(/#fleet$/);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Flota AMG Trans');
+    await expect(page.locator('.public-fleet-link')).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('.primary-nav,.header-actions')).toHaveCount(0);
+    await expect(page.locator('body')).not.toContainText('Firma przykładowa');
+    await expect(page.locator('.fleet-card')).toHaveCount(6);
+    expect(await page.evaluate(() => sessionStorage.getItem('amg-miles-demo-access'))).toBeNull();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(size.width);
+    await page.getByRole('button', { name: 'Logowanie', exact: true }).click();
+    await expect(page).toHaveURL(/#access$/);
+    await expect(page.locator('.primary-nav')).toHaveCount(0);
+    await page.goto('./?unauth=1#orders');
+    await expect(page).toHaveURL(/#access$/);
+  }
+});
+
+test('fleet artwork loads in full and the gallery restores keyboard focus', async ({ page }) => {
+  test.setTimeout(60_000);
+  await page.goto('./?unauth=1#fleet');
+  await expect(page.locator('.fleet-card h2')).toHaveText(['AMG 007', 'AMG 008', 'AMG 009', 'AMG 010', 'AMG 014', 'AMG 015']);
+  const cards = page.locator('.fleet-card');
+  for (let i = 0; i < 6; i++) {
+    const trigger = cards.nth(i).getByRole('button');
+    await trigger.scrollIntoViewIfNeeded();
+    await expect.poll(() => trigger.locator('img').evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
+    expect(await trigger.locator('img').evaluate(img => getComputedStyle(img).objectFit)).toBe('contain');
+    await trigger.click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole('heading')).toHaveText(['AMG 007', 'AMG 008', 'AMG 009', 'AMG 010', 'AMG 014', 'AMG 015'][i]);
+    const photo = dialog.locator('.fleet-expanded img');
+    await expect.poll(() => photo.evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
+    const original = await photo.getAttribute('src');
+    if (i < 4) {
+      await dialog.getByRole('button', { name: 'Następne ujęcie', exact: true }).click();
+      await expect(photo).not.toHaveAttribute('src', original);
+      await expect.poll(() => photo.evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
+      await expect(dialog.locator('figcaption')).toContainText('2 / 2');
+      await expect(dialog.getByRole('button', { name: 'Następne ujęcie', exact: true })).toBeFocused();
+      await dialog.getByRole('button', { name: 'Następne ujęcie', exact: true }).click();
+      await expect(photo).toHaveAttribute('src', original);
+      await dialog.getByRole('button', { name: 'Poprzednie ujęcie', exact: true }).click();
+      await expect(dialog.locator('figcaption')).toContainText('2 / 2');
+    } else await expect(dialog.locator('.fleet-gallery-controls')).toHaveCount(0);
+    expect(await dialog.evaluate(el => el.scrollWidth)).toBeLessThanOrEqual(page.viewportSize().width);
+    await page.keyboard.press('Escape');
+    await expect(dialog).not.toBeVisible();
+    await expect(trigger).toBeFocused();
+  }
+  await page.getByRole('button', { name: 'Kontakt z AMG', exact: true }).click();
+  await expect(page.getByRole('dialog')).not.toHaveClass(/fleet-dialog/);
+  await expect(page.getByRole('dialog')).toContainText('Jesteśmy po drodze.');
+});
+
+test('fleet navigation preserves the session and browser history', async ({ page }) => {
+  await page.goto('./#home');
+  await navigate(page, 'fleet');
+  await expect(page.locator('.fleet-card')).toHaveCount(6);
+  await navigate(page, 'orders');
+  await page.goBack();
+  await expect(page).toHaveURL(/#fleet$/);
+  await expect(page.locator('.primary-nav [data-view="fleet"]')).toHaveAttribute('aria-current', 'page');
+  await page.reload();
+  await expect(page.locator('.primary-nav [data-view="fleet"]')).toHaveAttribute('aria-current', 'page');
+  await page.locator('.account-entry').click();
+  await page.getByRole('button', { name: 'Wyloguj z konta demo', exact: true }).click();
+  await page.getByRole('button', { name: 'Flota AMG Trans', exact: true }).click();
+  await expect(page.locator('.primary-nav')).toHaveCount(0);
+  await expect(page.locator('.fleet-card')).toHaveCount(6);
+});
 
 test('the refreshed client home leads to the nearest operation', async ({ page }) => {
   await page.goto('./#home');
@@ -663,9 +743,9 @@ test('reward categories, detail and temporary goal selection', async ({ page }) 
   await expect(cards.filter({ hasText: 'Słuchawki bezprzewodowe' }).locator('.goal-label')).toHaveText('Twój cel');
 });
 
-test('the four primary tabs remain available and rewards have their own subnavigation', async ({ page }) => {
+test('the five primary tabs remain available and rewards have their own subnavigation', async ({ page }) => {
   await page.goto('./#home');
-  for (const view of ['home', 'orders', 'invoices', 'rewards']) {
+  for (const view of ['home', 'orders', 'invoices', 'rewards', 'fleet']) {
     const tab = page.locator(`.primary-nav [data-view="${view}"]`);
     await expect(tab).toBeVisible();
     await navigate(page, view);
@@ -689,7 +769,7 @@ test('the four primary tabs remain available and rewards have their own subnavig
 
 test('account services remain reachable without a duplicated more menu', async ({ page }) => {
   await page.goto('./#documents');
-  await expect(page.locator('.primary-nav button')).toHaveCount(4);
+  await expect(page.locator('.primary-nav button')).toHaveCount(5);
   await expect(page.locator('.primary-nav [data-view="more"]')).toHaveCount(0);
   await expect(page.locator('.service-trail')).toHaveCount(0);
   await expect(page).toHaveURL(/#documents$/);
@@ -731,11 +811,11 @@ test('account services remain reachable without a duplicated more menu', async (
   await expect(faq).toContainText('bibliotece Dokumenty');
 });
 
-test('the retired more route opens Start without restoring a fifth menu item', async ({ page }) => {
+test('the retired more route opens Start without restoring its menu item', async ({ page }) => {
   await page.goto('./#more');
   await expect(page).toHaveURL(/#more$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dzień dobry, Firma przykładowa.');
-  await expect(page.locator('.primary-nav button')).toHaveCount(4);
+  await expect(page.locator('.primary-nav button')).toHaveCount(5);
   await expect(page.locator('.primary-nav [data-view="more"],.hub-page')).toHaveCount(0);
   await expect(page.locator('.primary-nav [data-view="home"]')).toHaveAttribute('aria-current', 'page');
 });
